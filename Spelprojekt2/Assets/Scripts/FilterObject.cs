@@ -43,7 +43,7 @@ public class FilterObject : MonoBehaviour
 
         if(m_rb != null)
         {
-            m_rb.Sleep();
+            m_rb.isKinematic = true;
         }
     }
 
@@ -57,7 +57,7 @@ public class FilterObject : MonoBehaviour
 
         if(m_rb != null)
         {
-            m_rb.WakeUp();
+            m_rb.isKinematic = false;
         }
     }
 }
