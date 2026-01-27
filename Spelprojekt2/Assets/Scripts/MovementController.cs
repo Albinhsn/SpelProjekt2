@@ -14,6 +14,9 @@ public class MovementController : MonoBehaviour
     [SerializeField]
     private InputActionReference m_movementAction;
 
+    [SerializeField] 
+    private InputActionReference m_lookAction;
+
     [SerializeField]
     private InputActionReference m_jumpAction;
 
@@ -36,7 +39,8 @@ public class MovementController : MonoBehaviour
     
     void Update()
     {
-        this.transform.Rotate(0, Input.mousePositionDelta.x * m_mouseSensitivity, 0);
+        Vector2 input   = m_lookAction.action.ReadValue<Vector2>();
+        this.transform.Rotate(0, input.x * m_mouseSensitivity, 0);
         if(m_jumpAction.action.WasPressedThisFrame() && !m_isJumping)
         {
             m_rb.linearVelocity += new Vector3(0, m_jumpSpeed, 0);
