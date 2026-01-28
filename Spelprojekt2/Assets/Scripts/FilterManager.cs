@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +20,12 @@ public class FilterManager : MonoBehaviour
 {
     [SerializeField]
     private FilterManagerData m_actionData;
+    [SerializeField]
+    private UnityEvent<FilterKind, bool> m_filterChanged;
 
-    private int m_activeIndex = -1;
+    private FilterKind m_activeFilter = FilterKind.None;
     public List<List<FilterObject>> m_objects;
+
 
     public void SetCollisionEnterWithFilter(FilterKind kind)
     {
@@ -75,9 +79,9 @@ public class FilterManager : MonoBehaviour
     private bool CanDeactivateCurrentFilter()
     {
         bool result = true;
-        if(m_activeIndex != -1)
+        if(m_activeFilter != FilterKind.None)
         {
-            result = m_actionData.m_actions[m_activeIndex].colliding_with_count == 0;
+            result = m_actionData.m_actions[(int)m_activeFilter].colliding_with_count == 0;
         }
         return result;
     }
@@ -92,11 +96,20 @@ public class FilterManager : MonoBehaviour
             {
                 if(actions[i].action.action.WasPressedThisFrame())
                 {
+                    // ah: broadcast event
+                    // HACK(ah): Currently player at least relies on this happening before 
+                    // activating/deactivating objects. Because both rely on setting 
+                    // _isKinematic_ to either true/false. So correct behaviour is 
+                    // to set it to true (which activating does afterwards)
+                    bool activating       = m_activeFilter != (FilterKind)i;
+                    FilterKind new_filter = (FilterKind)i;
+                    this.m_filterChanged?.Invoke(new_filter, activating);
+
                     // ah: activate objects
                     List<FilterObject> objects = m_objects[i];
                     for(int j = 0; j < objects.Count; j++)
                     {
-                        if(m_activeIndex != i)
+                        if(activating)
                         {
                             objects[j].Activate();
                         }
@@ -107,22 +120,24 @@ public class FilterManager : MonoBehaviour
                     }
 
                     // ah: Change active index
-                    if(m_activeIndex != i)
+                    if(activating)
                     {
-                        if(m_activeIndex != -1)
+                        if(m_activeFilter != FilterKind.None)
                         {
-                            List<FilterObject> current_objects = m_objects[m_activeIndex];
+                            List<FilterObject> current_objects = m_objects[(int)m_activeFilter];
                             for(int j = 0; j < current_objects.Count; j++)
                             {
                                 current_objects[j].Deactivate();
                             }
                         }
-                        m_activeIndex = i;
+                        m_activeFilter = (FilterKind)i;
                     }
                     else
                     {
-                        m_activeIndex = -1;
+                        m_activeFilter = FilterKind.None;
                     }
+
+
                 }
             }
         }

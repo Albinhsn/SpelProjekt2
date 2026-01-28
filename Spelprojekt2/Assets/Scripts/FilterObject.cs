@@ -6,6 +6,7 @@ public enum FilterKind
     Red,
     Blue,
     COUNT,
+    None,
 }
 
 [RequireComponent(typeof(MeshRenderer), typeof(Collider))]
