@@ -55,7 +55,7 @@ public class Door : MonoBehaviour
     // HACK(ah): This is a reaaaaly big hack but for now i'm out of ideas
     private bool IsNotFiltered()
     {
-        return m_collider.enabled;
+        return !m_collider.isTrigger;
     }
 
     void Update()
