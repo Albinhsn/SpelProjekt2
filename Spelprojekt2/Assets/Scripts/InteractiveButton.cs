@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-public class Button : MonoBehaviour
+public class InteractiveButton : MonoBehaviour
 {
     [SerializeField]
     private UnityEvent m_onClick;
