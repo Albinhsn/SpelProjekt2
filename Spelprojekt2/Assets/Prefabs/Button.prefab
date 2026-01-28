@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 414538882327898792}
   - component: {fileID: 3780249470044012740}
   - component: {fileID: 5220449084166343108}
-  - component: {fileID: 7523852936810165899}
+  - component: {fileID: 7966677519516888000}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -197,7 +197,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &7523852936810165899
+--- !u!114 &7966677519516888000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -206,39 +206,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 3763186437236855838}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7ef69441941d594a804164538b8625f, type: 3}
+  m_Script: {fileID: 11500000, guid: 17cf1cfcb21a9e3828f297e23f1129bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_onClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Door, Assembly-CSharp
-        m_MethodName: Open
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_onRelease:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Door, Assembly-CSharp
-        m_MethodName: Close
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &6427415748472086656
 GameObject:
   m_ObjectHideFlags: 0
