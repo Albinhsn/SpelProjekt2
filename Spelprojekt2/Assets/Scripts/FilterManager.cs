@@ -74,6 +74,19 @@ public class FilterManager : MonoBehaviour
             }
         }
 
+        // ah: Find player and add to events
+        Player player = Object.FindFirstObjectByType<Player>();
+        if(player != null)
+        {
+            player.m_onTriggerEnterWithFilter.AddListener(SetCollisionEnterWithFilter);
+            player.m_onTriggerLeaveWithFilter.AddListener(SetCollisionLeaveWithFilter);
+            this.m_filterChanged.AddListener(player.DropItemIfPickedupItemIsFiltered);
+        }
+        else
+        {
+            Debug.LogWarning("Couldn't find player when creating filter manager");
+        }
+
     }
 
     private bool CanDeactivateCurrentFilter()

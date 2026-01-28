@@ -21,7 +21,7 @@ public class Door : MonoBehaviour
 
     private Collider m_collider;
 
-    void Awake()
+    void Start()
     {
         m_closePosition = this.transform.position;
         m_collider      = GetComponent<Collider>();

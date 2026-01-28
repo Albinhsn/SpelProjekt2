@@ -16,13 +16,12 @@ public class Player : MonoBehaviour
     private Collider m_collider;
     private const int MAX_NUMBER_OF_RAYS = 3;
 
-
     [Header("Filter events")]
     [SerializeField]
-    private UnityEvent<FilterKind> m_onTriggerEnterWithFilter;
+    public UnityEvent<FilterKind> m_onTriggerEnterWithFilter;
 
     [SerializeField]
-    private UnityEvent<FilterKind> m_onTriggerLeaveWithFilter;
+    public UnityEvent<FilterKind> m_onTriggerLeaveWithFilter;
 
 
     private int TagIsFilter(string tag)
@@ -127,7 +126,6 @@ public class Player : MonoBehaviour
                     int pickable_mask = LayerMask.GetMask("Pickable");
                     if(hit.distance < m_maxPickupDistance)
                     {
-                        // ah: check if item is filtered already
                         bool is_pickable = ((1 << hit.transform.gameObject.layer) & pickable_mask) != 0;
 
                         bool is_not_filtered = true;
