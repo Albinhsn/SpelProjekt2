@@ -37,8 +37,11 @@ public class FilterObject : MonoBehaviour
 
         if(m_collider != null)
         {
-            // NOTE(ah): This should probably just exclude a layer instead?
-            m_collider.enabled = false;
+            // NOTE(ah): We can't turn off collision entirely because we need to
+            // still know whether we're colliding with the object to avoid turning
+            // off a filter while inside an object of that type (say player standing
+            // inside it).
+            m_collider.isTrigger = true;
         }
 
         if(m_rb != null)
@@ -52,7 +55,7 @@ public class FilterObject : MonoBehaviour
         m_renderer.material = m_deactivatedMaterial;
         if(m_collider != null)
         {
-            m_collider.enabled = true;
+            m_collider.isTrigger = false;
         }
 
         if(m_rb != null)
