@@ -127,7 +127,17 @@ public class Player : MonoBehaviour
                     int pickable_mask = LayerMask.GetMask("Pickable");
                     if(hit.distance < m_maxPickupDistance)
                     {
-                        if(((1 << hit.transform.gameObject.layer) & pickable_mask) != 0)
+                        // ah: check if item is filtered already
+                        bool is_pickable = ((1 << hit.transform.gameObject.layer) & pickable_mask) != 0;
+
+                        bool is_not_filtered = true;
+                        FilterObject filter_object = hit.transform.gameObject.GetComponent<FilterObject>();
+                        if(filter_object != null)
+                        {
+                            is_not_filtered = !filter_object.Activated;
+                        }
+
+                        if(is_pickable && is_not_filtered)
                         {
                             // ah: pick up the item
                             pickedup_item = hit.transform;

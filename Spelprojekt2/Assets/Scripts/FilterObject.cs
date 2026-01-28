@@ -19,6 +19,8 @@ public class FilterObject : MonoBehaviour
     [SerializeField]
     private Material m_activatedMaterial;
 
+    public bool Activated => m_activated;
+    private bool m_activated;
     private MeshRenderer m_renderer;
     private Collider m_collider;
     private Rigidbody m_rb;
@@ -35,6 +37,7 @@ public class FilterObject : MonoBehaviour
     public void Activate()
     {
         m_renderer.material = m_activatedMaterial;
+        m_activated = true;
 
         if(m_collider != null)
         {
@@ -53,6 +56,7 @@ public class FilterObject : MonoBehaviour
 
     public void Deactivate()
     {
+        m_activated = false;
         m_renderer.material = m_deactivatedMaterial;
         if(m_collider != null)
         {
