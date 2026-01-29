@@ -8,12 +8,12 @@ using System.Linq;
 public struct FilterAction
 {
     // NOTE(ah): _kind_ is redundant, can be infered by the index
-    public FilterKind kind;
-    public InputActionReference action;
+    public FilterKind m_kind;
+    public InputActionReference m_action;
     // NOTE(ah): This needs to be an int because if we collide with 2 red filtered
     // objects it will basically be a raise condition if it's a bool. So instead
     // we just ref count it
-    public int colliding_with_count;
+    public int m_collidingWithCount;
 }
 
 public class FilterManager : MonoBehaviour
@@ -39,7 +39,7 @@ public class FilterManager : MonoBehaviour
             FilterAction[] actions = m_actionData.m_actions;
             for(int i = 0; i < actions.Length; i++)
             {
-                actions[i].action.action.Enable();
+                actions[i].m_action.action.Enable();
             }
         }
     }
@@ -49,19 +49,19 @@ public class FilterManager : MonoBehaviour
         bool result = true;
         if(m_activeFilter != FilterKind.None)
         {
-            result = m_actionData.m_actions[(int)m_activeFilter].colliding_with_count == 0;
+            result = m_actionData.m_actions[(int)m_activeFilter].m_collidingWithCount == 0;
         }
         return result;
     }
 
     public void SetCollisionEnterWithFilter(FilterKind kind)
     {
-        m_actionData.m_actions[(int)kind].colliding_with_count++;
+        m_actionData.m_actions[(int)kind].m_collidingWithCount++;
     }
 
     public void SetCollisionLeaveWithFilter(FilterKind kind)
     {
-        m_actionData.m_actions[(int)kind].colliding_with_count--;
+        m_actionData.m_actions[(int)kind].m_collidingWithCount--;
     }
 
     void Update()
@@ -72,7 +72,7 @@ public class FilterManager : MonoBehaviour
             FilterAction[] actions = m_actionData.m_actions;
             for(int i = 0; i < actions.Length; i++)
             {
-                if(actions[i].action.action.WasPressedThisFrame())
+                if(actions[i].m_action.action.WasPressedThisFrame())
                 {
                     // ah: broadcast event
                     // HACK(ah): Currently player at least relies on this happening before 

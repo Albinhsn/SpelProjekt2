@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static LinAlg.LinAlg;
 
 [RequireComponent(typeof(Rigidbody))]
 public class MovementController : MonoBehaviour
@@ -46,17 +47,6 @@ public class MovementController : MonoBehaviour
             m_rb.linearVelocity += new Vector3(0, m_jumpSpeed, 0);
             m_isJumping = true;
         }
-    }
-
-    // TODO(ah): Does this exist elsewhere or hoist to some library?
-    public static Vector3 Rejection(Vector3 a, Vector3 b)
-    {
-        return a - Vector3.Project(a, b);
-    }
-
-    public static Vector3 Hadamard(Vector3 a, Vector3 b)
-    {
-        return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
     }
 
     void FixedUpdate()

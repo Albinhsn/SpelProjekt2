@@ -42,7 +42,7 @@ public class FilterManagerEditor : Editor
             SerializedProperty element = actions.GetArrayElementAtIndex(i);
             EditorGUILayout.PropertyField(element.FindPropertyRelative("action"), false);
 
-            obj.m_actions[i].kind   = kind;
+            obj.m_actions[i].m_kind   = kind;
 
         }
         serializedObj.ApplyModifiedProperties();

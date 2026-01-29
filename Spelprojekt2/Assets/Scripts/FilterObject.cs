@@ -25,6 +25,18 @@ public class FilterObject : MonoBehaviour
     private Collider m_collider;
     private Rigidbody m_rb;
 
+    public static int TagIsFilter(string tag)
+    {
+        for(int i = 0; i < (int)FilterKind.COUNT; i++)
+        {
+            if(tag == ((FilterKind)i).ToString())
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     void Awake()
     {
         m_renderer = GetComponent<MeshRenderer>();

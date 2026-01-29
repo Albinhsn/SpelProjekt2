@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using static LinAlg.LinAlg;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Collider))]
@@ -11,7 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float m_maxPickupDistance;
 
-    private Transform pickedup_item;
+    private Transform m_pickedupItem;
 
     private Collider m_collider;
     private const int MAX_NUMBER_OF_RAYS = 3;
@@ -24,19 +25,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private UnityEvent<FilterKind> m_onTriggerLeaveWithFilter;
 
-
-    private int TagIsFilter(string tag)
-    {
-        for(int i = 0; i < (int)FilterKind.COUNT; i++)
-        {
-            if(tag == ((FilterKind)i).ToString())
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     void Awake()
     {
         m_pickupItemAction.action.Enable();
@@ -45,7 +33,7 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        int filter_value = TagIsFilter(other.gameObject.tag);
+        int filter_value = FilterObject.TagIsFilter(other.gameObject.tag);
         if(filter_value != -1)
         {
             m_onTriggerEnterWithFilter?.Invoke((FilterKind)filter_value);
@@ -54,7 +42,7 @@ public class Player : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        int filter_value = TagIsFilter(other.gameObject.tag);
+        int filter_value = FilterObject.TagIsFilter(other.gameObject.tag);
         if(filter_value != -1)
         {
             m_onTriggerLeaveWithFilter?.Invoke((FilterKind)filter_value);
@@ -63,9 +51,9 @@ public class Player : MonoBehaviour
 
     public void DropItemIfPickedupItemIsFiltered(FilterKind kind, bool active)
     {
-        if(active && pickedup_item != null)
+        if(active && m_pickedupItem != null)
         {
-            if(pickedup_item.tag == kind.ToString())
+            if(m_pickedupItem.tag == kind.ToString())
             {
                 DropItem();
             }
@@ -75,15 +63,15 @@ public class Player : MonoBehaviour
     void DropItem()
     {
         // ah: drop item
-        pickedup_item.SetParent(null);
+        m_pickedupItem.SetParent(null);
 
-        Rigidbody rb = pickedup_item.gameObject.GetComponent<Rigidbody>();
+        Rigidbody rb = m_pickedupItem.gameObject.GetComponent<Rigidbody>();
         if(rb != null)
         {
             rb.isKinematic = false;
         }
 
-        pickedup_item = null;
+        m_pickedupItem = null;
     }
 
     struct RaycastResult
@@ -105,7 +93,7 @@ public class Player : MonoBehaviour
     void PickupItem()
     {
 
-        if(pickedup_item != null)
+        if(m_pickedupItem != null)
         {
             DropItem();
         }
@@ -140,7 +128,7 @@ public class Player : MonoBehaviour
                         if(is_pickable && is_not_filtered)
                         {
                             // ah: pick up the item
-                            pickedup_item = hit.transform;
+                            m_pickedupItem = hit.transform;
 
                             // ah: transform the item to be infront of the player
                             Bounds hit_bounds = hit.collider.bounds;
@@ -148,7 +136,7 @@ public class Player : MonoBehaviour
                             Vector3 epsilon = new Vector3(0.1f, 0, 0.1f);
                             Vector3 offset = hit_bounds.extents + player_bounds.extents + epsilon;
                             offset.y = 0;
-                            hit.transform.position = this.transform.position + MovementController.Hadamard(offset, this.transform.forward);
+                            hit.transform.position = this.transform.position + Hadamard(offset, this.transform.forward);
                             hit.transform.rotation = this.transform.rotation;
                             hit.transform.SetParent(this.transform);
 
