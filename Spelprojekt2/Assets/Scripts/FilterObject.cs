@@ -14,16 +14,15 @@ public class FilterObject : MonoBehaviour
 {
     public FilterKind m_kind;
 
-    [SerializeField]
-    private Material m_deactivatedMaterial;
-    [SerializeField]
-    private Material m_activatedMaterial;
-
     public bool Activated => m_activated;
     private bool m_activated;
     private MeshRenderer m_renderer;
     private Collider m_collider;
     private Rigidbody m_rb;
+
+    private Material m_deactivatedMaterial;
+    private Material m_activatedMaterial;
+
 
     public static int TagIsFilter(string tag)
     {
@@ -39,11 +38,18 @@ public class FilterObject : MonoBehaviour
 
     void Awake()
     {
+
+        FilterMaterialData material_data = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
+        this.m_deactivatedMaterial = material_data.m_materials[(int)m_kind].m_deactivatedMaterial;
+        this.m_activatedMaterial   = material_data.m_materials[(int)m_kind].m_activatedMaterial;
+
+
         m_renderer = GetComponent<MeshRenderer>();
         m_collider = GetComponent<Collider>();
         m_rb       = GetComponent<Rigidbody>();
 
         m_renderer.material = m_deactivatedMaterial;
+
 
         this.gameObject.tag = this.m_kind.ToString();
     }
