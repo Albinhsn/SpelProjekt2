@@ -32,6 +32,8 @@ public class FilterObject : MonoBehaviour
         m_rb       = GetComponent<Rigidbody>();
 
         m_renderer.material = m_deactivatedMaterial;
+
+        this.gameObject.tag = this.m_kind.ToString();
     }
 
     public void Activate()

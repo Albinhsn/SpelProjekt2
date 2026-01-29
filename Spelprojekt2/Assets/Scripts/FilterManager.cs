@@ -20,50 +20,19 @@ public class FilterManager : MonoBehaviour
 {
     [SerializeField]
     private FilterManagerData m_actionData;
+
     [SerializeField]
     private UnityEvent<FilterKind, bool> m_filterChanged;
 
-    private FilterKind m_activeFilter = FilterKind.None;
-    public List<List<FilterObject>> m_objects;
+    public static FilterKind m_activeFilter = FilterKind.None;
 
-
-    public void SetCollisionEnterWithFilter(FilterKind kind)
+    void OnEnable()
     {
-        m_actionData.m_actions[(int)kind].colliding_with_count++;
+        Awake();
     }
 
-    public void SetCollisionLeaveWithFilter(FilterKind kind)
+    void Awake()
     {
-        m_actionData.m_actions[(int)kind].colliding_with_count--;
-    }
-
-    void Start()
-    {
-        // ah: Find each object that has FilterObject component and sort them by type.
-        //
-        // Doing this mostly to avoid having to when adding or changing an object both
-        // adding to an list of events or changing it so that a designer can just change
-        // the type and it just works.
-        m_objects              = new List<List<FilterObject>>();
-        FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
-        for(int i = 0; i < (int)FilterKind.COUNT; i++)
-        {
-            m_objects.Add(objects.Where(o => o.m_kind == (FilterKind)i).ToList());
-        }
-
-        // HACK(ah): We need to be able to not deactivate a filter if the player is colliding with
-        // an object of that filter (i.e. player standing inside say a red plane).
-        // So for now(?) just tag the filtered objects
-        for(int i = 0; i < m_objects.Count; i++)
-        {
-            List<FilterObject> filter_objects = m_objects[i];
-            string tag = ((FilterKind)i).ToString();
-            for(int j = 0; j < filter_objects.Count; j++)
-            {
-                filter_objects[j].gameObject.tag = tag;
-            }
-        }
-
         // ah: Enable all actions
         if(m_actionData.m_actions != null)
         {
@@ -73,7 +42,6 @@ public class FilterManager : MonoBehaviour
                 actions[i].action.action.Enable();
             }
         }
-
     }
 
     private bool CanDeactivateCurrentFilter()
@@ -84,6 +52,16 @@ public class FilterManager : MonoBehaviour
             result = m_actionData.m_actions[(int)m_activeFilter].colliding_with_count == 0;
         }
         return result;
+    }
+
+    public void SetCollisionEnterWithFilter(FilterKind kind)
+    {
+        m_actionData.m_actions[(int)kind].colliding_with_count++;
+    }
+
+    public void SetCollisionLeaveWithFilter(FilterKind kind)
+    {
+        m_actionData.m_actions[(int)kind].colliding_with_count--;
     }
 
     void Update()
@@ -106,16 +84,19 @@ public class FilterManager : MonoBehaviour
                     this.m_filterChanged?.Invoke(new_filter, activating);
 
                     // ah: activate objects
-                    List<FilterObject> objects = m_objects[i];
-                    for(int j = 0; j < objects.Count; j++)
+                    FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
+                    for(int j = 0; j < objects.Length; j++)
                     {
-                        if(activating)
+                        if(objects[j].m_kind == new_filter)
                         {
-                            objects[j].Activate();
-                        }
-                        else
-                        {
-                            objects[j].Deactivate();
+                            if(activating)
+                            {
+                                objects[j].Activate();
+                            }
+                            else
+                            {
+                                objects[j].Deactivate();
+                            }
                         }
                     }
 
@@ -124,10 +105,12 @@ public class FilterManager : MonoBehaviour
                     {
                         if(m_activeFilter != FilterKind.None)
                         {
-                            List<FilterObject> current_objects = m_objects[(int)m_activeFilter];
-                            for(int j = 0; j < current_objects.Count; j++)
+                            for(int j = 0; j < objects.Length; j++)
                             {
-                                current_objects[j].Deactivate();
+                                if(objects[j].m_kind == m_activeFilter)
+                                {
+                                    objects[j].Deactivate();
+                                }
                             }
                         }
                         m_activeFilter = (FilterKind)i;
