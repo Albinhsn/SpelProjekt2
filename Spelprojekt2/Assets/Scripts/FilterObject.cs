@@ -38,11 +38,10 @@ public class FilterObject : MonoBehaviour
 
     void Awake()
     {
-       FilterMaterialData material_data = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
-       this.m_deactivatedMaterial = material_data.m_materials[(int)m_kind].m_deactivatedMaterial;
-       this.m_activatedMaterial   = material_data.m_materials[(int)m_kind].m_activatedMaterial;
-        // 
-       
+
+        FilterMaterialData material_data = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
+        this.m_deactivatedMaterial = material_data.m_materials[(int)m_kind].m_deactivatedMaterial;
+        this.m_activatedMaterial   = material_data.m_materials[(int)m_kind].m_activatedMaterial;
 
 
         m_renderer = GetComponent<MeshRenderer>();
