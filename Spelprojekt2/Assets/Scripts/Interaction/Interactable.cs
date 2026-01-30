@@ -9,10 +9,13 @@ namespace Interaction
     {
         [SerializeField] private InstanceSet m_interactableSet;
         [SerializeField] private bool m_active = true;
+        [SerializeField] private bool m_requireUninteract = false;
         [SerializeField] private UnityEvent<Interactor> m_onInteraction;
-        [SerializeField] private UnityEvent<bool> m_highlight;
+        [SerializeField] private UnityEvent<bool> m_toggleHighlighted;
         
         public Vector3 position => transform.position;
+
+        public bool requireUninteract => m_requireUninteract;
 
 
         private void OnEnable()
@@ -27,11 +30,11 @@ namespace Interaction
         
         public void Interact(Interactor interactor)
         {
-            Debug.Log($"Interacted with {gameObject.name}");
+            Debug.Log($"{interactor.gameObject.name} interacted with {gameObject.name}");
             m_onInteraction.Invoke(interactor);
         }
 
-        public void SetHighlighted(bool highlight) => m_highlight.Invoke(highlight);
+        public void SetHighlighted(bool highlight) => m_toggleHighlighted.Invoke(highlight);
 
         public void SetActive(bool active)
         {

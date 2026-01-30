@@ -2,6 +2,8 @@ using System;
 using JetBrains.Annotations;
 using srUtils.Unity;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 namespace Interaction
@@ -14,18 +16,34 @@ namespace Interaction
         [SerializeField] private float m_coneFactor;
         
         [SerializeField] private InputActionReference m_interactAction;
+        [SerializeField] private UnityEvent<bool> m_toggleInteracting;
 
         [CanBeNull] private Interactable m_selected = null;
+        private bool m_interacting = false;
 
         private void Update()
         {
+            if(m_interacting) return;
             SearchFrustum();
 
             if (m_selected is not null && m_interactAction.action.WasPressedThisFrame())
             {
+                if (m_selected.requireUninteract)
+                {
+                    m_interacting = true;
+                    m_toggleInteracting.Invoke(true);
+                    m_selected.SetHighlighted(false);
+                }
                 m_selected.Interact(this);
             }
             
+        }
+
+        public void CancelInteract()
+        {
+            Assert.IsTrue(m_interacting, "cancelInteract called on non-interacting interactor");
+            m_interacting = false;
+            m_toggleInteracting.Invoke(false);
         }
 
         private void SearchFrustum()
