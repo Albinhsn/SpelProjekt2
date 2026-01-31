@@ -111,7 +111,8 @@ namespace AudioKit.FMOD
 
         private float GetSpeed(Vector3 delta)
         {
-            if (rb != null) return rb.linearVelocity.magnitude;
+			// Unity API: Rigidbody har velocity (linearVelocity finns inte i de flesta versioner)
+			if (rb != null) return rb.linearVelocity.magnitude;
             if (cc != null) return cc.velocity.magnitude;
             return delta.magnitude / Mathf.Max(0.0001f, Time.deltaTime);
         }

@@ -50,7 +50,7 @@ namespace AudioKit.FMOD
             cue.EnsureSampleDataLoaded();
 
             var inst = RuntimeManager.CreateInstance(cue.evt);
-            RuntimeManager.AttachInstanceToGameObject(inst, target, target.GetComponent<Rigidbody>());
+            RuntimeManager.AttachInstanceToGameObject(inst, target.gameObject, target.GetComponent<Rigidbody>());
             if (start) inst.start();
             return inst;
         }

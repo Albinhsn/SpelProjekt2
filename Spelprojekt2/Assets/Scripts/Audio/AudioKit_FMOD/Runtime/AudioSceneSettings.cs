@@ -1,11 +1,9 @@
 using UnityEngine;
 using FMODUnity;
 
-// AudioKit anteckning
 // Sätter audio-läge när scenen laddar
 // Bra för hub och världar
 // Kan även återställa vid exit
-
 
 namespace AudioKit.FMOD
 {
@@ -52,38 +50,60 @@ namespace AudioKit.FMOD
                 if (a == null) continue;
                 if (string.IsNullOrEmpty(a.bankName)) continue;
 
-                if (a.load) FMODUnity.RuntimeManager.LoadBank(a.bankName, a.loadSampleData);
-                else FMODUnity.RuntimeManager.UnloadBank(a.bankName);
+                if (a.load) RuntimeManager.LoadBank(a.bankName, a.loadSampleData);
+                else RuntimeManager.UnloadBank(a.bankName);
             }
         }
 
         private void ApplyEvents()
         {
             if (eventActions == null) return;
-            if (AudioEventHub.I == null) return;
+
+            // Kör actions även om hubben inte är redo ännu.
+            // PlayOneShotCue kan hanteras av SfxDirector utan AudioEventHub.
+            var pos = GetDefaultPos();
 
             for (int i = 0; i < eventActions.Length; i++)
-                RunAction(eventActions[i]);
+                RunAction(eventActions[i], pos);
         }
 
-        private static void RunAction(AudioEventAction a)
+        private static Vector3 GetDefaultPos()
+        {
+            var cam = Camera.main;
+            if (cam != null) return cam.transform.position;
+
+            var listener = AudioUnityFind.FindAny<AudioListener>(true);
+            if (listener != null) return listener.transform.position;
+
+            return Vector3.zero;
+        }
+
+        private static void RunAction(AudioEventAction a, Vector3 pos)
         {
             if (a == null) return;
 
             if (a.actionType == AudioActionType.PlayOneShotCue)
             {
-                if (SfxDirector.I != null && a.cue != null)
+                if (a.cue == null) return;
+
+                // Primärt: SfxDirector (hanterar cooldown + cue.is2D + sampledata)
+                if (SfxDirector.I != null)
                 {
-                    SfxDirector.I.PlayCue(a.cue, Vector3.zero);
+                    SfxDirector.I.PlayCue(a.cue, pos);
                     return;
                 }
 
-                if (AudioEventHub.I != null && a.cue != null)
-                    AudioEventHub.I.PlayOneShot(a.cue.evt, Vector3.zero, a.cueIs2D);
+                // Fallback: AudioEventHub
+                if (AudioEventHub.I != null)
+                {
+                    var is2D = a.cueIs2D || a.cue.is2D;
+                    AudioEventHub.I.PlayOneShot(a.cue.evt, pos, is2D);
+                }
 
                 return;
             }
 
+            // Resten kräver hub
             if (AudioEventHub.I == null) return;
 
             if (a.actionType == AudioActionType.PlayEvent)
@@ -93,10 +113,16 @@ namespace AudioKit.FMOD
                 AudioEventHub.I.Stop(a.eventId, a.allowFadeout);
 
             else if (a.actionType == AudioActionType.SetEventParameter)
-                AudioEventHub.I.SetEventParam(a.eventId, a.parameterName, a.parameterValue);
+            {
+                var pName = (a.parameter != null && a.parameter.IsValid) ? a.parameter.fmodName : a.parameterName;
+                AudioEventHub.I.SetEventParam(a.eventId, pName, a.parameterValue);
+            }
 
             else if (a.actionType == AudioActionType.SetGlobalParameter)
-                AudioEventHub.I.SetGlobalParam(a.parameterName, a.parameterValue);
+            {
+                var pName = (a.parameter != null && a.parameter.IsValid) ? a.parameter.fmodName : a.parameterName;
+                AudioEventHub.I.SetGlobalParam(pName, a.parameterValue);
+            }
         }
     }
 }

@@ -13,6 +13,8 @@ namespace AudioKit.FMOD
     {
         [Header("Parameter")]
         [SerializeField] private string parameterName = "ApproachDistance";
+        [Tooltip("Valfritt: använd en AudioParameterSO istället för att skriva namn.")] 
+        [SerializeField] private AudioParameterSO parameter;
         [SerializeField] private bool setAsGlobalParameter = true;
 
         [Header("Event")]
@@ -31,7 +33,8 @@ namespace AudioKit.FMOD
             if (player == null) return;
             if (startPoint == null) return;
             if (endPoint == null) return;
-            if (string.IsNullOrEmpty(parameterName)) return;
+            var pName = (parameter != null && parameter.IsValid) ? parameter.fmodName : parameterName;
+            if (string.IsNullOrEmpty(pName)) return;
 
             float distAB = Vector3.Distance(startPoint.position, endPoint.position);
             if (distAB <= 0.001f) return;
@@ -41,12 +44,12 @@ namespace AudioKit.FMOD
 
             if (setAsGlobalParameter)
             {
-                if (AudioSystem.I != null) AudioSystem.I.SetGlobalParam(parameterName, t);
-                else if (AudioEventHub.I != null) AudioEventHub.I.SetGlobalParam(parameterName, t);
+                if (AudioSystem.I != null) AudioSystem.I.SetGlobalParam(pName, t);
+                else if (AudioEventHub.I != null) AudioEventHub.I.SetGlobalParam(pName, t);
             }
 
             if (alsoSetOnEventInstance && AudioEventHub.I != null)
-                AudioEventHub.I.SetEventParam(eventIdToAlsoSet, parameterName, t);
+                AudioEventHub.I.SetEventParam(eventIdToAlsoSet, pName, t);
         }
     }
 }

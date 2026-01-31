@@ -1,11 +1,9 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-// AudioKit anteckning
 // Trigger som kör en AudioActions-lista
 // Bra för zoner, portar och cutscenes
-// Kräver Player-tag
-
+// Kräver Player-tag (eller tag på root/rigidbody)
 
 namespace AudioKit.FMOD
 {
@@ -47,7 +45,9 @@ namespace AudioKit.FMOD
 
         private bool IsActivator(Collider other)
         {
-            if (!string.IsNullOrEmpty(activatorTag) && !other.CompareTag(activatorTag))
+            if (other == null) return false;
+
+            if (!string.IsNullOrEmpty(activatorTag) && !HasTag(other, activatorTag))
                 return false;
 
             if (activatorLayers != (activatorLayers | (1 << other.gameObject.layer)))
@@ -56,28 +56,53 @@ namespace AudioKit.FMOD
             return true;
         }
 
+        private static bool HasTag(Collider other, string tag)
+        {
+            if (other.CompareTag(tag)) return true;
+
+            var rb = other.attachedRigidbody;
+            if (rb != null && rb.CompareTag(tag)) return true;
+
+            var root = other.transform.root;
+            if (root != null && root.CompareTag(tag)) return true;
+
+            return false;
+        }
+
         public void Run()
         {
+            var pos = transform.position;
+
             if (actions != null)
             {
                 for (int i = 0; i < actions.Length; i++)
-                    AudioSceneSettings_RunAction(actions[i]);
+                    RunAction(actions[i], pos);
             }
 
             onTriggered?.Invoke();
         }
 
-        private static void AudioSceneSettings_RunAction(AudioEventAction a)
+        private static void RunAction(AudioEventAction a, Vector3 pos)
         {
             if (a == null) return;
 
             if (a.actionType == AudioActionType.PlayOneShotCue)
             {
-                if (SfxDirector.I != null && a.cue != null)
-                    SfxDirector.I.PlayCue(a.cue, Vector3.zero);
+                if (a.cue == null) return;
 
-                else if (AudioEventHub.I != null && a.cue != null)
-                    AudioEventHub.I.PlayOneShot(a.cue.evt, Vector3.zero, a.cueIs2D);
+                // SfxDirector använder cue.is2D automatiskt
+                if (SfxDirector.I != null)
+                {
+                    SfxDirector.I.PlayCue(a.cue, pos);
+                    return;
+                }
+
+                // Fallback: AudioEventHub one-shot
+                if (AudioEventHub.I != null)
+                {
+                    var is2D = a.cueIs2D || a.cue.is2D;
+                    AudioEventHub.I.PlayOneShot(a.cue.evt, pos, is2D);
+                }
 
                 return;
             }
@@ -91,10 +116,16 @@ namespace AudioKit.FMOD
                 AudioEventHub.I.Stop(a.eventId, a.allowFadeout);
 
             else if (a.actionType == AudioActionType.SetEventParameter)
-                AudioEventHub.I.SetEventParam(a.eventId, a.parameterName, a.parameterValue);
+            {
+                var pName = (a.parameter != null && a.parameter.IsValid) ? a.parameter.fmodName : a.parameterName;
+                AudioEventHub.I.SetEventParam(a.eventId, pName, a.parameterValue);
+            }
 
             else if (a.actionType == AudioActionType.SetGlobalParameter)
-                AudioEventHub.I.SetGlobalParam(a.parameterName, a.parameterValue);
+            {
+                var pName = (a.parameter != null && a.parameter.IsValid) ? a.parameter.fmodName : a.parameterName;
+                AudioEventHub.I.SetGlobalParam(pName, a.parameterValue);
+            }
         }
     }
 }

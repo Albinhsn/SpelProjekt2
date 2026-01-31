@@ -2,22 +2,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using FMODUnity;
 
-// AudioKit anteckning
+
 // Laddar banker vid start
 // Bra för builds och streaming
-// Kan stängas av om ni inte vill
-
+// OBS: använd bank-NAMN som FMOD Unity känner igen (t.ex. "Master", "Music", "SFX")
 
 namespace AudioKit.FMOD
 {
     [DisallowMultipleComponent]
     public sealed class FmodBankLoader : MonoBehaviour
     {
-        [SerializeField] private string[] bankNames = new string[0];
+        [SerializeField] private string[] bankNames = System.Array.Empty<string>();
         [SerializeField] private bool loadOnStart = true;
+        [SerializeField] private bool unloadOnDestroy = true;
+        [SerializeField] private bool loadSampleData;
 
-        private readonly List<global::FMOD.Studio.Bank> loaded = new List<global::FMOD.Studio.Bank>(8);
-
+        private readonly HashSet<string> loaded = new HashSet<string>();
 
         private void Start()
         {
@@ -26,7 +26,7 @@ namespace AudioKit.FMOD
 
         private void OnDestroy()
         {
-            UnloadBanks();
+            if (unloadOnDestroy) UnloadBanks();
         }
 
         public void LoadBanks()
@@ -38,19 +38,15 @@ namespace AudioKit.FMOD
                 var name = bankNames[i];
                 if (string.IsNullOrEmpty(name)) continue;
 
-                RuntimeManager.StudioSystem.loadBankFile(
-                    name,
-                    global::FMOD.Studio.LOAD_BANK_FLAGS.NORMAL,
-                    out var bank
-                );
-
+                RuntimeManager.LoadBank(name, loadSampleData);
+                loaded.Add(name);
             }
         }
 
         public void UnloadBanks()
         {
-            for (int i = 0; i < loaded.Count; i++)
-                loaded[i].unload();
+            foreach (var name in loaded)
+                RuntimeManager.UnloadBank(name);
 
             loaded.Clear();
         }

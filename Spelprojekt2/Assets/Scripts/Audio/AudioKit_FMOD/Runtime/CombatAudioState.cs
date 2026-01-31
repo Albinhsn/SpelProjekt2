@@ -14,6 +14,12 @@ namespace AudioKit.FMOD
     {
         [SerializeField] private float exitDelay = 1.5f;
 
+        [Header("Parameter")]
+        [Tooltip("Valfritt: om satt används denna istället för cfg.combatParam.")]
+        [SerializeField] private AudioParameterSO parameter;
+        [SerializeField] private float onValue = 1f;
+        [SerializeField] private float offValue = 0f;
+
         private int tokens;
         private Coroutine exitRoutine;
 
@@ -56,7 +62,9 @@ namespace AudioKit.FMOD
             var cfg = AudioResources.Config;
             if (cfg == null) return;
 
-            AudioSystem.I.SetGlobalParam(cfg.combatParam, active ? 1f : 0f);
+            var name = (parameter != null && parameter.IsValid) ? parameter.fmodName : cfg.combatParam;
+            if (string.IsNullOrEmpty(name)) return;
+            AudioSystem.I.SetGlobalParam(name, active ? onValue : offValue);
         }
     }
 }

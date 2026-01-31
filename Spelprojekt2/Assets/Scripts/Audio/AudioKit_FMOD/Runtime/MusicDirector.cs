@@ -3,10 +3,11 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
 using FMODUnity;
-using FMOD.Studio;
+using global::FMOD.Studio;
 using AOT;
 
 using STOP_MODE = global::FMOD.Studio.STOP_MODE;
+
 // AudioKit anteckning
 // Driver huvudmusiken
 // State och layers via parametrar
@@ -31,19 +32,16 @@ namespace AudioKit.FMOD
     {
         public static CachedParam Resolve(EventInstance inst, string name)
         {
-            if (!inst.isValid()) return default(CachedParam);
-            if (string.IsNullOrEmpty(name)) return default(CachedParam);
+            if (!inst.isValid()) return default;
+            if (string.IsNullOrEmpty(name)) return default;
 
             inst.getDescription(out var desc);
-            if (!desc.isValid()) return default(CachedParam);
+            if (!desc.isValid()) return default;
 
             var res = desc.getParameterDescriptionByName(name, out var pd);
-            if (res != global::FMOD.RESULT.OK) return default(CachedParam);
+            if (res != global::FMOD.RESULT.OK) return default;
 
-            var cp = new CachedParam();
-            cp.valid = true;
-            cp.id = pd.id;
-            return cp;
+            return new CachedParam { valid = true, id = pd.id };
         }
 
         public static void Set(EventInstance inst, CachedParam p, float v)

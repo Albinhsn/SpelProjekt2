@@ -10,8 +10,6 @@ namespace AudioKit.FMOD
 {
     public sealed class EncounterEndSMB : StateMachineBehaviour
     {
-        [Header("Söknamn")]
-        [SerializeField] private string audioDriverComponentName = "EncounterMusicDriver";
 
         public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {

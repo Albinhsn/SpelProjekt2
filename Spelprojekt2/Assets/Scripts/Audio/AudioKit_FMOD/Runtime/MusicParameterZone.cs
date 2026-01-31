@@ -13,12 +13,15 @@ namespace AudioKit.FMOD
     [RequireComponent(typeof(Collider))]
     public sealed class MusicParameterZone : MonoBehaviour
     {
-        public enum ParameterMode { Known, Custom }
+        public enum ParameterMode { Known, Custom, Asset }
 
         [Header("Parameter")]
-        [SerializeField] private ParameterMode mode = ParameterMode.Custom;
+        [SerializeField] private ParameterMode mode = ParameterMode.Asset;
         [SerializeField] private KnownGlobalParam known = KnownGlobalParam.Indoor;
         [SerializeField] private string customParamName = "Indoor";
+
+        [Tooltip("Rekommenderat: använd en AudioParameterSO istället för att skriva namn.")] 
+        [SerializeField] private AudioParameterSO parameter;
 
         [Header("Värden")]
         [SerializeField] private float enterValue = 1f;
@@ -37,7 +40,7 @@ namespace AudioKit.FMOD
         private int sourceId;
         private Collider zoneCollider;
 
-        private readonly HashSet<Collider> inside = new HashSet<Collider>();
+        private readonly HashSet<int> inside = new HashSet<int>();
 
         private void Reset()
         {
@@ -81,7 +84,9 @@ namespace AudioKit.FMOD
 
                 if (zoneCollider.bounds.Intersects(pc.bounds))
                 {
-                    inside.Add(pc);
+					// inside är HashSet<int> och måste använda samma key som trigger-callbacks
+					var key = AudioActivatorUtil.GetActivatorKey(pc, requiredTag);
+					inside.Add(key);
                     Apply(true);
                     break;
                 }
@@ -105,18 +110,20 @@ namespace AudioKit.FMOD
         private void OnTriggerEnter(Collider other)
         {
             if (string.IsNullOrEmpty(requiredTag)) return;
-            if (!other.CompareTag(requiredTag)) return;
+            if (!AudioActivatorUtil.HasTag(other, requiredTag)) return;
 
-            inside.Add(other);
+            var key = AudioActivatorUtil.GetActivatorKey(other, requiredTag);
+            inside.Add(key);
             if (inside.Count == 1) Apply(true);
         }
 
         private void OnTriggerExit(Collider other)
         {
             if (string.IsNullOrEmpty(requiredTag)) return;
-            if (!other.CompareTag(requiredTag)) return;
+            if (!AudioActivatorUtil.HasTag(other, requiredTag)) return;
 
-            inside.Remove(other);
+            var key = AudioActivatorUtil.GetActivatorKey(other, requiredTag);
+            inside.Remove(key);
             if (inside.Count == 0) Apply(false);
         }
 
@@ -133,6 +140,7 @@ namespace AudioKit.FMOD
 
         private string ResolveName()
         {
+            if (mode == ParameterMode.Asset) return (parameter != null && parameter.IsValid) ? parameter.fmodName : null;
             if (mode == ParameterMode.Custom) return customParamName;
             if (AudioParameterDriver.I == null) return null;
             return AudioParameterDriver.I.Resolve(known);

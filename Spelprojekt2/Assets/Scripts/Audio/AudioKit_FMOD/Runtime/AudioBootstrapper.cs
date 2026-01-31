@@ -1,19 +1,20 @@
 using UnityEngine;
 
-// AudioKit anteckning
 // Startar ljudsystemet automatiskt
-// Slipper lägga managers i scenen
-// DontDestroy så det lever mellan scener
-
+// Kör efter första scenen laddats så vi kan undvika dubbletter
 
 namespace AudioKit.FMOD
 {
     public static class AudioBootstrapper
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Boot()
         {
-            var go = new GameObject("AudioSystem");
+            // Om någon redan lagt AudioSystem i scenen: skapa inte ett till.
+            if (AudioUnityFind.FindAny<AudioSystem>(true) != null)
+                return;
+
+            var go = new GameObject("_AudioSystem");
             Object.DontDestroyOnLoad(go);
 
             go.AddComponent<AudioSystem>();

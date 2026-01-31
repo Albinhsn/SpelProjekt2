@@ -28,7 +28,10 @@ namespace AudioKit.FMOD
         [Header("Parameter")]
         public string parameterName;
 
-        public float parameterValue;
+        
+        [Tooltip("Valfritt: om satt används denna istället för parameterName.")]
+        public AudioParameterSO parameter;
+public float parameterValue;
 
         [Header("Stop")]
         public bool allowFadeout = true;
