@@ -56,7 +56,6 @@ public class MovementController : MonoBehaviour
         {
             dir = dir.normalized;
         }
-        Debug.Log(input);
         transform.position = transform.position + m_speed * dir * Time.fixedDeltaTime;
     }
 }
