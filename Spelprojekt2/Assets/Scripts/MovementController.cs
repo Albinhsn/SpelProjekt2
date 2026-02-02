@@ -20,14 +20,29 @@ public class MovementController : MonoBehaviour
     private Rigidbody m_rb;
     private bool m_isJumping;
     private InputAction m_moveAction, m_jumpAction;
-    Transform m_cameraTransform;
+    private InputSystem_Actions m_inputActions;
+    private Transform m_cameraTransform;
 
     void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
-        m_moveAction = GetComponent<PlayerInput>().actions["Move"];
-        m_jumpAction = GetComponent<PlayerInput>().actions["Jump"];
+        // m_moveAction = GetComponent<PlayerInput>().actions["Move"];
+        // m_jumpAction = GetComponent<PlayerInput>().actions["Jump"];
+
+        
         m_cameraTransform = GetComponentInChildren<Camera>().transform;
+    }
+    void OnEnable()
+    {
+        m_inputActions = new();
+        m_moveAction = m_inputActions.Player.Move;
+        m_jumpAction = m_inputActions.Player.Jump;
+        m_inputActions.Enable();
+    }
+
+    void OnDisable()
+    {
+        m_inputActions.Disable();
     }
 
     private void OnTriggerEnter(Collider other)
