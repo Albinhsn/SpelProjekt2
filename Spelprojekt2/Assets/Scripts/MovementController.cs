@@ -50,7 +50,7 @@ public class MovementController : MonoBehaviour
     {
         // HACK(ah): Really poor movement, pls swap
         Vector3 forward = Rejection(m_cameraTransform.forward, new Vector3(0, 1, 0));
-        Vector3 right   = Rejection(transform.right, new Vector3(0, 1, 0));
+        Vector3 right   = Rejection(m_cameraTransform.right, new Vector3(0, 1, 0));
         Vector2 input   = m_moveAction.ReadValue<Vector2>();
         Vector3 dir     = forward * input.y + right * input.x;
         if(dir.sqrMagnitude > 0)
