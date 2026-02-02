@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 using static LinAlg.LinAlg;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -18,16 +19,15 @@ public class MovementController : MonoBehaviour
     private float m_mouseSensitivity;
     private Rigidbody m_rb;
     private bool m_isJumping;
-    private InputAction m_moveAction, m_lookAction, m_jumpAction;
-    [SerializeField] Transform m_cameraTransform;
+    private InputAction m_moveAction, m_jumpAction;
+    Transform m_cameraTransform;
 
     void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
         m_moveAction = GetComponent<PlayerInput>().actions["Move"];
-        // m_lookAction = GetComponent<PlayerInput>().actions["Look"];
         m_jumpAction = GetComponent<PlayerInput>().actions["Jump"];
-        // m_cameraTransform = 
+        m_cameraTransform = GetComponentInChildren<Camera>().transform;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -37,8 +37,6 @@ public class MovementController : MonoBehaviour
     
     void Update()
     {
-        // Vector2 input   = m_lookAction.ReadValue<Vector2>();
-        // transform.Rotate(0, input.x * m_mouseSensitivity, 0);
         if(m_jumpAction.WasPressedThisFrame() && !m_isJumping)
         {
             m_rb.linearVelocity += new Vector3(0, m_jumpSpeed, 0);
@@ -57,6 +55,11 @@ public class MovementController : MonoBehaviour
         {
             dir = dir.normalized;
         }
-        transform.position = transform.position + m_speed * dir * Time.fixedDeltaTime;
+
+        m_rb.linearVelocity = new Vector3(
+            dir.x * m_speed,
+            m_rb.linearVelocity.y,
+            dir.z * m_speed
+        );
     }
 }

@@ -3,24 +3,36 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] float m_additionalYAngle = 45f;
     private InputAction m_lookAction;
     float m_mouseSensitivity = 0.5f;
-    [SerializeField]Transform parent;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    float m_pitch = 0f;
+    Transform m_parent;
     void Awake()
     {
         m_lookAction = GetComponent<PlayerInput>().actions["Look"];
+        m_parent = transform.parent;
     }
 
-    // Update is called once per frame
     void Update()
     {
         Vector2 input = m_lookAction.ReadValue<Vector2>();
-        transform.RotateAround(parent.position,parent.transform.up, input.x * m_mouseSensitivity);
 
-        float m_currentYAngle = input.y * m_mouseSensitivity;
-        m_currentYAngle = Mathf.Clamp(m_currentYAngle, -45, 45);
+        transform.RotateAround(
+            m_parent.position,
+            m_parent.transform.up,
+            input.x * m_mouseSensitivity);
 
-        transform.RotateAround(parent.position,transform.right, m_currentYAngle/5);   
+        float pitchDelta = input.y * m_mouseSensitivity/2;
+        float newPitch = m_pitch + pitchDelta;
+        newPitch = Mathf.Clamp(newPitch, -m_additionalYAngle, m_additionalYAngle);
+
+        float clampedDelta = newPitch - m_pitch;
+        m_pitch = newPitch;
+
+        transform.RotateAround(
+            m_parent.position,
+            transform.right,
+            -clampedDelta);
     }
 }
