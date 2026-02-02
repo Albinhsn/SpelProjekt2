@@ -8,10 +8,22 @@ public class CameraController : MonoBehaviour
     float m_mouseSensitivity = 0.5f;
     float m_pitch = 0f;
     Transform m_parent;
+    private InputSystem_Actions m_inputActions;
     void Awake()
     {
-        m_lookAction = GetComponent<PlayerInput>().actions["Look"];
+        // m_lookAction = GetComponent<PlayerInput>().actions["Look"];
         m_parent = transform.parent;
+    }
+
+    void OnEnable()
+    {
+        m_inputActions = new();
+        m_lookAction = m_inputActions.Player.Look;
+        m_inputActions.Enable();
+    }
+    void OnDisable()
+    {
+        m_inputActions.Disable();
     }
 
     void Update()
