@@ -3,8 +3,10 @@ using UnityEngine;
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private GameObject m_objectToSpawn;
+    [SerializeField] private Vector3 m_initialVelocity;
 
     private GameObject m_object;
+    
     
     public void Awake()
     {
@@ -36,6 +38,12 @@ public class Spawner : MonoBehaviour
                 Destroy(this.m_object);
             }
             this.m_object = Instantiate(this.m_objectToSpawn, this.transform.position, Quaternion.identity);;
+
+            Rigidbody rb = this.m_object.GetComponent<Rigidbody>();
+            if(rb != null)
+            {
+                rb.linearVelocity = m_initialVelocity;
+            }
         }
     }
 

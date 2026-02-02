@@ -19,7 +19,7 @@ public class MovementController : MonoBehaviour
     private Rigidbody m_rb;
     private bool m_isJumping;
     private InputAction m_moveAction, m_lookAction, m_jumpAction;
-    [SerializeField] Transform m_child;
+    [SerializeField] Transform m_cameraTransform;
 
     void Awake()
     {
@@ -27,6 +27,7 @@ public class MovementController : MonoBehaviour
         m_moveAction = GetComponent<PlayerInput>().actions["Move"];
         // m_lookAction = GetComponent<PlayerInput>().actions["Look"];
         m_jumpAction = GetComponent<PlayerInput>().actions["Jump"];
+        // m_cameraTransform = 
     }
 
     private void OnTriggerEnter(Collider other)
@@ -48,7 +49,7 @@ public class MovementController : MonoBehaviour
     void FixedUpdate()
     {
         // HACK(ah): Really poor movement, pls swap
-        Vector3 forward = Rejection(m_child.forward, new Vector3(0, 1, 0));
+        Vector3 forward = Rejection(m_cameraTransform.forward, new Vector3(0, 1, 0));
         Vector3 right   = Rejection(transform.right, new Vector3(0, 1, 0));
         Vector2 input   = m_moveAction.ReadValue<Vector2>();
         Vector3 dir     = forward * input.y + right * input.x;
