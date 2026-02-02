@@ -2,22 +2,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// AudioKit anteckning
-// Footsteps system
-// Surface på marken bestämmer vilka ljud
-// Controller kan vara auto eller animation events
-
-
 namespace AudioKit.FMOD
 {
     public enum SurfaceType
     {
-        Default = 0,
+        Default  = 0,
         Concrete = 1,
-        Metal = 2,
-        Wood = 3,
-        Grass = 4,
-        Dirt = 5
+        Metal    = 2,
+        Wood     = 3,
+        Grass    = 4,
+        Dirt     = 5
     }
 
     [Serializable]
@@ -34,21 +28,26 @@ namespace AudioKit.FMOD
     public sealed class FootstepLibrarySO : ScriptableObject
     {
         public FootstepSet[] sets = Array.Empty<FootstepSet>();
-
         private Dictionary<SurfaceType, FootstepSet> map;
 
-        private void OnEnable()
+        private void OnEnable() => RebuildMap();
+
+#if UNITY_EDITOR
+        private void OnValidate() => RebuildMap();
+#endif
+
+        private void RebuildMap()
         {
-            map = new Dictionary<SurfaceType, FootstepSet>(sets.Length);
+            if (sets == null) sets = Array.Empty<FootstepSet>();
+
+            map = new Dictionary<SurfaceType, FootstepSet>(Mathf.Max(sets.Length, 1));
             for (int i = 0; i < sets.Length; i++)
-            {
                 map[sets[i].surface] = sets[i];
-            }
         }
 
         public bool TryGet(SurfaceType surface, out FootstepSet set)
         {
-            if (map == null) OnEnable();
+            if (map == null) RebuildMap();
             return map.TryGetValue(surface, out set);
         }
     }
@@ -104,17 +103,26 @@ namespace AudioKit.FMOD
             var stepDist = (speed >= runSpeed) ? stepDistanceRun : stepDistanceWalk;
             if (accum >= stepDist)
             {
-                accum = 0f;
+                accum -= stepDist;
                 PlayFootstep(speed >= runSpeed);
             }
         }
 
         private float GetSpeed(Vector3 delta)
         {
-			// Unity API: Rigidbody har velocity (linearVelocity finns inte i de flesta versioner)
-			if (rb != null) return rb.linearVelocity.magnitude;
+            if (rb != null) return GetRigidbodySpeed(rb);
             if (cc != null) return cc.velocity.magnitude;
+
             return delta.magnitude / Mathf.Max(0.0001f, Time.deltaTime);
+        }
+
+        private static float GetRigidbodySpeed(Rigidbody body)
+        {
+#if UNITY_6000_0_OR_NEWER
+            return body.linearVelocity.magnitude;
+#else
+            return body.velocity.magnitude;
+#endif
         }
 
         private void PlayFootstep(bool run)
@@ -136,15 +144,18 @@ namespace AudioKit.FMOD
 
         private SurfaceType ResolveSurface()
         {
-            if (Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, out var hit, rayLength, groundMask, QueryTriggerInteraction.Ignore))
+            var origin = transform.position + Vector3.up * 0.2f;
+
+            if (Physics.Raycast(origin, Vector3.down, out var hit, rayLength, groundMask, QueryTriggerInteraction.Ignore))
             {
                 var s = hit.collider.GetComponentInParent<FootstepSurface>();
                 if (s != null) return s.surface;
             }
+
             return SurfaceType.Default;
         }
 
         public void AnimEvent_FootstepWalk() => PlayFootstep(false);
-        public void AnimEvent_FootstepRun() => PlayFootstep(true);
+        public void AnimEvent_FootstepRun()  => PlayFootstep(true);
     }
 }
