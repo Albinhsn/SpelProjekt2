@@ -17,6 +17,10 @@ public class CameraController : MonoBehaviour
     {
         Vector2 input = m_lookAction.ReadValue<Vector2>();
         transform.RotateAround(parent.position,parent.transform.up, input.x * m_mouseSensitivity);
-        transform.RotateAround(parent.position,transform.right, input.y * m_mouseSensitivity/5);
+
+        float m_currentYAngle = input.y * m_mouseSensitivity;
+        m_currentYAngle = Mathf.Clamp(m_currentYAngle, -45, 45);
+
+        transform.RotateAround(parent.position,transform.right, m_currentYAngle/5);   
     }
 }
