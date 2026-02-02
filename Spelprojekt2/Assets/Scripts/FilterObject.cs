@@ -1,3 +1,4 @@
+using Interaction;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -19,6 +20,7 @@ public class FilterObject : MonoBehaviour
     private MeshRenderer m_renderer;
     private Collider m_collider;
     private Rigidbody m_rb;
+    private Interactable m_interactableComponent;
 
     private Material m_deactivatedMaterial;
     private Material m_activatedMaterial;
@@ -47,6 +49,7 @@ public class FilterObject : MonoBehaviour
         m_renderer = GetComponent<MeshRenderer>();
         m_collider = GetComponent<Collider>();
         m_rb       = GetComponent<Rigidbody>();
+        m_interactableComponent = GetComponent<Interactable>();
 
         m_renderer.material = m_deactivatedMaterial;
 
@@ -72,6 +75,8 @@ public class FilterObject : MonoBehaviour
         {
             m_rb.isKinematic = true;
         }
+        
+        m_interactableComponent?.SetActive(true);
     }
 
     public void Deactivate()
@@ -87,5 +92,7 @@ public class FilterObject : MonoBehaviour
         {
             m_rb.isKinematic = false;
         }
+        
+        m_interactableComponent?.SetActive(false);
     }
 }
