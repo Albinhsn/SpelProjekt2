@@ -6,14 +6,17 @@ public class Spawner : MonoBehaviour
     [SerializeField] private Vector3 m_initialVelocity;
 
     [SerializeField]
-    private bool m_respawnOnDestroy;
+    private bool m_spawnOnActivation;
 
     private GameObject m_object;
     
     
     public void Awake()
     {
-        Spawn();
+        if(!m_spawnOnActivation)
+        {
+            Spawn();
+        }
     }
 
     public bool CanSpawn()
@@ -35,10 +38,7 @@ public class Spawner : MonoBehaviour
     {
         if(CanSpawn())
         {
-            if(this.m_object != null)
-            {
-                Destroy(this.m_object);
-            }
+            Despawn();
             this.m_object = Instantiate(this.m_objectToSpawn, this.transform.position, Quaternion.identity);;
 
             Rigidbody rb = this.m_object.GetComponent<Rigidbody>();
@@ -49,9 +49,17 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    public void Despawn()
+    {
+        if(this.m_object != null)
+        {
+            Destroy(this.m_object);
+        }
+    }
+
     void Update()
     {
-        if(m_object == null && m_respawnOnDestroy)
+        if(m_object == null && !m_spawnOnActivation)
         {
             Spawn();
         }
