@@ -76,7 +76,7 @@ public class FilterObject : MonoBehaviour
             m_rb.isKinematic = true;
         }
         
-        m_interactableComponent?.SetActive(true);
+        m_interactableComponent?.SetIsInteractable(true);
     }
 
     public void Deactivate()
@@ -93,6 +93,6 @@ public class FilterObject : MonoBehaviour
             m_rb.isKinematic = false;
         }
         
-        m_interactableComponent?.SetActive(false);
+        m_interactableComponent?.SetIsInteractable(false);
     }
 }
