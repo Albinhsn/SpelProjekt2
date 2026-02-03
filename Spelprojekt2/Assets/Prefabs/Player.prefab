@@ -240,11 +240,11 @@ GameObject:
   - component: {fileID: 9082466895557383042}
   - component: {fileID: 363245655122115696}
   - component: {fileID: 2804696581348211148}
+  - component: {fileID: 5731249618501921105}
   - component: {fileID: 695921995035222353}
   - component: {fileID: 780126874217328345}
   - component: {fileID: 1162450360667965049}
   - component: {fileID: 3424783072077675338}
-  - component: {fileID: 5731249618501921105}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -337,6 +337,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_speed: 5
   m_jumpSpeed: 6
+--- !u!114 &5731249618501921105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6733362284341771832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79fef4ad425fbc74f999b4169372e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_transformRotationSpeed: 0.4
 --- !u!114 &695921995035222353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,18 +467,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 0.1, z: 0.5}
   m_Center: {x: 0, y: -1, z: 0}
---- !u!114 &5731249618501921105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6733362284341771832}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79fef4ad425fbc74f999b4169372e418, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7802460504755190333
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,6 +481,7 @@ GameObject:
   - component: {fileID: 1305772169706846622}
   - component: {fileID: 7815536667233639932}
   - component: {fileID: 5851279457604178779}
+  - component: {fileID: 13585459665569523}
   m_Layer: 0
   m_Name: FreeLook Camera
   m_TagString: Untagged
@@ -713,3 +715,33 @@ MonoBehaviour:
         DecelTime: 0
   PlayerIndex: -1
   AutoEnableInputs: 1
+--- !u!114 &13585459665569523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7802460504755190333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CameraRadius: 3
+  Decollision:
+    Enabled: 1
+    ObstacleLayers:
+      serializedVersion: 2
+      m_Bits: 1
+    UseFollowTarget:
+      Enabled: 0
+      YOffset: 0
+    Damping: 0.5
+    SmoothingTime: 0
+  TerrainResolution:
+    Enabled: 0
+    TerrainLayers:
+      serializedVersion: 2
+      m_Bits: 1
+    MaximumRaycast: 10
+    Damping: 0.5
