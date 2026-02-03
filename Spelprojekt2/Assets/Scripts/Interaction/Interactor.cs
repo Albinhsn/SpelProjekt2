@@ -16,7 +16,7 @@ namespace Interaction
         [SerializeField] private float m_coneFactor;
         
         [SerializeField] private InputActionReference m_interactAction;
-        [SerializeField] private UnityEvent<bool> m_toggleInteracting;
+        [SerializeField] private UnityEvent<bool> m_deactivateWhileInteracting;
 
         [CanBeNull] private Interactable m_selected = null;
         private bool m_interacting = false;
@@ -31,7 +31,7 @@ namespace Interaction
                 if (m_selected.requireUninteract)
                 {
                     m_interacting = true;
-                    m_toggleInteracting.Invoke(true);
+                    m_deactivateWhileInteracting.Invoke(false);
                     m_selected.SetHighlighted(false);
                 }
                 m_selected.Interact(this);
@@ -43,7 +43,7 @@ namespace Interaction
         {
             Assert.IsTrue(m_interacting, "cancelInteract called on non-interacting interactor");
             m_interacting = false;
-            m_toggleInteracting.Invoke(false);
+            m_deactivateWhileInteracting.Invoke(true);
         }
 
         private void SearchFrustum()
