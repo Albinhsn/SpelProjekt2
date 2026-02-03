@@ -50,6 +50,19 @@ namespace AudioKit.FMOD
         private const string PrefSfx    = "AUDIOKIT_VOL_SFX";
         private const string PrefUi     = "AUDIOKIT_VOL_UI";
 
+        private VCA GetVCA(string vca)
+        {
+            VCA result = new();
+            try
+            {
+                result = RuntimeManager.GetVCA(vca);
+            }catch(VCANotFoundException e)
+            {
+                Debug.LogWarning($"Couldn't find vca {vca}");
+            }
+            return result;
+        }
+
         private void Awake()
         {
             // Singleton-guard
@@ -73,10 +86,10 @@ namespace AudioKit.FMOD
             TryEnsureListener();
 
             // VCAs / Bus
-            vcaMaster = RuntimeManager.GetVCA(cfg.vcaMaster);
-            vcaMusic  = RuntimeManager.GetVCA(cfg.vcaMusic);
-            vcaSfx    = RuntimeManager.GetVCA(cfg.vcaSfx);
-            vcaUi     = RuntimeManager.GetVCA(cfg.vcaUi);
+            vcaMaster = GetVCA(cfg.vcaMaster);
+            vcaMusic  = GetVCA(cfg.vcaMusic);
+            vcaSfx    = GetVCA(cfg.vcaSfx);
+            vcaUi     = GetVCA(cfg.vcaUi);
 
             masterBus = RuntimeManager.GetBus(cfg.masterBus);
 
