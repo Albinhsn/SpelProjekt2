@@ -82,8 +82,6 @@ public class Player : MonoBehaviour
     void DropItem()
     {
         // ah: drop item
-        m_pickedupItem.SetParent(null);
-
         Rigidbody rb = m_pickedupItem.gameObject.GetComponent<Rigidbody>();
         if(rb != null)
         {
@@ -158,7 +156,6 @@ public class Player : MonoBehaviour
                             offset.y = 0;
                             hit.transform.position = this.transform.position + Hadamard(offset, Rejection(Camera.main.transform.forward, new Vector3(0,1,0)).normalized);
                             hit.transform.rotation = this.transform.rotation;
-                            hit.transform.SetParent(this.transform);
 
                             // ah: store distance between them
                             m_pickedupItemDistance = (transform.position - hit.transform.position).magnitude;

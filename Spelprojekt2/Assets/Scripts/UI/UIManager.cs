@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     private UIState m_stateOnInitialization;
 
     [SerializeField]
-    private AssetReference m_firstLevelReference;
+    private LevelsData m_levelData;
 
     [SerializeField]
     private GameObject m_playerPrefab;
@@ -27,10 +27,20 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private float m_areaHeight;
 
-    // Btn texture
-    
-    // Pause menu bg
+    [SerializeField]
+    private float m_btnWidth;
 
+    [SerializeField]
+    private float m_btnHeight;
+
+    [SerializeField]
+    private float m_sliderWidth;
+
+    [SerializeField]
+    private Texture2D m_btnTexture;
+
+    [SerializeField]
+    private Texture2D m_pauseMenuBG;
 
     private UIState m_state;
     private UIState m_statePriorToSettingsMenu;
@@ -52,10 +62,11 @@ public class UIManager : MonoBehaviour
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
 
-        GUILayoutOption[] button_width = new GUILayoutOption[1];
-        button_width[0] = GUILayout.Width(100);
+        GUILayoutOption[] button_options = new GUILayoutOption[2];
+        button_options[0] = GUILayout.Width(m_btnWidth);
+        button_options[1] = GUILayout.Height(m_btnHeight);
 
-        bool result = GUILayout.Button(text, button_width);
+        bool result = GUILayout.Button(text, button_options);
 
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -70,7 +81,7 @@ public class UIManager : MonoBehaviour
         GUILayout.FlexibleSpace();
 
         GUILayoutOption[] options = new GUILayoutOption[1];
-        options[0] = GUILayout.Width(150);
+        options[0] = GUILayout.Width(m_sliderWidth);
 
         GUIStyle slider_style = new GUIStyle(GUI.skin.horizontalSlider);
         slider_style.padding.top = -2;
@@ -121,11 +132,15 @@ public class UIManager : MonoBehaviour
 
                 if(PauseMenuBtn("Play"))
                 {
-                    SceneLoader loader = new(m_firstLevelReference, new());
-                    loader.Load();
-                    Instantiate(m_playerPrefab);
+                    if(m_levelData != null)
+                    {
+                        LevelData data = m_levelData.levels[0];
+                        SceneLoader loader = new(data.m_sceneReference, data.m_offset);
+                        loader.Load();
+                        Instantiate(m_playerPrefab);
 
-                    m_state = UIState.None;
+                        m_state = UIState.None;
+                    }
                 }
 
                 GUILayout.Space(25);
