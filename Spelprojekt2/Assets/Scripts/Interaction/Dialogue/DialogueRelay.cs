@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Interaction.Dialogue
 {
     [ExecuteAlways]
-    [CreateAssetMenu(menuName = "Data/DialogueSysRelay")]
+    [CreateAssetMenu(menuName = "Data/DialogueSystem/DialogueSysRelay")]
     public class DialogueRelay : ScriptableObject
     {
         [CanBeNull] public event System.Action<Story> d_onDialogueInitiation;

@@ -11,7 +11,11 @@ namespace Interaction.Dialogue
 {
     public class DialogueReceiver : MonoBehaviour
     {
+        [Header("Data")]
         [SerializeField] private DialogueRelay m_relay;
+        [SerializeField] private FontSet m_fontSet; //Index 0 is default
+        
+        [Header("Local")]
         [SerializeField] private GameObject m_dialogueContainer;
         [SerializeField] private TextMeshProUGUI m_textOut;
         [SerializeField] private GameObject m_canContinueIndicator;
@@ -38,6 +42,7 @@ namespace Interaction.Dialogue
 
         private void InitiateDialogue(Story story)
         {
+            SetFont(0, m_textOut);
             Assert.IsTrue(m_activeStory is null);
             m_dialogueContainer.SetActive(true);
             m_activeStory = story;
@@ -45,7 +50,7 @@ namespace Interaction.Dialogue
         }
         private void UpdateDialogue()
         {
-            ExecuteTagActions(m_activeStory.currentTags.ToArray());
+            ParseTags(m_activeStory.currentTags.ToArray());
             Debug.Log(m_activeStory.currentText);
             m_textOut.text = m_activeStory.currentText;
             SetAlternatives(m_activeStory.currentChoices.ToArray());
@@ -71,6 +76,7 @@ namespace Interaction.Dialogue
                 int alt = a;
                 m_altButtons[a].onClick.RemoveAllListeners();//Unity moment
                 m_altButtons[a].onClick.AddListener(() => m_relay.Select(alt));
+                SetFont(0, m_altButtons[a].GetComponentInChildren<TextMeshProUGUI>());
             }
 
             for (int a = 0; a < m_altButtons.Count; a++)
@@ -84,14 +90,32 @@ namespace Interaction.Dialogue
             }
         }
 
-        private void ExecuteTagActions(string[] tags)
+        private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
         {
             for (int a = 0; a < tags.Length; a++)
             {
-                switch (tags[a])
-                {//TODO: add UI tags here
+                int value_index = tags[a].IndexOf('=');
+                if (value_index == -1)//Static tag
+                {
+                    //switch for static tags
+                }
+                else
+                {
+                    int value = int.Parse(tags[a].Substring(value_index + 1));
+                    switch (tags[a].Substring(0, value_index))
+                    {
+                        case "font":
+                            SetFont(value, m_textOut);//Speaker font
+                            break;
+                    }
                 }
             }
+        }
+
+        private void SetFont(int font_index, TextMeshProUGUI target)
+        {
+            Assert.IsTrue(font_index < m_fontSet.count);
+            target.font = m_fontSet.GetFont(font_index);
         }
     }
 }
