@@ -5,6 +5,9 @@ public class Spawner : MonoBehaviour
     [SerializeField] private GameObject m_objectToSpawn;
     [SerializeField] private Vector3 m_initialVelocity;
 
+    [SerializeField]
+    private bool m_respawnOnDestroy;
+
     private GameObject m_object;
     
     
@@ -48,7 +51,7 @@ public class Spawner : MonoBehaviour
 
     void Update()
     {
-        if(m_object == null)
+        if(m_object == null && m_respawnOnDestroy)
         {
             Spawn();
         }
