@@ -1,17 +1,8 @@
 using UnityEngine;
 
-public enum RigidbodyKind
-{
-    Static,
-    Dynamic
-}
-
 [RequireComponent(typeof(Rigidbody))]
-public class RigidbodyController : MonoBehaviour
+public class DynamicRigidbody : MonoBehaviour
 {
-    [SerializeField]
-    private RigidbodyKind kind;
-
     private int collision_count;
 
     void Start()
@@ -43,6 +34,19 @@ public class RigidbodyController : MonoBehaviour
             {
                 // TODO(ah): Do this only "within some threshold"
                 collision_count++;
+            }
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        FilterObject filter_obj = other.GetComponent<FilterObject>();
+        if(filter_obj != null)
+        {
+            if(filter_obj.m_kind == FilterManager.m_activeFilter)
+            {
+                // TODO(ah): Do this only "within some threshold"
+                collision_count--;
             }
         }
     }
