@@ -10,16 +10,14 @@ public struct FilterAction
     // NOTE(ah): _kind_ is redundant, can be infered by the index
     public FilterKind m_kind;
     public InputActionReference m_action;
-    // NOTE(ah): This needs to be an int because if we collide with 2 red filtered
-    // objects it will basically be a raise condition if it's a bool. So instead
-    // we just ref count it
-    public int m_collidingWithCount;
 }
 
 public class FilterManager : MonoBehaviour
 {
     [SerializeField]
     private FilterManagerData m_actionData;
+
+    private int[] m_collidingWithCount;
 
     [SerializeField]
     public UnityEvent<FilterKind, bool> m_filterChanged;
@@ -42,6 +40,7 @@ public class FilterManager : MonoBehaviour
                 actions[i].m_action.action.Enable();
             }
         }
+        m_collidingWithCount = new int[(int)FilterKind.COUNT];
     }
 
     private bool CanDeactivateCurrentFilter()
@@ -49,19 +48,19 @@ public class FilterManager : MonoBehaviour
         bool result = true;
         if(m_activeFilter != FilterKind.None)
         {
-            result = m_actionData.m_actions[(int)m_activeFilter].m_collidingWithCount == 0;
+            result = m_collidingWithCount[(int)m_activeFilter] == 0;
         }
         return result;
     }
 
     public void SetCollisionEnterWithFilter(FilterKind kind)
     {
-        m_actionData.m_actions[(int)kind].m_collidingWithCount++;
+        m_collidingWithCount[(int)kind]++;
     }
 
     public void SetCollisionLeaveWithFilter(FilterKind kind)
     {
-        m_actionData.m_actions[(int)kind].m_collidingWithCount--;
+        m_collidingWithCount[(int)kind]--;
     }
 
     void Update()
