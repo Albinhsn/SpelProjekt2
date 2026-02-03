@@ -30,7 +30,6 @@ public class Spawner : MonoBehaviour
 
     public void Spawn()
     {
-
         if(CanSpawn())
         {
             if(this.m_object != null)
@@ -44,6 +43,14 @@ public class Spawner : MonoBehaviour
             {
                 rb.linearVelocity = m_initialVelocity;
             }
+        }
+    }
+
+    void Update()
+    {
+        if(m_object == null)
+        {
+            Spawn();
         }
     }
 

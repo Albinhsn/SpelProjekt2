@@ -22,7 +22,7 @@ public class FilterManager : MonoBehaviour
     private FilterManagerData m_actionData;
 
     [SerializeField]
-    private UnityEvent<FilterKind, bool> m_filterChanged;
+    public UnityEvent<FilterKind, bool> m_filterChanged;
 
     public static FilterKind m_activeFilter = FilterKind.None;
 

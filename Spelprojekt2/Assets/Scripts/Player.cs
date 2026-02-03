@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using static LinAlg.LinAlg;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Player : MonoBehaviour
 {
     [SerializeField]
@@ -12,7 +12,16 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float m_maxPickupDistance;
 
+    [SerializeField]
+    [Range(0.1f, 4.0f)]
+    private float m_maxDistancePickedupItemCanBeFromPlayer = 2.0f;
+
+    [SerializeField]
+    [Range(1.0f, 5.0f)]
+    private float m_speedPickedupItemMovesTowardsPlayer = 3.0f;
+
     private Transform m_pickedupItem;
+    private float m_pickedupItemDistance;
 
     private Collider m_collider;
     private const int MAX_NUMBER_OF_RAYS = 3;
@@ -25,10 +34,13 @@ public class Player : MonoBehaviour
     [SerializeField]
     private UnityEvent<FilterKind> m_onTriggerLeaveWithFilter;
 
+    private Rigidbody m_rb;
+
     void Awake()
     {
         m_pickupItemAction.action.Enable();
         m_collider = GetComponent<Collider>();
+        m_rb = GetComponent<Rigidbody>();
     }
 
     void OnTriggerEnter(Collider other)
@@ -68,7 +80,8 @@ public class Player : MonoBehaviour
         Rigidbody rb = m_pickedupItem.gameObject.GetComponent<Rigidbody>();
         if(rb != null)
         {
-            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.constraints = rb.constraints ^ RigidbodyConstraints.FreezeRotation;
         }
 
         m_pickedupItem = null;
@@ -83,7 +96,7 @@ public class Player : MonoBehaviour
     RaycastResult PickupRaycast(Vector3 origin)
     {
         RaycastResult result = new();
-        Vector3 direction = this.transform.forward;
+        Vector3 direction = Rejection(Camera.main.transform.forward, new Vector3(0,1,0));
         int layer_mask    = ~LayerMask.GetMask("Player");
         result.hit = Physics.Raycast(origin, direction, out result.data, Mathf.Infinity, layer_mask);
         return result;
@@ -136,15 +149,19 @@ public class Player : MonoBehaviour
                             Vector3 epsilon = new Vector3(0.1f, 0, 0.1f);
                             Vector3 offset = hit_bounds.extents + player_bounds.extents + epsilon;
                             offset.y = 0;
-                            hit.transform.position = this.transform.position + Hadamard(offset, this.transform.forward);
+                            hit.transform.position = this.transform.position + Hadamard(offset, Rejection(Camera.main.transform.forward, new Vector3(0,1,0)).normalized);
                             hit.transform.rotation = this.transform.rotation;
                             hit.transform.SetParent(this.transform);
+
+                            // ah: store distance between them
+                            m_pickedupItemDistance = (transform.position - hit.transform.position).magnitude;
 
                             // ah: Turn off rigid body
                             Rigidbody rb = hit.transform.gameObject.GetComponent<Rigidbody>();
                             if(rb != null)
                             {
-                                rb.isKinematic = true;
+                                rb.constraints = rb.constraints | RigidbodyConstraints.FreezeRotation;
+                                rb.useGravity = false;
                             }
                         }
                     }
@@ -157,13 +174,31 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        Debug.DrawRay(this.transform.position, this.transform.forward);
         if(m_pickupItemAction.action.WasPressedThisFrame())
         {
             PickupItem();
         }
 
+        if(m_pickedupItem != null)
+        {
+            Rigidbody rb = m_pickedupItem.transform.gameObject.GetComponent<Rigidbody>();
+            if(rb != null)
+            {
+                rb.linearVelocity = m_rb.linearVelocity;
+            }
+
+            Vector3 dir = this.transform.position - m_pickedupItem.transform.position;
+            if(dir.magnitude > m_maxDistancePickedupItemCanBeFromPlayer)
+            {
+                DropItem();
+            }
+
+            // NOTE(ah): Some epsilon added so it's not to close when it tries to move
+            const float DISTANCE_EPSILON = 0.3f;
+            if(dir.magnitude > m_pickedupItemDistance + DISTANCE_EPSILON)
+            {
+                rb.linearVelocity += dir.normalized * m_speedPickedupItemMovesTowardsPlayer;
+            }
+        }
     }
-
-
 }
