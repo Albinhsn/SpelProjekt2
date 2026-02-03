@@ -1,18 +1,21 @@
 #if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEditor.Events;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+
+#if AUDIOKIT_UGUI
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
+#endif
 
 namespace AudioKit.FMOD
 {
     /// <summary>
-    /// Skapar en helt genre-oberoende "AudioTest" scen + tomma test-assets.
-    /// Efteråt fylls FMOD events/parametrar i test-assets via Inspector.
+    /// Skapar en "AudioTest"-scen + tomma test-assets.
+    /// UI skapas bara om AUDIOKIT_UGUI är definierad.
     /// </summary>
     public static class AudioTestWizard
     {
@@ -30,9 +33,9 @@ namespace AudioKit.FMOD
             EnsureFolder(TestFolder);
 
             // 2) Skapa test assets (tomma; fylls i via Inspector)
-            var oneShotCue = EnsureAsset<AudioCueSO>(Path.Combine(TestFolder, "AC_TestOneShot.asset").Replace("\\", "/"));
-            var loopCue    = EnsureAsset<AudioCueSO>(Path.Combine(TestFolder, "AC_TestLoop.asset").Replace("\\", "/"));
-            var testParam  = EnsureAsset<AudioParameterSO>(Path.Combine(TestFolder, "AP_TestParam.asset").Replace("\\", "/"));
+            var oneShotCue = EnsureAsset<AudioCueSO>(NormalizePath(Path.Combine(TestFolder, "AC_TestOneShot.asset")));
+            var loopCue    = EnsureAsset<AudioCueSO>(NormalizePath(Path.Combine(TestFolder, "AC_TestLoop.asset")));
+            var testParam  = EnsureAsset<AudioParameterSO>(NormalizePath(Path.Combine(TestFolder, "AP_TestParam.asset")));
 
             // 3) Ny scen
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
@@ -67,46 +70,50 @@ namespace AudioKit.FMOD
             // One-shot trigger cube
             var oneShot = GameObject.CreatePrimitive(PrimitiveType.Cube);
             oneShot.name = "OneShotTrigger";
-            oneShot.transform.SetParent(tests.transform);
+            oneShot.transform.SetParent(tests.transform, false);
             oneShot.transform.position = new Vector3(0, 0.5f, 6);
             oneShot.GetComponent<Collider>().isTrigger = true;
             var t1 = oneShot.AddComponent<AudioOneShotTrigger>();
-            SetPrivateField(t1, "cue", oneShotCue);
+            SetField(t1, "cue", oneShotCue);
 
             // Loop emitter sphere
             var loop = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             loop.name = "LoopEmitter";
-            loop.transform.SetParent(tests.transform);
+            loop.transform.SetParent(tests.transform, false);
             loop.transform.position = new Vector3(4, 0.5f, 6);
             var em = loop.AddComponent<AudioEmitter>();
-            SetPrivateField(em, "cue", loopCue);
-            SetPrivateField(em, "playOnEnable", false); // starta via UI
+            SetField(em, "cue", loopCue);
+            SetField(em, "playOnEnable", false); // starta via UI
 
             // Parameter zone cube
             var zone = GameObject.CreatePrimitive(PrimitiveType.Cube);
             zone.name = "ParamZone";
-            zone.transform.SetParent(tests.transform);
+            zone.transform.SetParent(tests.transform, false);
             zone.transform.position = new Vector3(-4, 0.5f, 6);
             zone.transform.localScale = new Vector3(6, 2, 6);
             zone.GetComponent<Collider>().isTrigger = true;
+
             var pz = zone.AddComponent<AudioParameterZone>();
-
-            // Placeholder-param via asset (AP_TestParam.fmodName fylls i)
             var pref = new AudioParamRef { parameter = testParam, key = "", name = "" };
-            SetPrivateField(pz, "parameter", pref);
-            SetPrivateField(pz, "sourceId", "test_zone");
+            SetField(pz, "parameter", pref);
+            SetField(pz, "sourceId", "test_zone");
 
-            // 4) UI
+            // 4) UI (valfritt)
+#if AUDIOKIT_UGUI
             CreateUI(root.transform, oneShotCue, loopCue, testParam, em);
+#else
+            Debug.Log("AudioTest-scen skapad utan UI. (Lägg till define AUDIOKIT_UGUI om du vill skapa UI automatiskt.)");
+#endif
 
             // 5) Spara scen
-            EnsureFolder(Path.GetDirectoryName(ScenePath).Replace("\\", "/"));
+            EnsureFolder(NormalizePath(Path.GetDirectoryName(ScenePath)));
             EditorSceneManager.SaveScene(scene, ScenePath);
 
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
             Debug.Log("AudioTest-scen skapad: " + ScenePath);
         }
 
+#if AUDIOKIT_UGUI
         private static void CreateUI(Transform root, AudioCueSO oneShotCue, AudioCueSO loopCue, AudioParameterSO testParam, AudioEmitter loopEmitter)
         {
             // EventSystem
@@ -142,7 +149,7 @@ namespace AudioKit.FMOD
             vlg.spacing = 10;
             vlg.padding = new RectOffset(12, 12, 12, 12);
 
-            // UI driver
+            // UI driver (förutsätter att AudioTestUI finns i Runtime)
             var uiGo = new GameObject("AudioTestUI");
             uiGo.transform.SetParent(canvasGo.transform, false);
             var ui = uiGo.AddComponent<AudioTestUI>();
@@ -152,7 +159,6 @@ namespace AudioKit.FMOD
             ui.testParam = new AudioParamRef { parameter = testParam };
             ui.loopRegistryId = "TEST_LOOP"; // placeholder (valfritt)
 
-            // Buttons
             AddButton(panel.transform, "Play OneShot (cue)", ui, AudioTestUIButton.PlayOneShot);
             AddButton(panel.transform, "Start Loop (emitter)", ui, AudioTestUIButton.StartLoop);
             AddButton(panel.transform, "Stop Loop (emitter)", ui, AudioTestUIButton.StopLoop);
@@ -176,10 +182,11 @@ namespace AudioKit.FMOD
 
             var textGo = new GameObject("Text", typeof(RectTransform), typeof(Text));
             textGo.transform.SetParent(go.transform, false);
+
             var txt = textGo.GetComponent<Text>();
             txt.text = label;
             txt.alignment = TextAnchor.MiddleCenter;
-            txt.font = GetBuiltinFont();
+            txt.font = GetFontSafe();
             txt.color = Color.black;
 
             var tr = textGo.GetComponent<RectTransform>();
@@ -188,7 +195,6 @@ namespace AudioKit.FMOD
             tr.offsetMin = Vector2.zero;
             tr.offsetMax = Vector2.zero;
 
-            // Persistent listeners (sparas i scenen)
             switch (kind)
             {
                 case AudioTestUIButton.PlayOneShot: UnityEventTools.AddPersistentListener(btn.onClick, ui.PlayOneShot); break;
@@ -201,7 +207,6 @@ namespace AudioKit.FMOD
             }
         }
 
-        // FIX: Saknades. Används för att kolla om det redan finns en EventSystem i scenen.
         private static EventSystem FindEventSystem()
         {
             if (EventSystem.current != null) return EventSystem.current;
@@ -213,10 +218,25 @@ namespace AudioKit.FMOD
 #endif
         }
 
+        private static Font GetFontSafe()
+        {
+            // Försök built-in först
+            var f = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            if (f != null) return f;
+
+            // Fallback: OS-font (funkar både Editor och Play)
+            var names = Font.GetOSInstalledFontNames();
+            if (names != null && names.Length > 0)
+                return Font.CreateDynamicFontFromOSFont(names[0], 16);
+
+            return Font.CreateDynamicFontFromOSFont("Arial", 16);
+        }
+#endif
+
         private static void EnsureFolder(string path)
         {
             if (string.IsNullOrEmpty(path)) return;
-            path = path.Replace("\\", "/");
+            path = NormalizePath(path);
             if (AssetDatabase.IsValidFolder(path)) return;
 
             var parts = path.Split('/');
@@ -233,8 +253,12 @@ namespace AudioKit.FMOD
 
         private static T EnsureAsset<T>(string path) where T : ScriptableObject
         {
+            path = NormalizePath(path);
+
             var existing = AssetDatabase.LoadAssetAtPath<T>(path);
             if (existing != null) return existing;
+
+            EnsureFolder(NormalizePath(Path.GetDirectoryName(path)));
 
             var asset = ScriptableObject.CreateInstance<T>();
             AssetDatabase.CreateAsset(asset, path);
@@ -242,22 +266,26 @@ namespace AudioKit.FMOD
             return asset;
         }
 
-        private static void SetPrivateField(object obj, string fieldName, object value)
+        private static void SetField(object obj, string fieldName, object value)
         {
+            if (obj == null) return;
+
             var t = obj.GetType();
-            var f = t.GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            if (f != null) f.SetValue(obj, value);
+            var f = t.GetField(fieldName,
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Public);
+
+            if (f == null)
+            {
+                Debug.LogWarning($"AudioTestWizard: Hittade inte fält '{fieldName}' på {t.Name}");
+                return;
+            }
+
+            f.SetValue(obj, value);
         }
 
-        private static Font GetBuiltinFont()
-        {
-#if UNITY_6000_0_OR_NEWER
-            // Unity 6: Arial.ttf är inte längre en giltig built-in font.
-            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-#else
-            return Resources.GetBuiltinResource<Font>("Arial.ttf");
-#endif
-        }
+        private static string NormalizePath(string path) => string.IsNullOrEmpty(path) ? path : path.Replace("\\", "/");
     }
 }
 #endif
