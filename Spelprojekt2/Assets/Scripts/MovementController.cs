@@ -21,7 +21,7 @@ public class MovementController : MonoBehaviour
     void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
-        m_cameraTransform = GetComponentInChildren<Camera>().transform;
+        m_cameraTransform = Camera.main.transform;
     }
 
     private void OnTriggerEnter(Collider other)
