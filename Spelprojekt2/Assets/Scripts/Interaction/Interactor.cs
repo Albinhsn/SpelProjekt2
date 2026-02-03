@@ -48,7 +48,7 @@ namespace Interaction
 
         private void SearchFrustum()
         {
-            Interactable? sel = null;
+            Interactable sel = null;
             float sel_distance = float.MaxValue;
             
             foreach (Interactable obj in m_interactableSet.GetEnumerable())
