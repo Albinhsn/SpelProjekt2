@@ -72,7 +72,7 @@ namespace Interaction.Dialogue
                     break;
                 default:
                     m_story.ChooseChoiceIndex(selection);
-                    m_story.Continue();//Continue twice to skip reading own choice
+                    //m_story.Continue();//Continue twice to skip reading own choice
                     if (!m_story.canContinue)//Exit
                     {
                         ExitDialogue();
