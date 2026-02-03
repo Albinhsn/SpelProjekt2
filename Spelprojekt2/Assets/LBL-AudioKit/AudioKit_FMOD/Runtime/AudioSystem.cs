@@ -56,7 +56,7 @@ namespace AudioKit.FMOD
             try
             {
                 result = RuntimeManager.GetVCA(vca);
-            }catch(VCANotFoundException e)
+            }catch(VCANotFoundException)
             {
                 Debug.LogWarning($"Couldn't find vca {vca}");
             }
