@@ -13,6 +13,7 @@ public enum UIState
 
 public class UIManager : MonoBehaviour
 {
+
     private enum ConsoleWindowPage
     {
         Settings,
@@ -20,6 +21,9 @@ public class UIManager : MonoBehaviour
         DebugInfo,
         COUNT
     }
+
+    [SerializeField]
+    private Font font;
 
     [SerializeField]
     private UIState m_stateOnInitialization;
@@ -79,6 +83,7 @@ public class UIManager : MonoBehaviour
 
         GUIStyle btn_style = new GUIStyle(GUI.skin.button);
         btn_style.normal.background = m_btnTexture;
+        btn_style.font = font;
 
         bool result = GUILayout.Button(text, btn_style, button_options);
 
