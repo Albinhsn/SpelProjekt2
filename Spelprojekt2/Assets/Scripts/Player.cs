@@ -43,6 +43,12 @@ public class Player : MonoBehaviour
         m_rb = GetComponent<Rigidbody>();
     }
 
+    void Start()
+    {
+        FilterManager fm = FindFirstObjectByType<FilterManager>();
+        fm.m_filterChanged.AddListener(this.DropItemIfPickedupItemIsFiltered);
+    }
+
     void OnTriggerEnter(Collider other)
     {
         int filter_value = FilterObject.TagIsFilter(other.gameObject.tag);
