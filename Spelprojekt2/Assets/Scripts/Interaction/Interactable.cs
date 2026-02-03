@@ -36,7 +36,7 @@ namespace Interaction
 
         public void SetHighlighted(bool highlight) => m_toggleHighlighted.Invoke(highlight);
 
-        public void SetActive(bool active)
+        public void SetIsInteractable(bool active)
         {
             if (active == m_active) return;
             m_active = active;
