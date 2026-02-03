@@ -26,7 +26,7 @@ namespace Interaction.Dialogue
             m_story = new Story(m_inkData.text);
             foreach (CinemachineCamera obj in m_cameraOverrides)
             {
-                obj.Priority = int.MaxValue;
+                obj.Priority = 0;
             }
         }
 
@@ -38,6 +38,7 @@ namespace Interaction.Dialogue
                 return;
             }
             m_activeInteractor = interactor;
+            SetActiveCamera(0);
             
             m_interacting = true;
             m_story.Continue();
@@ -118,7 +119,7 @@ namespace Interaction.Dialogue
         {
             for (int a = 0; a < m_cameraOverrides.Length; a++)
             {
-                m_cameraOverrides[a].Priority = a == index ? 0 : int.MaxValue;
+                m_cameraOverrides[a].Priority = a == index ? int.MaxValue : 0;
             }
         }
     }
