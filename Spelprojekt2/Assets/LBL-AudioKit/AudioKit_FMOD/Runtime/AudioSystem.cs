@@ -175,6 +175,11 @@ namespace AudioKit.FMOD
                 vcaUi.setVolume(v);
         }
 
+        public float GetMasterVolume()
+        {
+            return baseMaster;
+        }
+
         public void SetMasterVolume(float v)
         {
             baseMaster = Mathf.Clamp01(v);
