@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using AudioKit.FMOD;
 
 public enum UIState
 {
@@ -44,17 +45,13 @@ public class UIManager : MonoBehaviour
 
     private UIState m_state;
     private UIState m_statePriorToSettingsMenu;
-
-    // NOTE(ah): We might not want to store the audio volume here
-    // but instead query it from the AudioSystem (but that doesn't exist at time of writing)
-    // - 3 feb
-    private float m_audioVolume;
+    
+    private AudioSystem m_audioSystem;
 
     void Awake()
     {
         m_state = m_stateOnInitialization;
-
-        // TODO(ah): get the AudioSystem and query for the initial audio volume
+        m_audioSystem = FindFirstObjectByType<AudioSystem>();
     }
 
     bool PauseMenuBtn(string text)
@@ -176,11 +173,11 @@ public class UIManager : MonoBehaviour
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
 
-                    float volume = Slider(m_audioVolume);
-                    if(volume != m_audioVolume)
+                    float audio_volume = m_audioSystem.GetMasterVolume();
+                    float new_volume   = Slider(audio_volume);
+                    if(new_volume != audio_volume)
                     {
-                        m_audioVolume = volume;
-                        // TODO(ah): Actually set volume
+                        m_audioSystem.SetMasterVolume(new_volume);
                     }
                 }
 
