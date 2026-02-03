@@ -21,6 +21,16 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject m_playerPrefab;
 
+    [SerializeField]
+    private float m_areaWidth;
+
+    [SerializeField]
+    private float m_areaHeight;
+
+    // Btn texture
+    
+    // Pause menu bg
+
 
     private UIState m_state;
     private UIState m_statePriorToSettingsMenu;
@@ -79,8 +89,8 @@ public class UIManager : MonoBehaviour
         GUIStyle window_style    = new GUIStyle(GUI.skin.window);
         window_style.padding.top = 0;
 
-        float w = 200;
-        float h = 400;
+        float w = m_areaWidth;
+        float h = m_areaHeight;
 
         float x = (Screen.width - w) * 0.5f;
         float y = (Screen.height - h) * 0.5f;
