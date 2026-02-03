@@ -10,12 +10,12 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float m_additionalYAngle = 45f;
     private InputAction m_lookAction;
     private float m_pitch = 0f;
-    private Transform m_parent;
+    [SerializeField]private Transform m_parent;
     private InputSystem_Actions m_inputActions;
 
     void Awake()
     {
-        m_parent = transform.parent;
+        // m_parent = transform.parent;
     }
     void Update()
     {
