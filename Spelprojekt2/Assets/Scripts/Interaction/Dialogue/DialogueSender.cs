@@ -91,6 +91,7 @@ namespace Interaction.Dialogue
             m_interacting = false;
             m_activeInteractor.CancelInteract();
             m_activeInteractor = null;
+            m_story.ResetState();
         }
         
         private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
