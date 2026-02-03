@@ -54,7 +54,7 @@ public class UIManager : MonoBehaviour
         m_audioSystem = FindFirstObjectByType<AudioSystem>();
     }
 
-    bool PauseMenuBtn(string text)
+    bool MenuBtn(string text)
     {
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
@@ -63,7 +63,10 @@ public class UIManager : MonoBehaviour
         button_options[0] = GUILayout.Width(m_btnWidth);
         button_options[1] = GUILayout.Height(m_btnHeight);
 
-        bool result = GUILayout.Button(text, button_options);
+        GUIStyle btn_style = new GUIStyle(GUI.skin.button);
+        btn_style.normal.background = m_btnTexture;
+
+        bool result = GUILayout.Button(text, btn_style, button_options);
 
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -127,7 +130,7 @@ public class UIManager : MonoBehaviour
             {
                 AreaBegin();
 
-                if(PauseMenuBtn("Play"))
+                if(MenuBtn("Play"))
                 {
                     if(m_levelData != null)
                     {
@@ -141,14 +144,14 @@ public class UIManager : MonoBehaviour
                 }
 
                 GUILayout.Space(25);
-                if(PauseMenuBtn("Settings"))
+                if(MenuBtn("Settings"))
                 {
                     m_statePriorToSettingsMenu = UIState.MainMenu;
                     m_state = UIState.Settings;
                 }
 
                 GUILayout.Space(25);
-                if(PauseMenuBtn("Quit"))
+                if(MenuBtn("Quit"))
                 {
                 #if UNITY_EDITOR
                     UnityEditor.EditorApplication.isPlaying = false;
@@ -183,7 +186,7 @@ public class UIManager : MonoBehaviour
 
                 GUILayout.Space(40);
 
-                if(PauseMenuBtn("Back"))
+                if(MenuBtn("Back"))
                 {
                     m_state = m_statePriorToSettingsMenu;
                 }
@@ -195,19 +198,19 @@ public class UIManager : MonoBehaviour
             {
                 AreaBegin();
 
-                if(PauseMenuBtn("Continue"))
+                if(MenuBtn("Continue"))
                 {
                     m_state = UIState.None;
                 }
                 GUILayout.Space(25);
-                if(PauseMenuBtn("Settings"))
+                if(MenuBtn("Settings"))
                 {
                     m_statePriorToSettingsMenu = UIState.PauseMenu;
                     m_state = UIState.Settings;
                 }
 
                 GUILayout.Space(25);
-                if(PauseMenuBtn("Main Menu"))
+                if(MenuBtn("Main Menu"))
                 {
                     // TODO(ah): How do we manage this?
                     m_state = UIState.MainMenu;
