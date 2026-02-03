@@ -16,7 +16,8 @@ public class PlayerTransformRotation : MonoBehaviour
     {
         if(m_rb.linearVelocity.sqrMagnitude > 0.01f)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(m_rb.linearVelocity.normalized, Vector3.up), m_transformRotationSpeed);
+            Vector3 m_flatVelocity = new Vector3(m_rb.linearVelocity.x, 0, m_rb.linearVelocity.z);
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(m_flatVelocity.normalized, Vector3.up), m_transformRotationSpeed);
         }
     }
 }
