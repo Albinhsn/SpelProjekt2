@@ -12,6 +12,14 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float m_maxPickupDistance;
 
+    [SerializeField]
+    [Range(0.1f, 4.0f)]
+    private float m_maxDistancePickedupItemCanBeFromPlayer = 2.0f;
+
+    [SerializeField]
+    [Range(1.0f, 5.0f)]
+    private float m_speedPickedupItemMovesTowardsPlayer = 3.0f;
+
     private Transform m_pickedupItem;
     private float m_pickedupItemDistance;
 
@@ -166,7 +174,6 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        Debug.DrawRay(this.transform.position, this.transform.forward);
         if(m_pickupItemAction.action.WasPressedThisFrame())
         {
             PickupItem();
@@ -181,14 +188,16 @@ public class Player : MonoBehaviour
             }
 
             Vector3 dir = this.transform.position - m_pickedupItem.transform.position;
-            if(dir.magnitude > 2.0f)
+            if(dir.magnitude > m_maxDistancePickedupItemCanBeFromPlayer)
             {
                 DropItem();
             }
 
-            if(dir.magnitude > m_pickedupItemDistance + 0.3f)
+            // NOTE(ah): Some epsilon added so it's not to close when it tries to move
+            const float DISTANCE_EPSILON = 0.3f;
+            if(dir.magnitude > m_pickedupItemDistance + DISTANCE_EPSILON)
             {
-                rb.linearVelocity += dir.normalized * 2;
+                rb.linearVelocity += dir.normalized * m_speedPickedupItemMovesTowardsPlayer;
             }
         }
     }
