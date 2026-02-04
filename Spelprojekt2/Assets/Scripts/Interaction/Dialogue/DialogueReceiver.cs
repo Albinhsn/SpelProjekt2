@@ -29,6 +29,12 @@ namespace Interaction.Dialogue
             m_dialogueContainer.SetActive(false);
             if (m_altButtons is null) m_altButtons = new List<Button>();
         }
+        private void OnDisable()
+        {
+            m_relay.d_onDialogueInitiation -= InitiateDialogue;
+            m_relay.d_onDialogueUpdate -= UpdateDialogue;
+            m_relay.d_onDialogueExit -= EndDialogue;
+        }
 
         private void InitiateDialogue(Story story)
         {
@@ -84,6 +90,7 @@ namespace Interaction.Dialogue
             {
                 switch (tags[a])
                 {//TODO: add UI tags here
+                    default:{break;}
                 }
             }
         }
