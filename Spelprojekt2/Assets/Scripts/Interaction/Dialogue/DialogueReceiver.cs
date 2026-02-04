@@ -90,6 +90,7 @@ namespace Interaction.Dialogue
             {
                 switch (tags[a])
                 {//TODO: add UI tags here
+                    default:{break;}
                 }
             }
         }
