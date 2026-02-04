@@ -13,7 +13,7 @@ public class PlayerTransformRotation : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {        
         Vector3 m_flatVelocity = new Vector3(m_rb.linearVelocity.x, 0, m_rb.linearVelocity.z);
         
