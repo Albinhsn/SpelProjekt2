@@ -27,7 +27,7 @@ public sealed class PersistentDataManager
 
     public static void DeserializeAll(SerializableObject[] objs)
     {
-        byte[] game_state = Resources.Load<TextAsset>("game_state.bin").bin;
+        byte[] game_state = Resources.Load<TextAsset>("game_state.bin").bytes;
         if(game_state != null)
         {
         }
