@@ -27,14 +27,29 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        FilterObject filter_obj = other.GetComponent<FilterObject>();
-        if(filter_obj != null)
+        bool is_filtered = false;
+
+        // Check other
         {
-            if(filter_obj.m_kind == FilterManager.m_activeFilter)
+            FilterObject filter_obj = other.GetComponent<FilterObject>();
+            if(filter_obj != null)
             {
-                // TODO(ah): Do this only "within some threshold"
-                collision_count++;
+                is_filtered |= filter_obj.m_kind == FilterManager.m_activeFilter;
             }
+        }
+
+        // Check self
+        {
+            FilterObject filter_obj = this.GetComponent<FilterObject>();
+            if(filter_obj != null)
+            {
+                is_filtered |= filter_obj.m_kind == FilterManager.m_activeFilter;
+            }
+        }
+
+        if(is_filtered)
+        {
+            collision_count++;
         }
     }
 
