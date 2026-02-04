@@ -61,6 +61,7 @@ public class UIManager : MonoBehaviour
     
     private AudioSystem m_audioSystem;
     private ConsoleWindowPage m_windowPage;
+    private string m_consoleCommand;
 
     void Awake()
     {
@@ -149,8 +150,8 @@ public class UIManager : MonoBehaviour
             {
                 // ah: Define area
                 {
-                    Rect window_rect = new Rect(20, 20, 400, 300);
-                    GUIStyle window_style = new GUIStyle(GUI.skin.window);
+                    Rect window_rect         = new Rect(20, 20, 400, 300);
+                    GUIStyle window_style    = new GUIStyle(GUI.skin.window);
                     window_style.padding.top = 0;
 
                     GUI.Box(window_rect, GUIContent.none);
@@ -217,6 +218,30 @@ public class UIManager : MonoBehaviour
                         }
                         case ConsoleWindowPage.Console:
                         {
+                            // output area 
+                            {
+                                Rect output_rect    = new Rect(0, 25, window_rect.width, 300);
+                                GUIStyle area_style = new GUIStyle(GUI.skin.box);
+                                area_style.normal.background = Texture2D.whiteTexture;
+                                GUILayout.BeginArea(output_rect, area_style);
+
+                                GUIStyle output_string_style = new GUIStyle(GUI.skin.label);
+                                output_string_style.font = font;
+                                output_string_style.normal.textColor = Color.black;
+                                output_string_style.fontSize = 13;
+                                output_string_style.fixedHeight = 18;
+                                for(int i = 0; i < 11; i++)
+                                {
+                                    GUILayout.Label($"Foo{i}", output_string_style);
+                                }
+
+                                string input = Input.inputString;
+
+                                m_consoleCommand += input;
+                                GUILayout.Label(m_consoleCommand, new GUIStyle(GUI.skin.textArea));
+
+                                GUILayout.EndArea();
+                            }
                             break;
                         }
                         case ConsoleWindowPage.DebugInfo:
