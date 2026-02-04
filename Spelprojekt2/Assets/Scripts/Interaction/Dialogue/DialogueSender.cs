@@ -83,6 +83,7 @@ namespace Interaction.Dialogue
             {
                 switch (tags[a])
                 {//TODO: add world tags here
+                    default:{break;}
                 }
             }
         }

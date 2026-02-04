@@ -9,17 +9,17 @@ namespace srUtils.Unity
         [SerializeField] private bool mirrorY;
         [SerializeField] private bool invertX;
         [SerializeField] private bool invertY;
-        private SpriteRenderer renderer;
+        private SpriteRenderer sprite_renderer;
 
         private void Awake()
         {
-            renderer = GetComponent<SpriteRenderer>();
+            sprite_renderer = GetComponent<SpriteRenderer>();
         }
 
         public void UpdateDirection(Vector2 direction)
         {
-            if (mirrorX) renderer.flipX = direction.x > 0 ? invertX : !invertX;
-            if (mirrorY) renderer.flipY = direction.y > 0 ? invertY : !invertY;
+            if (mirrorX) sprite_renderer.flipX = direction.x > 0 ? invertX : !invertX;
+            if (mirrorY) sprite_renderer.flipY = direction.y > 0 ? invertY : !invertY;
         }
     }
 }
