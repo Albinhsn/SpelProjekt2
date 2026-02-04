@@ -1,9 +1,12 @@
 using UnityEngine;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 public sealed class PersistentDataManager
 {
+
+    private enum DataKind
+    {
+        Player = (1 << 0),
+    }
 
     private static PersistentDataManager _instance;
     private static PersistentDataManager m_instance {
@@ -20,22 +23,20 @@ public sealed class PersistentDataManager
 
     public PersistentDataManager()
     {
-        var game_state = Resources.Load<TextAsset>("game_state.json");
+    }
+
+    public static void DeserializeAll(SerializableObject[] objs)
+    {
+        byte[] game_state = Resources.Load<TextAsset>("game_state.bin").bin;
         if(game_state != null)
         {
-            JArray items = JArray.Parse(game_state.text);
         }
 
     }
 
-    public static void DeserializeAll(GameObject[] objs)
+    public static void SerializeAll(SerializableObject[] objs)
     {
-
-    }
-
-    public static void SerializeAll(GameObject[] objs)
-    {
-
+        // Serialize current filter
     }
 
 
