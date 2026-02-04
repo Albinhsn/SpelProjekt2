@@ -4,19 +4,8 @@ using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
 
-[System.Serializable]
-public struct FilterAction
-{
-    // NOTE(ah): _kind_ is redundant, can be infered by the index
-    public FilterKind m_kind;
-    public InputActionReference m_action;
-}
-
 public class FilterManager : MonoBehaviour
 {
-    [SerializeField]
-    private FilterManagerData m_actionData;
-
     private int[] m_collidingWithCount;
 
     [SerializeField]
@@ -31,15 +20,6 @@ public class FilterManager : MonoBehaviour
 
     void Awake()
     {
-        // ah: Enable all actions
-        if(m_actionData.m_actions != null)
-        {
-            FilterAction[] actions = m_actionData.m_actions;
-            for(int i = 0; i < actions.Length; i++)
-            {
-                actions[i].m_action.action.Enable();
-            }
-        }
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
     }
 
@@ -65,13 +45,12 @@ public class FilterManager : MonoBehaviour
 
     void Update()
     {
-        if(m_actionData.m_actions != null && CanDeactivateCurrentFilter())
+        if(CanDeactivateCurrentFilter())
         {
             // ah: check if any filter was activated
-            FilterAction[] actions = m_actionData.m_actions;
-            for(int i = 0; i < actions.Length; i++)
+            for(int i = 0; i < (int)FilterKind.COUNT; i++)
             {
-                if(actions[i].m_action.action.WasPressedThisFrame())
+                if(InputManager.Filter((FilterKind)i))
                 {
                     // ah: broadcast event
                     // HACK(ah): Currently player at least relies on this happening before 

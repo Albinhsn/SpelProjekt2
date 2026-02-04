@@ -55,4 +55,23 @@ public sealed class InputManager
     {
         Instance.m_inputActions.Player.Enable();
     }
+
+    public static bool Filter(FilterKind kind)
+    {
+        bool result = false;
+        switch(kind)
+        {
+            case FilterKind.Red:
+            {
+                result = Instance.m_inputActions.Player.FilterRed.WasPressedThisFrame();
+                break;
+            }
+            case FilterKind.Blue:
+            {
+                result = Instance.m_inputActions.Player.FilterBlue.WasPressedThisFrame();
+                break;
+            }
+        }
+        return result;
+    }
 }
