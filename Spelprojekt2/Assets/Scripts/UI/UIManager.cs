@@ -8,19 +8,10 @@ public enum UIState
     MainMenu,
     Settings,
     PauseMenu,
-    Console,
 }
 
 public class UIManager : MonoBehaviour
 {
-
-    private enum ConsoleWindowPage
-    {
-        Settings,
-        Console,
-        DebugInfo,
-        COUNT
-    }
 
     [SerializeField]
     private Font font;
@@ -60,8 +51,6 @@ public class UIManager : MonoBehaviour
     private UIState m_statePriorToConsole;
     
     private AudioSystem m_audioSystem;
-    private ConsoleWindowPage m_windowPage;
-    private string m_consoleCommand;
 
     void Awake()
     {
@@ -146,122 +135,6 @@ public class UIManager : MonoBehaviour
     {
         switch(m_state)
         {
-            case UIState.Console:
-            {
-                // ah: Define area
-                {
-                    Rect window_rect         = new Rect(20, 20, 400, 300);
-                    GUIStyle window_style    = new GUIStyle(GUI.skin.window);
-                    window_style.padding.top = 0;
-
-                    GUI.Box(window_rect, GUIContent.none);
-
-                    GUILayout.BeginArea(window_rect);
-                    GUILayout.BeginVertical();
-                    
-                    int padding = 2;
-                    GUIStyle label_style = new GUIStyle(GUI.skin.label);
-                    label_style.padding.top = padding - 2;
-                    GUIStyle btn_style = new GUIStyle(GUI.skin.label);
-                    {
-                        Rect row = GUILayoutUtility.GetRect(1f, 1f);
-                        row.y += padding;
-
-                        float btn_height = 20;
-                        float btn_width  = 50;
-                        
-                        GUILayout.BeginHorizontal();
-
-                        Rect btn_rect = new Rect(row.x, row.y + padding, btn_width, btn_height);
-
-                        if(GUI.Button(btn_rect, "<<<", btn_style))
-                        {
-                            int next_page = (int)m_windowPage - 1;
-                            if(next_page == -1)
-                            {
-                                m_windowPage = (ConsoleWindowPage)((int)ConsoleWindowPage.COUNT - 1);
-                            }
-                            else
-                            {
-                                m_windowPage = (ConsoleWindowPage)next_page;
-                            }
-
-                        }
-                        GUILayout.FlexibleSpace();
-                        GUILayout.Label(m_windowPage.ToString(), label_style);
-                        GUILayout.FlexibleSpace();
-
-                        btn_rect.x = row.x + row.width - btn_width;
-                        if(GUI.Button(btn_rect, ">>>", btn_style))
-                        {
-                            int next_page = (int)m_windowPage + 1;
-                            if(next_page == (int)ConsoleWindowPage.COUNT)
-                            {
-                                m_windowPage = (ConsoleWindowPage)0;
-                            }
-                            else
-                            {
-                                m_windowPage = (ConsoleWindowPage)next_page;
-                            }
-
-                        }
-                        GUILayout.EndHorizontal();
-                    }
-
-                    // ah: windows
-                    switch(m_windowPage)
-                    {
-
-                        case ConsoleWindowPage.Settings:
-                        {
-                            break;
-                        }
-                        case ConsoleWindowPage.Console:
-                        {
-                            // output area 
-                            {
-                                Rect output_rect    = new Rect(0, 25, window_rect.width, 300);
-                                GUIStyle area_style = new GUIStyle(GUI.skin.box);
-                                area_style.normal.background = Texture2D.whiteTexture;
-                                GUILayout.BeginArea(output_rect, area_style);
-
-                                GUIStyle output_string_style = new GUIStyle(GUI.skin.label);
-                                output_string_style.font = font;
-                                output_string_style.normal.textColor = Color.black;
-                                output_string_style.fontSize = 13;
-                                output_string_style.fixedHeight = 18;
-                                for(int i = 0; i < 11; i++)
-                                {
-                                    GUILayout.Label($"Foo{i}", output_string_style);
-                                }
-
-                                string input = Input.inputString;
-
-                                m_consoleCommand += input;
-                                GUILayout.Label(m_consoleCommand, new GUIStyle(GUI.skin.textArea));
-
-                                GUILayout.EndArea();
-                            }
-                            break;
-                        }
-                        case ConsoleWindowPage.DebugInfo:
-                        {
-                            int monobehaviour_count = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).Length;
-                            int game_object_count = FindObjectsByType<GameObject>(FindObjectsSortMode.None).Length;
-
-                            GUILayout.Label($"GameObjects: {monobehaviour_count}");
-                            GUILayout.Label($"Monobehaviours: {game_object_count}");
-                            break;
-                        }
-                        default:{break;}
-                    }
-
-                    GUILayout.EndVertical();
-                    GUILayout.EndArea();
-                }
-
-                break;
-            }
             case UIState.MainMenu:
             {
                 AreaBegin();
@@ -371,18 +244,6 @@ public class UIManager : MonoBehaviour
             if(Input.GetKeyUp(KeyCode.Escape))
             {
                 m_state = UIState.PauseMenu;
-            }
-        }
-        if(Input.GetKeyUp(KeyCode.Alpha0))
-        {
-            if(m_state == UIState.Console)
-            {
-                m_state = m_statePriorToConsole;
-            }
-            else
-            {
-                m_statePriorToConsole = m_state;
-                m_state = UIState.Console;
             }
         }
     }
