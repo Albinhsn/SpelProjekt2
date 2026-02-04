@@ -1,5 +1,11 @@
 using UnityEngine;
 
+public enum DoorDirection
+{
+    Up,
+    Sideways,
+}
+
 [RequireComponent(typeof(Collider))]
 public class Door : MonoBehaviour
 {
@@ -11,8 +17,12 @@ public class Door : MonoBehaviour
     private float m_timeToClose;
 
     [SerializeField]
-    private float m_openHeight;
+    private float m_openDistance;
 
+    [SerializeField]
+    private DoorDirection direction; 
+
+    private Vector3 m_direction => direction == DoorDirection.Up ? new Vector3(0,1,0) : new Vector3(1,0,0);
 
     private float m_timeRemaining;
     private bool  m_closing;
@@ -31,11 +41,18 @@ public class Door : MonoBehaviour
     {
         if(!m_opening)
         {
-            // this.transform.position = m_closePosition + new Vector3(0, m_openHeight, 0);
             m_opening = true;
             m_closing = false;
-            float current_height_ratio = 1.0f - (this.transform.position.y - m_closePosition.y) / m_openHeight;
-            m_timeRemaining = m_timeToOpen * current_height_ratio;
+            float current_ratio = 0;
+            if(direction == DoorDirection.Up)
+            {
+                current_ratio = 1.0f - (this.transform.position.y - m_closePosition.y) / m_openDistance;
+            }
+            if(direction == DoorDirection.Sideways)
+            {
+                current_ratio = 1.0f - (this.transform.position.x - m_closePosition.x) / m_openDistance;
+            }
+            m_timeRemaining = m_timeToOpen * current_ratio;
         }
     }
 
@@ -43,12 +60,19 @@ public class Door : MonoBehaviour
     {
         if(m_timeToClose != 0 && !m_closing)
         {
-
             m_closing = true;
             m_opening = false;
-
-            float current_height_ratio = (this.transform.position.y - m_closePosition.y) / m_openHeight;
-            m_timeRemaining = m_timeToClose * current_height_ratio;
+            float current_ratio = 0;
+            if(direction == DoorDirection.Up)
+            {
+                current_ratio = (this.transform.position.y - m_closePosition.y) / m_openDistance;
+            }
+            if(direction == DoorDirection.Sideways)
+            {
+                current_ratio = (this.transform.position.x - m_closePosition.x) / m_openDistance;
+            }
+            m_timeRemaining = m_timeToClose * current_ratio;
+            Debug.Log($"Closing with {m_timeRemaining}");
         }
     }
 
@@ -66,16 +90,16 @@ public class Door : MonoBehaviour
 
             if(m_opening)
             {
-                float heightRatio       = 1.0f - m_timeRemaining / m_timeToOpen;
-                float additional_height = Mathf.Lerp(0, m_openHeight, heightRatio);
-                this.transform.position = m_closePosition + new Vector3(0, additional_height, 0);
+                float ratio       = 1.0f - m_timeRemaining / m_timeToOpen;
+                float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
+                this.transform.position = m_closePosition + m_direction * additional_distance;
 
             }
             else if(m_closing)
             {
-                float heightRatio       = m_timeRemaining / m_timeToClose;
-                float additional_height = Mathf.Lerp(0, m_openHeight, heightRatio);
-                this.transform.position = m_closePosition + new Vector3(0, additional_height, 0);
+                float ratio = m_timeRemaining / m_timeToClose;
+                float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
+                this.transform.position = m_closePosition + m_direction * additional_distance;
             }
             else
             {
