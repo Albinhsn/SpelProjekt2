@@ -81,7 +81,6 @@ public class Player : MonoBehaviour
 
     void DropItem()
     {
-        // ah: drop item
         Rigidbody rb = m_pickedupItem.gameObject.GetComponent<Rigidbody>();
         if(rb != null)
         {
