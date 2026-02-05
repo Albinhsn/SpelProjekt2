@@ -61,14 +61,14 @@ public sealed class InputManager
         bool result = false;
         switch(kind)
         {
-            case FilterKind.Red:
+            case FilterKind.Primary:
             {
-                result = Instance.m_inputActions.Player.FilterRed.WasPressedThisFrame();
+                result = Instance.m_inputActions.Player.FilterPrimary.WasPressedThisFrame();
                 break;
             }
-            case FilterKind.Blue:
+            case FilterKind.Secondary:
             {
-                result = Instance.m_inputActions.Player.FilterBlue.WasPressedThisFrame();
+                result = Instance.m_inputActions.Player.FilterSecondary.WasPressedThisFrame();
                 break;
             }
         }

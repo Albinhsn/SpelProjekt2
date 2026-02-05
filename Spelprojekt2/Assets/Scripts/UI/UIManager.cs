@@ -117,13 +117,10 @@ public class UIManager : MonoBehaviour
     }
 
     void
-    AreaBegin()
+    AreaBegin(float w, float h)
     {
         GUIStyle window_style    = new GUIStyle(GUI.skin.window);
         window_style.padding.top = 0;
-
-        float w = m_areaWidth;
-        float h = m_areaHeight;
 
         float x = (Screen.width - w) * 0.5f;
         float y = (Screen.height - h) * 0.5f;
@@ -146,13 +143,41 @@ public class UIManager : MonoBehaviour
         GUILayout.EndArea();
     }
 
+    int 
+    MenuSelection(int prev_value, string label, string[] selections)
+    {
+        GUIStyle style  = new(GUI.skin.button);
+        style.fontSize -= 10;
+        style.font      = font;
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+
+        GUIStyle label_style = new GUIStyle(GUI.skin.label);
+        label_style.font = font;
+        label_style.fontSize = 15;
+        GUILayout.Label(label, label_style);
+
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        int new_value = GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        return new_value;
+
+    }
+
     void OnGUI()
     {
         switch(m_state)
         {
             case UIState.MainMenu:
             {
-                AreaBegin();
+                AreaBegin(m_areaWidth, m_areaHeight);
 
                 if(MenuBtn("Play"))
                 {
@@ -197,7 +222,7 @@ public class UIManager : MonoBehaviour
             }
             case UIState.Settings:
             {
-                AreaBegin();
+                AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 1.25f);
 
                 // Volume slider
                 {
@@ -220,7 +245,49 @@ public class UIManager : MonoBehaviour
                     }
                 }
 
-                GUILayout.Space(40);
+                // Color Accessibility
+                {
+
+                    FilterManager fm = FindFirstObjectByType<FilterManager>();
+                    if(fm != null)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.FlexibleSpace();
+
+                        GUILayout.Label("Color settings");
+
+                        GUILayout.FlexibleSpace();
+                        GUILayout.EndHorizontal();
+
+
+                        FilterColor[] colors = fm.m_filterColorData.m_Colors;
+
+                        int prev_primary   = (int)colors[0];
+                        int prev_secondary = (int)colors[1];
+
+                        string[] filter_color_strings = new string[(int)FilterColor.COUNT];
+                        for(int i = 0; i < (int)FilterColor.COUNT; i++)
+                        {
+                            filter_color_strings[i] = ((FilterColor)i).ToString();
+                        }
+
+                        int new_primary = MenuSelection(prev_primary, "Primary", filter_color_strings);
+                        if(prev_primary != new_primary)
+                        {
+                            colors[0] = (FilterColor)new_primary;
+                            fm.ChangeFilterColor();
+                        }
+
+                        int new_secondary = MenuSelection(prev_secondary, "Secondary", filter_color_strings);
+                        if(prev_secondary != new_secondary)
+                        {
+                            colors[1] = (FilterColor)new_secondary;
+                            fm.ChangeFilterColor();
+                        }
+                    }
+                }
+
+                GUILayout.Space(15);
 
                 if(MenuBtn("Back"))
                 {
@@ -232,7 +299,7 @@ public class UIManager : MonoBehaviour
             }
             case UIState.PauseMenu:
             {
-                AreaBegin();
+                AreaBegin(m_areaWidth, m_areaHeight);
 
                 if(Input.GetKeyUp(KeyCode.Escape))
                 {
