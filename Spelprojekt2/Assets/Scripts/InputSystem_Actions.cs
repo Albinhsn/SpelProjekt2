@@ -120,7 +120,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Filter Red"",
+                    ""name"": ""Filter Primary"",
                     ""type"": ""Button"",
                     ""id"": ""41ecc8cb-4c29-421f-815c-49d844e53d39"",
                     ""expectedControlType"": """",
@@ -129,7 +129,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Filter Blue"",
+                    ""name"": ""Filter Secondary"",
                     ""type"": ""Button"",
                     ""id"": ""2ae67ef0-9810-4560-9b7d-483e1d52a06a"",
                     ""expectedControlType"": """",
@@ -342,7 +342,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Filter Red"",
+                    ""action"": ""Filter Primary"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -353,7 +353,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Filter Blue"",
+                    ""action"": ""Filter Secondary"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -975,8 +975,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_FilterRed = m_Player.FindAction("Filter Red", throwIfNotFound: true);
-        m_Player_FilterBlue = m_Player.FindAction("Filter Blue", throwIfNotFound: true);
+        m_Player_FilterPrimary = m_Player.FindAction("Filter Primary", throwIfNotFound: true);
+        m_Player_FilterSecondary = m_Player.FindAction("Filter Secondary", throwIfNotFound: true);
         m_Player_Reset = m_Player.FindAction("Reset", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -1075,8 +1075,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_FilterRed;
-    private readonly InputAction m_Player_FilterBlue;
+    private readonly InputAction m_Player_FilterPrimary;
+    private readonly InputAction m_Player_FilterSecondary;
     private readonly InputAction m_Player_Reset;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
@@ -1102,13 +1102,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         /// <summary>
-        /// Provides access to the underlying input action "Player/FilterRed".
+        /// Provides access to the underlying input action "Player/FilterPrimary".
         /// </summary>
-        public InputAction @FilterRed => m_Wrapper.m_Player_FilterRed;
+        public InputAction @FilterPrimary => m_Wrapper.m_Player_FilterPrimary;
         /// <summary>
-        /// Provides access to the underlying input action "Player/FilterBlue".
+        /// Provides access to the underlying input action "Player/FilterSecondary".
         /// </summary>
-        public InputAction @FilterBlue => m_Wrapper.m_Player_FilterBlue;
+        public InputAction @FilterSecondary => m_Wrapper.m_Player_FilterSecondary;
         /// <summary>
         /// Provides access to the underlying input action "Player/Reset".
         /// </summary>
@@ -1148,12 +1148,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @FilterRed.started += instance.OnFilterRed;
-            @FilterRed.performed += instance.OnFilterRed;
-            @FilterRed.canceled += instance.OnFilterRed;
-            @FilterBlue.started += instance.OnFilterBlue;
-            @FilterBlue.performed += instance.OnFilterBlue;
-            @FilterBlue.canceled += instance.OnFilterBlue;
+            @FilterPrimary.started += instance.OnFilterPrimary;
+            @FilterPrimary.performed += instance.OnFilterPrimary;
+            @FilterPrimary.canceled += instance.OnFilterPrimary;
+            @FilterSecondary.started += instance.OnFilterSecondary;
+            @FilterSecondary.performed += instance.OnFilterSecondary;
+            @FilterSecondary.canceled += instance.OnFilterSecondary;
             @Reset.started += instance.OnReset;
             @Reset.performed += instance.OnReset;
             @Reset.canceled += instance.OnReset;
@@ -1177,12 +1177,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @FilterRed.started -= instance.OnFilterRed;
-            @FilterRed.performed -= instance.OnFilterRed;
-            @FilterRed.canceled -= instance.OnFilterRed;
-            @FilterBlue.started -= instance.OnFilterBlue;
-            @FilterBlue.performed -= instance.OnFilterBlue;
-            @FilterBlue.canceled -= instance.OnFilterBlue;
+            @FilterPrimary.started -= instance.OnFilterPrimary;
+            @FilterPrimary.performed -= instance.OnFilterPrimary;
+            @FilterPrimary.canceled -= instance.OnFilterPrimary;
+            @FilterSecondary.started -= instance.OnFilterSecondary;
+            @FilterSecondary.performed -= instance.OnFilterSecondary;
+            @FilterSecondary.canceled -= instance.OnFilterSecondary;
             @Reset.started -= instance.OnReset;
             @Reset.performed -= instance.OnReset;
             @Reset.canceled -= instance.OnReset;
@@ -1519,19 +1519,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Filter Red" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Filter Primary" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnFilterRed(InputAction.CallbackContext context);
+        void OnFilterPrimary(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Filter Blue" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Filter Secondary" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnFilterBlue(InputAction.CallbackContext context);
+        void OnFilterSecondary(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Reset" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

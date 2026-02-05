@@ -22,21 +22,21 @@ public class FilterMaterialEditor : Editor
     {
         FilterMaterialData obj = (FilterMaterialData)target;
 
-        int filterKindCount = (int)FilterKind.COUNT;
+        int filterColorCount = (int)FilterColor.COUNT;
 
-        if(obj.m_materials == null)
+        if(obj.m_materials == null || obj.m_materials.Length != filterColorCount)
         {
-            obj.m_materials = new FilterMaterial[filterKindCount];
+            obj.m_materials = new FilterMaterial[filterColorCount];
         }
 
         SerializedObject serializedObj = new SerializedObject(obj);
         SerializedProperty materials   = serializedObj.FindProperty("m_materials");
-        for(int i = 0; i < filterKindCount; i++)
+        for(int i = 0; i < filterColorCount; i++)
         {
-            FilterKind kind = (FilterKind)i;
+            FilterColor color = (FilterColor)i;
 
             BeginCenterElement();
-            GUILayout.Label(kind.ToString());
+            GUILayout.Label(color.ToString());
             EndCenterElement();
 
             SerializedProperty element = materials.GetArrayElementAtIndex(i);

@@ -12,6 +12,9 @@ public class FilterManager : MonoBehaviour
     public UnityEvent<FilterKind, bool> m_filterChanged;
 
     public static FilterKind m_activeFilter = FilterKind.None;
+    public FilterColorData m_filterColorData;
+    public FilterMaterialData m_filterMaterialData;
+
 
     void OnEnable()
     {
@@ -20,7 +23,21 @@ public class FilterManager : MonoBehaviour
 
     void Awake()
     {
+        m_filterMaterialData = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
+        m_filterColorData    = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
+
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
+
+        ChangeFilterColor();
+    }
+
+    public void ChangeFilterColor()
+    {
+        FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
+        for(int j = 0; j < objects.Length; j++)
+        {
+            objects[j].ChangeMaterialColor(m_filterColorData, m_filterMaterialData);
+        }
     }
 
     private bool CanDeactivateCurrentFilter()
