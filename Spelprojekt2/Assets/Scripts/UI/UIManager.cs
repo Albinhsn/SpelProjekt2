@@ -271,16 +271,30 @@ public class UIManager : MonoBehaviour
                             filter_color_strings[i] = ((FilterColor)i).ToString();
                         }
 
+                        bool change_filter = false;
                         int new_primary = MenuSelection(prev_primary, "Primary", filter_color_strings);
                         if(prev_primary != new_primary)
                         {
-                            colors[0] = (FilterColor)new_primary;
-                            fm.ChangeFilterColor();
+                            if(new_primary == prev_secondary)
+                            {
+                                prev_secondary = (new_primary + 1) % (int)FilterColor.COUNT;
+                            }
+                            change_filter = true;
                         }
 
                         int new_secondary = MenuSelection(prev_secondary, "Secondary", filter_color_strings);
                         if(prev_secondary != new_secondary)
                         {
+                            if(new_secondary == new_primary)
+                            {
+                                new_primary = (new_secondary + 1) % (int)FilterColor.COUNT;
+                            }
+                            change_filter = true;
+                        }
+
+                        if(change_filter)
+                        {
+                            colors[0] = (FilterColor)new_primary;
                             colors[1] = (FilterColor)new_secondary;
                             fm.ChangeFilterColor();
                         }
