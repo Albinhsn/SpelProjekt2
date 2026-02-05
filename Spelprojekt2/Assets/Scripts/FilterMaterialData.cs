@@ -1,6 +1,15 @@
 using UnityEngine;
 using System;
 
+public enum FilterColor
+{
+    Red,
+    Green,
+    Blue,
+    Yellow,
+    COUNT
+}
+
 [System.Serializable]
 public struct FilterMaterial
 {
