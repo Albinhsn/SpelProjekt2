@@ -160,12 +160,9 @@ public class UIManager : MonoBehaviour
                     InputManager.EnablePlayerInput();
                     if(m_levelData != null)
                     {
-
                         LevelData data = m_levelData.levels[0];
                         SceneLoader loader = new(data.m_sceneReference, data.m_offset, m_playerPrefab);
                         loader.Load();
-
-                        // This might need to happen AFTER 
 
                         // TODO(ah): stream in different levels depending on where you are
 

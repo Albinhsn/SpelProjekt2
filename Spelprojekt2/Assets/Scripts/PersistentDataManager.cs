@@ -16,7 +16,8 @@ using static Serialization;
   Magic (PLAY) (32bit)
   Version (32bit)
   Filter active (32bit)
-  Position, Rotation
+  Position, Rotation,
+  Latest spawn position
 
  */
 
@@ -64,7 +65,13 @@ public sealed class PersistentDataManager
             }
         }
 
-        // TODO(ah): delete player data
+        {
+            var path = Path.Combine(Application.persistentDataPath, $"player.bin");
+            if(File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
     }
 
 
@@ -92,8 +99,8 @@ public sealed class PersistentDataManager
         // Magic, Version
         int header_size = sizeof(int) * 2;
 
-        // Filter active, Position, Rotation
-        int obj_size    = sizeof(float) * 7 + sizeof(int); 
+        // Filter active, Position, Rotation, spawn point
+        int obj_size    = sizeof(float) * 10 + sizeof(int); 
 
         int total_size = header_size + obj_size;
         byte[] buffer  = new byte[total_size];
@@ -130,6 +137,14 @@ public sealed class PersistentDataManager
             player.transform.rotation.w
         };
         offset = memcpy(ref buffer, SerializeArray(rot), offset);
+
+        float[] spawn_point = new float[3]
+        {
+            LevelCheckpointManager.m_currentSpawnPoint.x,
+            LevelCheckpointManager.m_currentSpawnPoint.y,
+            LevelCheckpointManager.m_currentSpawnPoint.z,
+        };
+        offset = memcpy(ref buffer, SerializeArray(spawn_point), offset);
 
 
 
@@ -180,8 +195,13 @@ public sealed class PersistentDataManager
             float[] rotation = new float[4];
             offset = DeserializeArray<float>(ref rotation, buffer, offset);
 
+            // spawn point
+            float[] spawn_point = new float[3];
+            offset = DeserializeArray<float>(ref spawn_point, buffer, offset);
+
             player.gameObject.transform.position = new Vector3(position[0], position[1], position[2]);
             player.gameObject.transform.rotation = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
+            LevelCheckpointManager.SetNewSpawnPoint(new Vector3(spawn_point[0], spawn_point[1], spawn_point[2]));
             Debug.Log("[PDM] Deserialized player");
         }
         else
