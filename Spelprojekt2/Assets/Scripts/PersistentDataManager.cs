@@ -1,15 +1,22 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.IO;
 using System;
 using System.Collections.Generic;
 using static Serialization;
 
 /*
- V0 format:
-  Magic (DATA) (32bit)
-  Version 0 (32bit)
+ v0 format for scene:
+  Magic (SCEN) (32bit)
+  Version (32bit)
   Count of objects (32bit)
   ID, Position, Rotation
+
+ v0 format for player:
+  Magic (PLAY) (32bit)
+  Version (32bit)
+  Filter active (32bit)
+  Position, Rotation
 
  */
 
@@ -45,13 +52,153 @@ public sealed class PersistentDataManager
     {
     }
 
-    public static void DeserializeAll(String name, SerializableObject[] objs)
+    public static void RemoveAllSerializedData()
+    {
+        for(int i = 0; i < SceneManager.loadedSceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            var path = Path.Combine(Application.persistentDataPath, $"{scene.name}.bin");
+            if(File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+
+        // TODO(ah): delete player data
+    }
+
+
+    public static void SerializeLoadedLevels()
+    {
+        for(int i = 0; i < SceneManager.loadedSceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            if(scene.isLoaded)
+            {
+                List<SerializableObject> objs = new();
+                foreach(var root in scene.GetRootGameObjects())
+                {
+                    objs.AddRange(root.GetComponentsInChildren<SerializableObject>(true));
+                }
+                PersistentDataManager.SerializeScene(scene.name, objs.ToArray());
+            }
+        }
+
+        // TODO(ah): serialize player data
+    }
+
+    public static void SerializePlayer(Player player)
+    {
+        // Magic, Version
+        int header_size = sizeof(int) * 2;
+
+        // Filter active, Position, Rotation
+        int obj_size    = sizeof(float) * 7 + sizeof(int); 
+
+        int total_size = header_size + obj_size;
+        byte[] buffer  = new byte[total_size];
+
+        // Magic
+        buffer[0]  = (byte)'P';
+        buffer[1]  = (byte)'L';
+        buffer[2]  = (byte)'A';
+        buffer[3]  = (byte)'Y';
+        int offset = 4;
+
+        // Version
+        offset = SerializeScalar<int>(ref buffer, 0, offset);
+
+        // Filter active
+        offset = SerializeScalar<int>(ref buffer, (int)FilterManager.m_activeFilter, offset);
+
+        // Position
+        float[] pos = new float[3]
+        {
+            player.transform.position.x,
+            player.transform.position.y,
+            player.transform.position.z
+        };
+        offset = memcpy(ref buffer, SerializeArray(pos), offset);
+
+
+        // Rotation 
+        float[] rot = new float[4] 
+        {
+            player.transform.rotation.x,
+            player.transform.rotation.y,
+            player.transform.rotation.z,
+            player.transform.rotation.w
+        };
+        offset = memcpy(ref buffer, SerializeArray(rot), offset);
+
+
+
+        var path = Path.Combine(Application.persistentDataPath, "player.bin");
+        Debug.Log($"[PDM] Serializing player, offset: {offset}, expected {total_size} to {path}");
+        File.WriteAllBytes(path, buffer);
+
+    }
+
+    public static FilterKind DeserializePlayer(Player player)
+    {
+        var path = Path.Combine(Application.persistentDataPath, "player.bin");
+
+        FilterKind result = FilterKind.None;
+
+        if(File.Exists(path))
+        {
+            byte[] buffer = File.ReadAllBytes(path);
+            int offset = 0;
+
+            // Magic
+            {
+                uint magic = 0;
+                offset = DeserializeScalar<uint>(ref magic, buffer, offset);
+
+                char b0 = (char)((magic >> 0 ) & 0xFF);
+                char b1 = (char)((magic >> 8 ) & 0xFF);
+                char b2 = (char)((magic >> 16) & 0xFF);
+                char b3 = (char)((magic >> 24) & 0xFF);
+
+                Debug.Log($"[PDM] Magic: {b0}{b1}{b2}{b3} from player");
+            }
+
+            // Version
+            int version = 0;
+            offset = DeserializeScalar<int>(ref version, buffer, offset);
+
+            // Filter active
+            int filter = 0;
+            offset = DeserializeScalar<int>(ref filter, buffer, offset);
+            result = (FilterKind)filter;
+
+            // Position
+            float[] position = new float[3];
+            offset = DeserializeArray<float>(ref position, buffer, offset);
+
+            // Rotation
+            float[] rotation = new float[4];
+            offset = DeserializeArray<float>(ref rotation, buffer, offset);
+
+            player.gameObject.transform.position = new Vector3(position[0], position[1], position[2]);
+            player.gameObject.transform.rotation = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
+            Debug.Log("[PDM] Deserialized player");
+        }
+        else
+        {
+            Debug.Log("[PDM] Didn't find any player data to deserialize");
+        }
+        return result;
+
+    }
+
+    public static void DeserializeScene(String name, SerializableObject[] objs)
     {
         var path = Path.Combine(Application.persistentDataPath, $"{name}.bin");
 
         if(File.Exists(path))
         {
-            Debug.Log($"Deserializing {name}");
+            Debug.Log($"[PDM] Deserializing {name}");
             byte[] buffer = File.ReadAllBytes(path);
             int offset = 0;
 
@@ -112,7 +259,7 @@ public sealed class PersistentDataManager
         }
     }
 
-    public static void SerializeAll(String name, SerializableObject[] objs)
+    public static void SerializeScene(String name, SerializableObject[] objs)
     {
 
         // Magic, Version, Object count
@@ -127,10 +274,10 @@ public sealed class PersistentDataManager
         byte[] buffer  = new byte[total_size];
 
         // Magic
-        buffer[0]  = (byte)'D';
-        buffer[1]  = (byte)'A';
-        buffer[2]  = (byte)'T';
-        buffer[3]  = (byte)'A';
+        buffer[0]  = (byte)'S';
+        buffer[1]  = (byte)'C';
+        buffer[2]  = (byte)'E';
+        buffer[3]  = (byte)'N';
         int offset = 4;
 
         // Version
@@ -168,7 +315,7 @@ public sealed class PersistentDataManager
         
 
         var path = Path.Combine(Application.persistentDataPath, $"{name}.bin");
-        Debug.Log($"Serializing {name}, offset: {offset}, expected {total_size} to {path}");
+        Debug.Log($"[PDM] Serializing {name}, offset: {offset}, expected {total_size} to {path}");
         File.WriteAllBytes(path, buffer);
     }
 
