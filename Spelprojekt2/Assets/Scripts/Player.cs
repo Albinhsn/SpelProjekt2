@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using static LinAlg.LinAlg;
 using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Player : MonoBehaviour
@@ -100,7 +101,7 @@ public class Player : MonoBehaviour
     RaycastResult PickupRaycast(Vector3 origin)
     {
         RaycastResult result = new();
-        Vector3 direction = Rejection(Camera.main.transform.forward, new Vector3(0,1,0));
+        Vector3 direction = Rejection(this.transform.forward, new Vector3(0,1,0));
         int layer_mask    = ~LayerMask.GetMask("Player");
         result.hit = Physics.Raycast(origin, direction, out result.data, Mathf.Infinity, layer_mask);
         return result;
@@ -147,15 +148,6 @@ public class Player : MonoBehaviour
                             // ah: pick up the item
                             m_pickedupItem = hit.transform;
 
-                            // ah: transform the item to be infront of the player
-                            Bounds hit_bounds = hit.collider.bounds;
-
-                            Vector3 epsilon = new Vector3(0.1f, 0, 0.1f);
-                            Vector3 offset = hit_bounds.extents + player_bounds.extents + epsilon;
-                            offset.y = 0;
-                            hit.transform.position = this.transform.position + Hadamard(offset, Rejection(Camera.main.transform.forward, new Vector3(0,1,0)).normalized);
-                            hit.transform.rotation = this.transform.rotation;
-
                             // ah: store distance between them
                             m_pickedupItemDistance = (transform.position - hit.transform.position).magnitude;
 
@@ -177,6 +169,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        
         if(m_pickupItemAction.action.WasPressedThisFrame())
         {
             PickupItem();
@@ -184,10 +177,32 @@ public class Player : MonoBehaviour
 
         if(m_pickedupItem != null)
         {
+            float radius = 1;
+            Vector3 targetPos = this.transform.position + this.transform.forward * radius;
+            Vector3 itemToPlayerDir = this.transform.position - m_pickedupItem.transform.position;
+            Vector2 itemToPlayerDirXZ = new Vector2(itemToPlayerDir.x, itemToPlayerDir.z).normalized;
+            Vector2 itemToPlayerDirXZNormal = new Vector2(-itemToPlayerDirXZ.y, itemToPlayerDirXZ.x);
+            float itemToPlayerDist = itemToPlayerDir.magnitude;
+            float distanceToCircle = itemToPlayerDist - radius;
+            Vector3 itemToTargetPosDir = m_pickedupItem.transform.position + itemToPlayerDir * distanceToCircle;
+            Vector3 directionToTargetFromCircle = targetPos - itemToTargetPosDir;
+            float distanceToTargetFromItem = (targetPos - m_pickedupItem.transform.position).magnitude;
+            Vector3 targetVelocity = new Vector3(
+                itemToPlayerDirXZNormal.x * m_speedPickedupItemMovesTowardsPlayer,
+                0,
+                itemToPlayerDirXZNormal.y * m_speedPickedupItemMovesTowardsPlayer
+            );
+
+            float Dir = Mathf.Sign(Vector2.Dot(itemToPlayerDirXZNormal, new Vector2(directionToTargetFromCircle.x, directionToTargetFromCircle.z)));
+            
+            float speed = Mathf.Clamp(distanceToTargetFromItem*distanceToTargetFromItem/2f, 0, 1);
             Rigidbody rb = m_pickedupItem.transform.gameObject.GetComponent<Rigidbody>();
+            Debug.Log(distanceToTargetFromItem);
             if(rb != null)
             {
-                rb.linearVelocity = m_rb.linearVelocity;
+                rb.linearVelocity = m_rb.linearVelocity + targetVelocity * Dir * speed;
+
+                
             }
 
             Vector3 dir = this.transform.position - m_pickedupItem.transform.position;
