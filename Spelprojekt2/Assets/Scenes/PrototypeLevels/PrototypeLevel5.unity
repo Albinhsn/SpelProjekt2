@@ -271,7 +271,7 @@ Transform:
   m_GameObject: {fileID: 57370168}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.01, y: 0, z: 0}
+  m_LocalPosition: {x: 3.13, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -722,7 +722,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &479821954
 Transform:
   m_ObjectHideFlags: 0
@@ -1103,8 +1103,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 651577092211975136, guid: 667a8fe6bfaf56a4d8110f6b4ef42e19, type: 3}
     - target: {fileID: 39801844757407020, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: m_initialVelocity.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 39801844757407020, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_initialVelocity.y
-      value: -10
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 1231275870445607722, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_LocalScale.x
@@ -1462,6 +1466,10 @@ PrefabInstance:
       propertyPath: m_objectToSpawn
       value: 
       objectReference: {fileID: 651577092211975136, guid: 667a8fe6bfaf56a4d8110f6b4ef42e19, type: 3}
+    - target: {fileID: 39801844757407020, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: m_initialVelocity.x
+      value: -5
+      objectReference: {fileID: 0}
     - target: {fileID: 39801844757407020, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_initialVelocity.y
       value: -10
@@ -2765,8 +2773,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 651577092211975136, guid: 667a8fe6bfaf56a4d8110f6b4ef42e19, type: 3}
     - target: {fileID: 39801844757407020, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: m_initialVelocity.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 39801844757407020, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_initialVelocity.y
-      value: -10
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 1231275870445607722, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_LocalScale.x
