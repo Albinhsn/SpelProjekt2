@@ -53,11 +53,22 @@ public sealed class PersistentDataManager
     {
     }
 
+    public static void RemoveSceneData(int scene_build_index)
+    {
+        Scene scene = SceneManager.GetSceneByBuildIndex(scene_build_index);
+        var path = Path.Combine(Application.persistentDataPath, $"{scene.name}.bin");
+        if(File.Exists(path))
+        {
+            File.Delete(path);
+        }
+    }
+
     public static void RemoveAllSerializedData()
     {
-        for(int i = 0; i < SceneManager.loadedSceneCount; i++)
+        Debug.Log($"There are {SceneManager.sceneCountInBuildSettings} scenes in the build");
+        for(int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
         {
-            Scene scene = SceneManager.GetSceneAt(i);
+            Scene scene = SceneManager.GetSceneByBuildIndex(i);
             var path = Path.Combine(Application.persistentDataPath, $"{scene.name}.bin");
             if(File.Exists(path))
             {
@@ -99,8 +110,8 @@ public sealed class PersistentDataManager
         // Magic, Version
         int header_size = sizeof(int) * 2;
 
-        // Filter active, Position, Rotation, spawn point
-        int obj_size    = sizeof(float) * 10 + sizeof(int); 
+        // Filter active, Position, Rotation, spawn point, scene build index
+        int obj_size    = sizeof(float) * 10 + sizeof(int) * 2; 
 
         int total_size = header_size + obj_size;
         byte[] buffer  = new byte[total_size];
@@ -146,7 +157,7 @@ public sealed class PersistentDataManager
         };
         offset = memcpy(ref buffer, SerializeArray(spawn_point), offset);
 
-
+        offset = SerializeScalar<int>(ref buffer, LevelCheckpointManager.m_sceneBuildIndex, offset);
 
         var path = Path.Combine(Application.persistentDataPath, "player.bin");
         Debug.Log($"[PDM] Serializing player, offset: {offset}, expected {total_size} to {path}");
@@ -199,10 +210,14 @@ public sealed class PersistentDataManager
             float[] spawn_point = new float[3];
             offset = DeserializeArray<float>(ref spawn_point, buffer, offset);
 
+            // scene spawn point belongs to
+            int scene_index = 0;
+            offset          = DeserializeScalar<int>(ref scene_index, buffer, offset);
+
             player.gameObject.transform.position = new Vector3(position[0], position[1], position[2]);
             player.gameObject.transform.rotation = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
-            LevelCheckpointManager.SetNewSpawnPoint(new Vector3(spawn_point[0], spawn_point[1], spawn_point[2]));
-            Debug.Log("[PDM] Deserialized player");
+            LevelCheckpointManager.SetNewSpawnPoint(new Vector3(spawn_point[0], spawn_point[1], spawn_point[2]), scene_index);
+            Debug.Log("[PDM] Deserialized player/game");
         }
         else
         {

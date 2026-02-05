@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
-using UnityEngine.AddressableAssets;
 using AudioKit.FMOD;
 
 public enum UIState
@@ -161,7 +160,7 @@ public class UIManager : MonoBehaviour
                     if(m_levelData != null)
                     {
                         LevelData data = m_levelData.levels[0];
-                        SceneLoader loader = new(data.m_sceneReference, data.m_offset, m_playerPrefab);
+                        SceneLoader loader = new(data.m_sceneName, data.m_offset, m_playerPrefab);
                         loader.Load();
 
                         // TODO(ah): stream in different levels depending on where you are
@@ -176,6 +175,7 @@ public class UIManager : MonoBehaviour
                     m_statePriorToSettingsMenu = UIState.MainMenu;
                     m_state = UIState.Settings;
                 }
+
 
                 if(MenuBtn("Delete save"))
                 {
@@ -261,14 +261,17 @@ public class UIManager : MonoBehaviour
                     }
                 }
 
-                GUILayout.Space(25);
+                if(MenuBtn("Reset to checkpoint"))
+                {
+                    LevelCheckpointManager.ResetToCheckpoint();
+                }
+
                 if(MenuBtn("Settings"))
                 {
                     m_statePriorToSettingsMenu = UIState.PauseMenu;
                     m_state = UIState.Settings;
                 }
 
-                GUILayout.Space(25);
                 if(MenuBtn("Main Menu"))
                 {
                     PersistentDataManager.SerializeLoadedLevels();

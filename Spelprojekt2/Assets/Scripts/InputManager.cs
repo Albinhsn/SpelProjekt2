@@ -3,7 +3,6 @@ using UnityEngine;
 public sealed class InputManager
 {
     private static InputManager _instance;
-    private static bool m_playerInputEnabled = true;
     private static InputManager Instance {
     get
         {
@@ -25,7 +24,6 @@ public sealed class InputManager
 
     public static Vector2 ReadMovementValue()
     {
-        // Debug.Log($"Reading movement with input {m_playerInputEnabled}");
         Vector2 movement = Instance.m_inputActions.Player.Move.ReadValue<Vector2>();
         return movement;
     }
@@ -51,15 +49,11 @@ public sealed class InputManager
     public static void DisablePlayerInput()
     {
         Instance.m_inputActions.Player.Disable();
-        m_playerInputEnabled = false;
-        Debug.LogWarning("Disabling player input");
     }
 
     public static void EnablePlayerInput()
     {
         Instance.m_inputActions.Player.Enable();
-        m_playerInputEnabled = true;
-        Debug.LogWarning("Enable player input");
     }
 
     public static bool Filter(FilterKind kind)
