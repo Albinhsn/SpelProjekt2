@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerTransformRotation : MonoBehaviour
 {
-    [SerializeField] float m_transformRotationSpeed = .4f;
+    [SerializeField,Tooltip("The speed at which the player rotates to face the direction of movement")] float m_transformRotationSpeed = .4f;
     private Rigidbody m_rb;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()

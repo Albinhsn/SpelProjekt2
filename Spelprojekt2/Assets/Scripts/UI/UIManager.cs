@@ -1,5 +1,6 @@
 using UnityEngine;
-using UnityEngine.AddressableAssets;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 using AudioKit.FMOD;
 
 public enum UIState
@@ -13,6 +14,9 @@ public enum UIState
 public class UIManager : MonoBehaviour
 {
 
+    private static UIManager m_instance;
+
+
     [SerializeField]
     private Font font;
 
@@ -23,7 +27,7 @@ public class UIManager : MonoBehaviour
     private LevelsData m_levelData;
 
     [SerializeField]
-    private GameObject m_playerPrefab;
+    private Player m_playerPrefab;
 
     [SerializeField]
     private float m_areaWidth;
@@ -54,6 +58,15 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
+        if(m_instance != null && m_instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        m_instance = this;
+        DontDestroyOnLoad(this.gameObject);
+
         m_state = m_stateOnInitialization;
     }
 
@@ -143,12 +156,14 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Play"))
                 {
+                    InputManager.EnablePlayerInput();
                     if(m_levelData != null)
                     {
                         LevelData data = m_levelData.levels[0];
-                        SceneLoader loader = new(data.m_sceneReference, data.m_offset);
+                        SceneLoader loader = new(data.m_sceneName, data.m_offset, m_playerPrefab);
                         loader.Load();
-                        Instantiate(m_playerPrefab);
+
+                        // TODO(ah): stream in different levels depending on where you are
 
                         m_state = UIState.None;
                     }
@@ -161,9 +176,16 @@ public class UIManager : MonoBehaviour
                     m_state = UIState.Settings;
                 }
 
+
+                if(MenuBtn("Delete save"))
+                {
+                    PersistentDataManager.RemoveAllSerializedData();
+                }
+
                 GUILayout.Space(25);
                 if(MenuBtn("Quit"))
                 {
+                    PersistentDataManager.RemoveAllSerializedData();
                 #if UNITY_EDITOR
                     UnityEditor.EditorApplication.isPlaying = false;
                 #endif
@@ -212,22 +234,62 @@ public class UIManager : MonoBehaviour
             {
                 AreaBegin();
 
-                if(MenuBtn("Continue"))
+                if(Input.GetKeyUp(KeyCode.Escape))
                 {
+                    InputManager.EnablePlayerInput();
                     m_state = UIState.None;
                 }
-                GUILayout.Space(25);
+
+                if(MenuBtn("Resume"))
+                {
+                    InputManager.EnablePlayerInput();
+                    m_state = UIState.None;
+                }
+
+                if(MenuBtn("Save"))
+                {
+                    PersistentDataManager.SerializeLoadedLevels();
+
+                    Player player = FindFirstObjectByType<Player>();
+                    if(player != null)
+                    {
+                        PersistentDataManager.SerializePlayer(player);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Tried to save without any player?");
+                    }
+                }
+
+                if(MenuBtn("Reset to checkpoint"))
+                {
+                    LevelCheckpointManager.ResetToCheckpoint();
+                }
+
                 if(MenuBtn("Settings"))
                 {
                     m_statePriorToSettingsMenu = UIState.PauseMenu;
                     m_state = UIState.Settings;
                 }
 
-                GUILayout.Space(25);
                 if(MenuBtn("Main Menu"))
                 {
-                    // TODO(ah): How do we manage this?
+                    PersistentDataManager.SerializeLoadedLevels();
+                    Player player = FindFirstObjectByType<Player>();
+                    if(player != null)
+                    {
+                        PersistentDataManager.SerializePlayer(player);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Tried to save without any player?");
+                    }
+
                     m_state = UIState.MainMenu;
+
+                    Scene scene = SceneManager.GetActiveScene();
+                    SceneManager.LoadScene(scene.name);
+
                 }
 
                 AreaEnd();
@@ -246,6 +308,7 @@ public class UIManager : MonoBehaviour
             if(Input.GetKeyUp(KeyCode.Escape))
             {
                 m_state = UIState.PauseMenu;
+                InputManager.DisablePlayerInput();
             }
         }
     }
