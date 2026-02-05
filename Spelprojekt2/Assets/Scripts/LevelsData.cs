@@ -1,13 +1,10 @@
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public struct LevelData
 {
-    public AssetReference m_sceneReference;
+    public string m_sceneName;
     public Vector3 m_offset;
 }
 
