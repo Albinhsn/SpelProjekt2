@@ -28,6 +28,16 @@ public class SceneLoader
             else
             {
                 root.transform.position += this.m_offset;
+                Debug.Log($"Streaming in {scene.name}");
+                SerializableObject[] serialized_objects = root.GetComponentsInChildren<SerializableObject>(true);
+                if(serialized_objects != null && serialized_objects.Length != 0)
+                {
+                    PersistentDataManager.DeserializeAll(scene.name, serialized_objects);
+                }
+                else
+                {
+                    Debug.Log($"Found no serializable objects for {scene.name}");
+                }
             }
         }
     }

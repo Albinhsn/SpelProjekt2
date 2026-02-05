@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 using UnityEngine.AddressableAssets;
 using AudioKit.FMOD;
 
@@ -203,6 +205,23 @@ public class UIManager : MonoBehaviour
                 if(MenuBtn("Back"))
                 {
                     m_state = m_statePriorToSettingsMenu;
+                }
+                if(MenuBtn("Serialize"))
+                {
+                    for(int i = 0; i < SceneManager.loadedSceneCount; i++)
+                    {
+                        Scene scene = SceneManager.GetSceneAt(i);
+                        if(scene.isLoaded)
+                        {
+                            List<SerializableObject> objs = new();
+
+                            foreach(var root in scene.GetRootGameObjects())
+                            {
+                                objs.AddRange(root.GetComponentsInChildren<SerializableObject>(true));
+                            }
+                            PersistentDataManager.SerializeAll(scene.name, objs.ToArray());
+                        }
+                    }
                 }
 
                 AreaEnd();

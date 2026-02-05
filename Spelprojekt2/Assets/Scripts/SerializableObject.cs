@@ -3,14 +3,14 @@ using System;
 
 public class SerializableObject : MonoBehaviour
 {
-    public string ID;
+    public Guid m_ID;
 
 #if UNITY_EDITOR
     public void OnValidate()
     {
-        if(ID == null)
+        if(m_ID == null)
         {
-            ID = System.Guid.NewGuid().ToString();
+            m_ID = System.Guid.NewGuid();
         }
     }
 #endif
