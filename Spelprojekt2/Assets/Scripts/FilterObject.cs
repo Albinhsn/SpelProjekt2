@@ -2,6 +2,15 @@ using Interaction;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+public enum FilterColor
+{
+    Red,
+    Green,
+    Blue,
+    Yellow,
+    COUNT
+}
+
 public enum FilterKind
 {
     Primary,
@@ -52,13 +61,12 @@ public class FilterObject : MonoBehaviour
 
         if(fm != null)
         {
-            ChangeMaterialColor(fm.m_filterColorData);   
+            ChangeMaterialColor(fm.m_filterColorData, fm.m_filterMaterialData);   
         }
     }
 
-    public void ChangeMaterialColor(FilterColorData filterColorData)
+    public void ChangeMaterialColor(FilterColorData filterColorData, FilterMaterialData material_data)
     {
-        FilterMaterialData material_data = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
 
         FilterColor color = filterColorData.m_Colors[(int)m_kind];
         
