@@ -121,12 +121,14 @@ public class UIManager : MonoBehaviour
         GUILayout.BeginArea(window_rect);
         GUILayout.BeginVertical();
 
-        GUILayout.Space(100);
+        GUILayout.FlexibleSpace();
+
     }
 
     void 
     AreaEnd()
     {
+        GUILayout.FlexibleSpace();
         GUILayout.EndVertical();
         GUILayout.EndArea();
     }
