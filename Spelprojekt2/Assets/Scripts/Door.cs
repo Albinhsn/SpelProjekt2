@@ -72,7 +72,6 @@ public class Door : MonoBehaviour
                 current_ratio = (this.transform.position.x - m_closePosition.x) / m_openDistance;
             }
             m_timeRemaining = m_timeToClose * current_ratio;
-            Debug.Log($"Closing with {m_timeRemaining}");
         }
     }
 

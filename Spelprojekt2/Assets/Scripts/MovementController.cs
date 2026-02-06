@@ -7,11 +7,13 @@ using static LinAlg.LinAlg;
 public class MovementController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField]
+    [SerializeField, Tooltip("The movement speed of the player")]
     private float m_speed;
 
-    [SerializeField] 
-    private float m_jumpSpeed;
+    [SerializeField,Tooltip("The force applied in y axis when the player jumps")] 
+    private float m_jumpForce = 5.0f;
+    [SerializeField,Range(0.0f, 1.0f), Tooltip("The higher the value, the smoother the acceleration/deceleration(0 = instant, 1 = no movement)")]
+    private float m_smoothAccelerationFactor = 0.1f;
     private Rigidbody m_rb;
     private bool m_isJumping;
     private Transform m_cameraTransform;
@@ -31,7 +33,7 @@ public class MovementController : MonoBehaviour
     {
         if(InputManager.Jumped() && !m_isJumping)
         {
-            m_rb.linearVelocity += new Vector3(0, m_jumpSpeed, 0);
+            m_rb.linearVelocity += new Vector3(0, m_jumpForce = 5.0f, 0);
             m_isJumping = true;
         }
     }
@@ -51,10 +53,10 @@ public class MovementController : MonoBehaviour
         }
 
         // Apply movement
-        m_rb.linearVelocity = new Vector3(
+        m_rb.linearVelocity = Vector3.Lerp(new Vector3(
             dir.x * m_speed,
             m_rb.linearVelocity.y,
             dir.z * m_speed
-        );
+        ), m_rb.linearVelocity, m_smoothAccelerationFactor);
     }
 }

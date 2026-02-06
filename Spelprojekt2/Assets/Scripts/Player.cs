@@ -26,13 +26,12 @@ public class Player : MonoBehaviour
     private Collider m_collider;
     private const int MAX_NUMBER_OF_RAYS = 3;
 
-
     [Header("Filter events")]
     [SerializeField]
-    private UnityEvent<FilterKind> m_onTriggerEnterWithFilter;
+    public UnityEvent<FilterKind> m_onTriggerEnterWithFilter;
 
     [SerializeField]
-    private UnityEvent<FilterKind> m_onTriggerLeaveWithFilter;
+    public UnityEvent<FilterKind> m_onTriggerLeaveWithFilter;
 
     private Rigidbody m_rb;
 
@@ -41,6 +40,14 @@ public class Player : MonoBehaviour
         m_pickupItemAction.action.Enable();
         m_collider = GetComponent<Collider>();
         m_rb = GetComponent<Rigidbody>();
+    }
+
+    void Start()
+    {
+        FilterManager fm = FindFirstObjectByType<FilterManager>();
+        fm.m_filterChanged.AddListener(this.DropItemIfPickedupItemIsFiltered);
+        this.m_onTriggerEnterWithFilter.AddListener(fm.SetCollisionEnterWithFilter);
+        this.m_onTriggerLeaveWithFilter.AddListener(fm.SetCollisionLeaveWithFilter);
     }
 
     void OnTriggerEnter(Collider other)
