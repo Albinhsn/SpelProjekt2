@@ -73,12 +73,7 @@ public class FilterObject : MonoBehaviour
         this.m_deactivatedMaterial = material_data.m_materials[(int)color].m_deactivatedMaterial;
         this.m_activatedMaterial   = material_data.m_materials[(int)color].m_activatedMaterial;
 
-        if(m_renderer == null)
-        {
-            m_renderer = GetComponent<MeshRenderer>();
-        }
-
-        if(m_renderer == null)
+        if(m_renderer != null)
         {
             m_renderer.material = m_activated ? m_activatedMaterial : m_deactivatedMaterial;
         }
