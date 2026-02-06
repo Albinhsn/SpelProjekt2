@@ -50,6 +50,11 @@ public class FilterObject : MonoBehaviour
 
     void Awake()
     {
+        if(m_kind == FilterKind.None)
+        {
+            Debug.LogError("FilterKind should never be set to None, needs to be primary or secondary");
+        }
+
         m_renderer = GetComponent<MeshRenderer>();
         m_collider = GetComponent<Collider>();
         m_rb       = GetComponent<Rigidbody>();
