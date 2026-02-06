@@ -694,6 +694,7 @@ MonoBehaviour:
   - {fileID: 6958133858594120289}
   - {fileID: -7649133700714844912}
   - {fileID: -566029353970193518}
+  - {fileID: 3393693082827214404}
 --- !u!114 &448115243408767295
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1053,6 +1054,22 @@ MonoBehaviour:
   ambientProbeDimmer:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &3393693082827214404
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 790eb070b632d484ebd163e4d3450263, type: 3}
+  m_Name: GlitchVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &3894095270110585505
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1716,6 +1733,28 @@ MonoBehaviour:
   writeDepthAlphaThreshold:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &6406269881683620841
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1c708065d0a3bf40a01d33cf16f1cba, type: 3}
+  m_Name: PostProcessVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  <displayName>k__BackingField: 
+  m_IsInitialized: 0
+  typeName: 
+  <passName>k__BackingField: 
+  intensity:
+    <fieldHash>k__BackingField: -1163497592
+    m_OverrideState: 1
+    m_Value: 0
+  m_Material: {fileID: 0}
 --- !u!114 &6591865539740486567
 MonoBehaviour:
   m_ObjectHideFlags: 3
