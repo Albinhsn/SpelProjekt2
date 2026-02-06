@@ -50,6 +50,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Texture2D m_pauseMenuBG;
 
+    [SerializeField]
+    private GlitchTransitionManager m_glitchTransitionManager;
+
     private UIState m_state;
     private UIState m_statePriorToSettingsMenu;
     private UIState m_statePriorToConsole;
@@ -171,6 +174,21 @@ public class UIManager : MonoBehaviour
 
     }
 
+    void StartGame()
+    {
+        InputManager.EnablePlayerInput();
+        if(m_levelData != null)
+        {
+            LevelData data = m_levelData.levels[0];
+            SceneLoader loader = new(data.m_sceneName, data.m_offset, m_playerPrefab);
+            loader.Load();
+
+            // TODO(ah): stream in different levels depending on where you are
+
+            m_state = UIState.None;
+        }
+    }
+
     void OnGUI()
     {
         switch(m_state)
@@ -181,16 +199,15 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Play"))
                 {
-                    InputManager.EnablePlayerInput();
-                    if(m_levelData != null)
+                    if(m_glitchTransitionManager != null)
                     {
-                        LevelData data = m_levelData.levels[0];
-                        SceneLoader loader = new(data.m_sceneName, data.m_offset, m_playerPrefab);
-                        loader.Load();
-
-                        // TODO(ah): stream in different levels depending on where you are
-
+                        m_glitchTransitionManager.m_onTransitionEnd.AddListener(StartGame);
+                        m_glitchTransitionManager.StartTransition();
                         m_state = UIState.None;
+                    }
+                    else
+                    {
+                        StartGame();
                     }
                 }
 

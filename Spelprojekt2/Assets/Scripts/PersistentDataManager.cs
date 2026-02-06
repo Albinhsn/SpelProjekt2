@@ -65,7 +65,6 @@ public sealed class PersistentDataManager
 
     public static void RemoveAllSerializedData()
     {
-        Debug.Log($"There are {SceneManager.sceneCountInBuildSettings} scenes in the build");
         for(int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
         {
             Scene scene = SceneManager.GetSceneByBuildIndex(i);
@@ -160,7 +159,6 @@ public sealed class PersistentDataManager
         offset = SerializeScalar<int>(ref buffer, LevelCheckpointManager.m_sceneBuildIndex, offset);
 
         var path = Path.Combine(Application.persistentDataPath, "player.bin");
-        Debug.Log($"[PDM] Serializing player, offset: {offset}, expected {total_size} to {path}");
         File.WriteAllBytes(path, buffer);
 
     }
@@ -186,7 +184,6 @@ public sealed class PersistentDataManager
                 char b2 = (char)((magic >> 16) & 0xFF);
                 char b3 = (char)((magic >> 24) & 0xFF);
 
-                Debug.Log($"[PDM] Magic: {b0}{b1}{b2}{b3} from player");
             }
 
             // Version
@@ -217,7 +214,6 @@ public sealed class PersistentDataManager
             player.gameObject.transform.position = new Vector3(position[0], position[1], position[2]);
             player.gameObject.transform.rotation = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
             LevelCheckpointManager.SetNewSpawnPoint(new Vector3(spawn_point[0], spawn_point[1], spawn_point[2]), scene_index);
-            Debug.Log("[PDM] Deserialized player/game");
         }
         else
         {
@@ -233,7 +229,6 @@ public sealed class PersistentDataManager
 
         if(File.Exists(path))
         {
-            Debug.Log($"[PDM] Deserializing {name}");
             byte[] buffer = File.ReadAllBytes(path);
             int offset = 0;
 
@@ -247,7 +242,6 @@ public sealed class PersistentDataManager
                 char b2 = (char)((magic >> 16) & 0xFF);
                 char b3 = (char)((magic >> 24) & 0xFF);
 
-                Debug.Log($"[PDM] Magic: {b0}{b1}{b2}{b3} from {name}");
             }
 
 
@@ -257,7 +251,6 @@ public sealed class PersistentDataManager
             int object_count = 0;
             offset = DeserializeScalar<int>(ref object_count, buffer, offset);
 
-            Debug.Log($"[PDM] Found {object_count} objects");
 
             Dictionary<string, ObjectData> obj_dict = new();
             for(int i = 0; i < object_count; i++)
