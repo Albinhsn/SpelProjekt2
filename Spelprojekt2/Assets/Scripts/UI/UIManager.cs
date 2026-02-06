@@ -53,6 +53,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GlitchTransitionManager m_glitchTransitionManager;
 
+    private bool m_firstPauseMenuFrame;
+
     private UIState m_state;
     private UIState m_statePriorToSettingsMenu;
     private UIState m_statePriorToConsole;
@@ -332,7 +334,7 @@ public class UIManager : MonoBehaviour
             {
                 AreaBegin(m_areaWidth, m_areaHeight);
 
-                if(Input.GetKeyUp(KeyCode.Escape))
+                if(!m_firstPauseMenuFrame && Input.GetKeyUp(KeyCode.Escape))
                 {
                     InputManager.EnablePlayerInput();
                     m_state = UIState.None;
@@ -390,6 +392,7 @@ public class UIManager : MonoBehaviour
 
                 }
 
+                m_firstPauseMenuFrame = false;
                 AreaEnd();
                 break;
             }
@@ -405,6 +408,7 @@ public class UIManager : MonoBehaviour
         {
             if(Input.GetKeyUp(KeyCode.Escape))
             {
+                m_firstPauseMenuFrame = true;
                 m_state = UIState.PauseMenu;
                 InputManager.DisablePlayerInput();
             }
