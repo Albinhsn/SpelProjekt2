@@ -59,7 +59,7 @@ public class FilterObject : MonoBehaviour
 
         FilterManager fm = FindFirstObjectByType<FilterManager>();
 
-        if(fm != null)
+        if(fm != null && fm.m_filterColorData != null && fm.m_filterMaterialData != null)
         {
             ChangeMaterialColor(fm.m_filterColorData, fm.m_filterMaterialData);   
         }
@@ -73,7 +73,16 @@ public class FilterObject : MonoBehaviour
         this.m_deactivatedMaterial = material_data.m_materials[(int)color].m_deactivatedMaterial;
         this.m_activatedMaterial   = material_data.m_materials[(int)color].m_activatedMaterial;
 
-        m_renderer.material = m_activated ? m_activatedMaterial : m_deactivatedMaterial;
+        if(m_renderer == null)
+        {
+            m_renderer = GetComponent<MeshRenderer>();
+        }
+
+        if(m_renderer == null)
+        {
+            m_renderer.material = m_activated ? m_activatedMaterial : m_deactivatedMaterial;
+        }
+
     }
 
     public void Activate()
