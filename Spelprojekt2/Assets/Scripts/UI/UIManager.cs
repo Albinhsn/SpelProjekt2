@@ -63,6 +63,7 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
+
         if(m_instance != null && m_instance != this)
         {
             Destroy(this.gameObject);
