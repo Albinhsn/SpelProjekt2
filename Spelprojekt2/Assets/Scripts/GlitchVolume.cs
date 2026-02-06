@@ -6,14 +6,20 @@ using System;
 [Serializable, VolumeComponentMenu("Post-processing/Custom/GlitchVolume")]
 public sealed class GlitchVolume : CustomPostProcessVolumeComponent, IPostProcessComponent
 {
-    [Tooltip("Controls the intensity of the effect.")]
-    public ClampedFloatParameter intensity = new ClampedFloatParameter(0f, 0f, 1f);
+    [Header("Scanline settings")]
+    public ClampedFloatParameter m_scanlineSpeed = new ClampedFloatParameter(0f, 0f, 1f);
+    public ClampedFloatParameter m_scanlineStrength= new ClampedFloatParameter(0f, 0f, 1f);
 
-    public ColorParameter color = new ColorParameter(new Color(1,1,1,1), false);
+    [Header("Glitch settings")]
+    public ClampedFloatParameter m_glitchSpeed    = new ClampedFloatParameter(0f, 0f, 100f);
+    public ClampedFloatParameter m_glitchStrength = new ClampedFloatParameter(0f, 0f, 100f);
 
     Material m_Material;
 
-    public bool IsActive() => m_Material != null && intensity.value > 0f;
+    [Header("Animated settings used at runtime because Unity is a piece of shit")]
+    public ClampedFloatParameter m_intensity = new ClampedFloatParameter(0f, 0f, 1f);
+
+    public bool IsActive() => m_Material != null;
 
     // Do not forget to add this post process in the Custom Post Process Orders list (Project Settings > Graphics > HDRP Global Settings).
     public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.AfterPostProcess;
@@ -30,10 +36,13 @@ public sealed class GlitchVolume : CustomPostProcessVolumeComponent, IPostProces
 
     public override void Render(CommandBuffer cmd, HDCamera camera, RTHandle source, RTHandle destination)
     {
-        if (m_Material == null)
+        if (!IsActive())
             return;
 
-        m_Material.SetVector("_Color", color.value);
+        m_Material.SetFloat("_ScanlineSpeed", m_scanlineSpeed.value * m_intensity.value);
+        m_Material.SetFloat("_ScanlineStrength", m_scanlineStrength.value * m_intensity.value);
+        m_Material.SetFloat("_GlitchSpeed", m_glitchSpeed.value * m_intensity.value);
+        m_Material.SetFloat("_GlitchStrength", m_glitchStrength.value * m_intensity.value);
         m_Material.SetTexture("_MainTex", source);
         HDUtils.DrawFullScreen(cmd, m_Material, destination, shaderPassId: 0);
     }

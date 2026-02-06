@@ -73,8 +73,12 @@ Shader "Hidden/Shader/GlitchVolume"
     }
 
     // List of properties to control your post process effect
-    float4 _Color;
     TEXTURE2D_X(_MainTex);
+
+    float _GlitchSpeed;
+    float _GlitchStrength;
+    float _ScanlineSpeed;
+    float _ScanlineStrength;
 
     float4 CustomPostProcess(Varyings input) : SV_Target
     {
@@ -83,23 +87,19 @@ Shader "Hidden/Shader/GlitchVolume"
         float2 uvy = float2(input.texcoord.y, input.texcoord.y);
 
         // Noise
-        float NoiseAmount    = 100;
-        float GlitchStrength = 5;
         float2 t = float2(_Time.y, _Time.y);
-        float noise = GradientNoiseFloat(uvy * NoiseAmount + t * GlitchStrength, 1);
+        float noise = GradientNoiseFloat(uvy * _GlitchStrength + t * _GlitchSpeed, 1);
         noise       = Remap2(noise, 0, 1, -1, 1);
 
         // Flickering
-        float flick = GradientNoiseFloat(t * GlitchStrength, 1);
+        float flick = GradientNoiseFloat(t * _GlitchSpeed, 1);
         flick = flick * flick * flick * 0.1f;
 
         // He then multiplies Noise * Flickering 
         // This is used as an offset in the x,y direction for the sampling the result
 
         // Scanline
-        float ScanlineStrength = 0.1f;
-        float ScanlineSpeed = 20;
-        float s = clamp(sin(60000 * uvy.y + _Time.y * ScanlineSpeed), ScanlineStrength, 1);
+        float s = clamp(sin(60000 * uvy.y + _Time.y * _ScanlineSpeed), _ScanlineStrength, 1);
 
         // NOTE(ah): This is extremely dumb but he does it in the tutorial
         // Why do you remap a range that you clamped in [ScanlineStrength, 1] and assume
@@ -108,6 +108,8 @@ Shader "Hidden/Shader/GlitchVolume"
         // It's even worse because you already want the range to be in [0,1] in the end?
         // So just do the remap properly the first time instead of the clamp?
         s = Remap2(s, -1, 1, 0.4, 1);
+
+        s = _ScanlineStrength == 0 ? 1 : s;
 
         float offset = float2(flick * noise, 0);
         float3 sourceColor = SAMPLE_TEXTURE2D_X(_MainTex, s_linear_clamp_sampler, ClampAndScaleUVForBilinearPostProcessTexture(input.texcoord.xy + offset)).xyz;
