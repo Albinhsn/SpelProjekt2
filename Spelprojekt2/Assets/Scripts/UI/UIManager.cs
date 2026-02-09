@@ -11,11 +11,11 @@ public enum UIState
     PauseMenu,
 }
 
+[RequireComponent(typeof(GlitchTransitionManager))]
 public class UIManager : MonoBehaviour
 {
 
     private static UIManager m_instance;
-
 
     [SerializeField]
     private Font font;
@@ -56,6 +56,8 @@ public class UIManager : MonoBehaviour
     private bool m_firstPauseMenuFrame;
 
     private UIState m_state;
+
+    // TODO(ah): Do something stack based over this nonsense
     private UIState m_statePriorToSettingsMenu;
     private UIState m_statePriorToConsole;
     
@@ -189,6 +191,8 @@ public class UIManager : MonoBehaviour
             // TODO(ah): stream in different levels depending on where you are
 
             m_state = UIState.None;
+
+            SceneManager.UnloadSceneAsync("MainMenu");
         }
     }
 
@@ -387,10 +391,11 @@ public class UIManager : MonoBehaviour
                     }
 
                     m_state = UIState.MainMenu;
-
+                    
                     Scene scene = SceneManager.GetActiveScene();
-                    SceneManager.LoadScene(scene.name);
-
+                    SceneManager.UnloadSceneAsync(scene.name);
+                    // TODO(ah): Use the scene loader
+                    SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
                 }
 
                 m_firstPauseMenuFrame = false;

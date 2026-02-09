@@ -241,62 +241,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 2.220446e-16, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &116146858
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 116146860}
-  - component: {fileID: 116146859}
-  m_Layer: 0
-  m_Name: UIManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &116146859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116146858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64b0aee4a03fbd2ddbf764f86dd76cc2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  font: {fileID: 0}
-  m_stateOnInitialization: 0
-  m_levelData: {fileID: 0}
-  m_playerPrefab: {fileID: 0}
-  m_areaWidth: 0
-  m_areaHeight: 0
-  m_btnWidth: 0
-  m_btnHeight: 0
-  m_sliderWidth: 0
-  m_btnTexture: {fileID: 0}
-  m_pauseMenuBG: {fileID: 0}
-  m_glitchTransitionManager: {fileID: 0}
---- !u!4 &116146860
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116146858}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.26, y: 0.07999999, z: -1.49}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &362741015
 GameObject:
   m_ObjectHideFlags: 0
@@ -797,11 +741,6 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -920,6 +859,11 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
 --- !u!108 &1645762824
 Light:
   m_ObjectHideFlags: 0
@@ -1666,6 +1610,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4209284688245309094, guid: f7ce5346706fdcfeea3b2eb61281f101, type: 3}
+      propertyPath: m_IsGlobal
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8915864249574968845, guid: f7ce5346706fdcfeea3b2eb61281f101, type: 3}
       propertyPath: m_Name
       value: RespawnPlayerBounds
@@ -1857,5 +1805,4 @@ SceneRoots:
   - {fileID: 635330388519573172}
   - {fileID: 8547164234676687122}
   - {fileID: 1342625193}
-  - {fileID: 116146860}
   - {fileID: 1818879261}

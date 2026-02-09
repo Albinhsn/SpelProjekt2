@@ -40,6 +40,7 @@ public class SceneLoader
             }
         }
 
+        SceneManager.SetActiveScene(scene);
         if(m_playerPrefab != null)
         {
             Player player = GameObject.Instantiate(m_playerPrefab);
