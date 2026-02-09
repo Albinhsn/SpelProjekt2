@@ -4,6 +4,7 @@ public enum DoorDirection
 {
     Up,
     Sideways,
+    Forewards
 }
 
 [RequireComponent(typeof(Collider))]
@@ -22,7 +23,11 @@ public class Door : MonoBehaviour
     [SerializeField]
     private DoorDirection direction; 
 
-    private Vector3 m_direction => direction == DoorDirection.Up ? new Vector3(0,1,0) : new Vector3(1,0,0);
+   private Vector3 m_direction => direction == DoorDirection.Up ? new Vector3(0,1,0) : 
+       direction == DoorDirection.Sideways ? new Vector3(1,0,0) : new Vector3(0,0,1);
+        
+   // private Vector3 m_direction;
+    
 
     private float m_timeRemaining;
     private bool  m_closing;
@@ -35,6 +40,9 @@ public class Door : MonoBehaviour
     {
         m_closePosition = this.transform.position;
         m_collider      = GetComponent<Collider>();
+        
+      
+        
     }
 
     public void Open()
@@ -51,6 +59,10 @@ public class Door : MonoBehaviour
             if(direction == DoorDirection.Sideways)
             {
                 current_ratio = 1.0f - (this.transform.position.x - m_closePosition.x) / m_openDistance;
+            }
+            if(direction == DoorDirection.Forewards)
+            {
+                current_ratio = 1.0f - (this.transform.position.z - m_closePosition.z) / m_openDistance;
             }
             m_timeRemaining = m_timeToOpen * current_ratio;
         }
@@ -70,6 +82,10 @@ public class Door : MonoBehaviour
             if(direction == DoorDirection.Sideways)
             {
                 current_ratio = (this.transform.position.x - m_closePosition.x) / m_openDistance;
+            }
+            if(direction == DoorDirection.Forewards)
+            {
+                current_ratio = (this.transform.position.z - m_closePosition.z) / m_openDistance;
             }
             m_timeRemaining = m_timeToClose * current_ratio;
         }
