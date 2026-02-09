@@ -185,7 +185,7 @@ public class UIManager : MonoBehaviour
         if(m_levelData != null)
         {
             LevelData data = m_levelData.levels[0];
-            SceneLoader loader = new(data.m_sceneName, data.m_offset, m_playerPrefab);
+            SceneLoader loader = new(data.m_scene, m_playerPrefab);
             loader.Load();
 
             // TODO(ah): stream in different levels depending on where you are

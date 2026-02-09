@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public struct LevelData
 {
     public string m_sceneName;
-    public Vector3 m_offset;
+    public SceneData m_scene;
 }
 
 [CreateAssetMenu(fileName = "LevelsData", menuName = "ScriptableObjects/LevelsData")]
