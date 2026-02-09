@@ -177,7 +177,7 @@ public class Player : MonoBehaviour
 
         if(m_pickedupItem != null)
         {
-            float radius = 1;
+            float radius = 2;
             Vector3 targetPos = this.transform.position + this.transform.forward * radius;
             Vector3 itemToPlayerDir = this.transform.position - m_pickedupItem.transform.position;
             Vector2 itemToPlayerDirXZ = new Vector2(itemToPlayerDir.x, itemToPlayerDir.z).normalized;
@@ -187,36 +187,52 @@ public class Player : MonoBehaviour
             Vector3 itemToTargetPosDir = m_pickedupItem.transform.position + itemToPlayerDir * distanceToCircle;
             Vector3 directionToTargetFromCircle = targetPos - itemToTargetPosDir;
             float distanceToTargetFromItem = (targetPos - m_pickedupItem.transform.position).magnitude;
+
             Vector3 targetVelocity = new Vector3(
                 itemToPlayerDirXZNormal.x * m_speedPickedupItemMovesTowardsPlayer,
-                0,
+                (targetPos.y - m_pickedupItem.transform.position.y) * 10f,
                 itemToPlayerDirXZNormal.y * m_speedPickedupItemMovesTowardsPlayer
             );
 
+            // if item is outside of the circle the value is negative, if it's inside, the value is positive
+            float forwardDir = -Mathf.Sign(distanceToCircle);
             float Dir = Mathf.Sign(Vector2.Dot(itemToPlayerDirXZNormal, new Vector2(directionToTargetFromCircle.x, directionToTargetFromCircle.z)));
+
+            float angle = Mathf.Abs(distanceToCircle) * 100f;
+
+            Vector3 rotatedTargetVelocity = new Vector3(
+                targetVelocity.x * Mathf.Cos(Mathf.Deg2Rad*forwardDir*Dir*angle) - targetVelocity.z * Mathf.Sin(Mathf.Deg2Rad*forwardDir*Dir*angle),
+                targetVelocity.y,
+                targetVelocity.x * Mathf.Sin(Mathf.Deg2Rad*forwardDir*Dir*angle) + targetVelocity.z * Mathf.Cos(Mathf.Deg2Rad*forwardDir*Dir*angle)
+            );
+
+            // Vector3 rotatedTargetVelocity2 = Quaternion.Euler(0, Dir*45, 0) * targetVelocity;
+
             
             float speed = Mathf.Clamp(distanceToTargetFromItem*distanceToTargetFromItem/2f, 0, 1);
             Rigidbody rb = m_pickedupItem.transform.gameObject.GetComponent<Rigidbody>();
-            Debug.Log(distanceToTargetFromItem);
+            // Debug.Log(targetVelocity);
+            // Debug.Log("rotated" + rotatedTargetVelocity);
+            Debug.DrawLine(m_pickedupItem.transform.position, targetPos, Color.red);
             if(rb != null)
             {
-                rb.linearVelocity = m_rb.linearVelocity + targetVelocity * Dir * speed;
-
+                rb.linearVelocity = m_rb.linearVelocity + rotatedTargetVelocity * Dir * speed;
                 
             }
-
+            Debug.Log(m_pickedupItem.transform.position);
             Vector3 dir = this.transform.position - m_pickedupItem.transform.position;
-            if(dir.magnitude > m_maxDistancePickedupItemCanBeFromPlayer)
-            {
-                DropItem();
-            }
+            // if(dir.magnitude > m_maxDistancePickedupItemCanBeFromPlayer)
+            // {
+            //     DropItem();
+            // }
 
             // NOTE(ah): Some epsilon added so it's not to close when it tries to move
-            const float DISTANCE_EPSILON = 0.3f;
-            if(dir.magnitude > m_pickedupItemDistance + DISTANCE_EPSILON)
-            {
-                rb.linearVelocity += dir.normalized * m_speedPickedupItemMovesTowardsPlayer;
-            }
+            // const float DISTANCE_EPSILON = 0.3f;
+            // if(dir.magnitude > m_pickedupItemDistance + DISTANCE_EPSILON)
+            // {
+            //     rb.linearVelocity += dir.normalized * m_speedPickedupItemMovesTowardsPlayer;
+            //     Debug.Log("test");
+            // }
         }
     }
 }
