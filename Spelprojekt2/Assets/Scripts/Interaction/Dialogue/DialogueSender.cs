@@ -105,11 +105,11 @@ namespace Interaction.Dialogue
                 }
                 else
                 {
-                    int value = int.Parse(tags[a].Substring(value_index + 1));
+                    string value = tags[a].Substring(value_index + 1);
                     switch (tags[a].Substring(0, value_index))
                     {
                         case "camera":
-                            SetActiveCamera(value);
+                            SetActiveCamera(int.Parse(value));
                             break;
                     }
                 }

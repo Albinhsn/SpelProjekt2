@@ -14,6 +14,7 @@ namespace Interaction.Dialogue
         [Header("Data")]
         [SerializeField] private DialogueRelay m_relay;
         [SerializeField] private FontSet m_fontSet; //Index 0 is default
+        [SerializeField] private DialogueColorSet m_colorSet;
         
         [Header("Local")]
         [SerializeField] private GameObject m_dialogueContainer;
@@ -74,9 +75,19 @@ namespace Interaction.Dialogue
                 RectTransform alt_transform = m_altButtons[a].GetComponent<RectTransform>();
                 alt_transform.anchoredPosition = new Vector2(0, 0 - alt_transform.rect.height / 2 - m_altButtonOffset - a * alt_transform.rect.height);
                 int alt = a;
-                m_altButtons[a].onClick.RemoveAllListeners();//Unity moment
+                m_altButtons[a].onClick.RemoveAllListeners(); //Unity moment
                 m_altButtons[a].onClick.AddListener(() => m_relay.Select(alt));
-                SetFont(0, m_altButtons[a].GetComponentInChildren<TextMeshProUGUI>());
+                TextMeshProUGUI alt_text_out = m_altButtons[a].GetComponentInChildren<TextMeshProUGUI>();
+                SetFont(0, alt_text_out);
+                
+                alt_text_out.color = Color.white;//Coloration, must use color drivers from Button component
+                ColorBlock button_colors = new ColorBlock();
+                button_colors.normalColor = m_colorSet.defaultColor;
+                button_colors.selectedColor = m_colorSet.defaultColor;
+                button_colors.highlightedColor = m_colorSet.highlightColor;
+                button_colors.pressedColor = m_colorSet.highlightColor;
+                button_colors.colorMultiplier = 1;
+                m_altButtons[a].colors = button_colors;
             }
 
             for (int a = 0; a < m_altButtons.Count; a++)
@@ -92,6 +103,8 @@ namespace Interaction.Dialogue
 
         private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
         {
+            bool use_default_color = true;
+            
             for (int a = 0; a < tags.Length; a++)
             {
                 int value_index = tags[a].IndexOf('=');
@@ -101,15 +114,21 @@ namespace Interaction.Dialogue
                 }
                 else
                 {
-                    int value = int.Parse(tags[a].Substring(value_index + 1));
+                    string value = tags[a].Substring(value_index + 1);
                     switch (tags[a].Substring(0, value_index))
                     {
                         case "font":
-                            SetFont(value, m_textOut);//Speaker font
+                            SetFont(int.Parse(value), m_textOut);//Speaker font
+                            break;
+                        case "color":
+                            m_textOut.color = m_colorSet.GetColor(value);//Color of speaker text
+                            use_default_color = false;
                             break;
                     }
                 }
             }
+
+            if (use_default_color) m_textOut.color = m_colorSet.defaultColor;
         }
 
         private void SetFont(int font_index, TextMeshProUGUI target)
