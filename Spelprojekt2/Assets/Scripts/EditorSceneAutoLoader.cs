@@ -42,6 +42,11 @@ static class EditorSceneAutoLoader
                 }
             }
         }
+
+        if(roots != null && scene.name != "MainSceneItems")
+        {
+            EditorSceneManager.OpenScene("Assets/Scenes/MainSceneItems.unity", OpenSceneMode.Additive);
+        }
     }
 }
 #endif
