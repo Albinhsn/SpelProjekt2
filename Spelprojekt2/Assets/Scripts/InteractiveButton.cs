@@ -35,6 +35,11 @@ public class InteractiveButton : MonoBehaviour
                     break;
                 }
             }
+            else
+            {
+                result = false;
+                break;
+            }
         }
         return result;
     }
