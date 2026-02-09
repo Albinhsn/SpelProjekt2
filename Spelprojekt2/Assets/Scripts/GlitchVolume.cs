@@ -24,7 +24,7 @@ public sealed class GlitchVolume : CustomPostProcessVolumeComponent, IPostProces
     // Do not forget to add this post process in the Custom Post Process Orders list (Project Settings > Graphics > HDRP Global Settings).
     public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.AfterPostProcess;
 
-    const string kShaderName = "Hidden/Shader/GlitchVolume";
+    const string kShaderName = "Shader/GlitchVolume";
 
     public override void Setup()
     {

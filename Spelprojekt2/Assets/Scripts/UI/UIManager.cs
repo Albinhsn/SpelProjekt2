@@ -11,11 +11,11 @@ public enum UIState
     PauseMenu,
 }
 
+[RequireComponent(typeof(GlitchTransitionManager))]
 public class UIManager : MonoBehaviour
 {
 
     private static UIManager m_instance;
-
 
     [SerializeField]
     private Font font;
@@ -56,6 +56,8 @@ public class UIManager : MonoBehaviour
     private bool m_firstPauseMenuFrame;
 
     private UIState m_state;
+
+    // TODO(ah): Do something stack based over this nonsense
     private UIState m_statePriorToSettingsMenu;
     private UIState m_statePriorToConsole;
     
@@ -63,6 +65,7 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
+
         if(m_instance != null && m_instance != this)
         {
             Destroy(this.gameObject);
@@ -182,12 +185,14 @@ public class UIManager : MonoBehaviour
         if(m_levelData != null)
         {
             LevelData data = m_levelData.levels[0];
-            SceneLoader loader = new(data.m_sceneName, data.m_offset, m_playerPrefab);
+            SceneLoader loader = new(data.m_scene, m_playerPrefab);
             loader.Load();
 
             // TODO(ah): stream in different levels depending on where you are
 
             m_state = UIState.None;
+
+            SceneManager.UnloadSceneAsync("MainMenu");
         }
     }
 
@@ -386,10 +391,11 @@ public class UIManager : MonoBehaviour
                     }
 
                     m_state = UIState.MainMenu;
-
+                    
                     Scene scene = SceneManager.GetActiveScene();
-                    SceneManager.LoadScene(scene.name);
-
+                    SceneManager.UnloadSceneAsync(scene.name);
+                    // TODO(ah): Use the scene loader
+                    SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
                 }
 
                 m_firstPauseMenuFrame = false;

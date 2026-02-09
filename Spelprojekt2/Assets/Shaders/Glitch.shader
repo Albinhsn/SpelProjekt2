@@ -1,4 +1,4 @@
-Shader "Hidden/Shader/GlitchVolume"
+Shader "Shader/GlitchVolume"
 {
     Properties
     {
