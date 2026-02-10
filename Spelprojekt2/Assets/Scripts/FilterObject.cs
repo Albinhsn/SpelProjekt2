@@ -2,10 +2,19 @@ using Interaction;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public enum FilterKind
+public enum FilterColor
 {
     Red,
+    Green,
     Blue,
+    Yellow,
+    COUNT
+}
+
+public enum FilterKind
+{
+    Primary,
+    Secondary,
     COUNT,
     None,
 }
@@ -24,6 +33,7 @@ public class FilterObject : MonoBehaviour
 
     private Material m_deactivatedMaterial;
     private Material m_activatedMaterial;
+    
 
 
     public static int TagIsFilter(string tag)
@@ -40,21 +50,39 @@ public class FilterObject : MonoBehaviour
 
     void Awake()
     {
-
-        FilterMaterialData material_data = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
-        this.m_deactivatedMaterial = material_data.m_materials[(int)m_kind].m_deactivatedMaterial;
-        this.m_activatedMaterial   = material_data.m_materials[(int)m_kind].m_activatedMaterial;
-
+        if(m_kind == FilterKind.None)
+        {
+            Debug.LogError("FilterKind should never be set to None, needs to be primary or secondary");
+        }
 
         m_renderer = GetComponent<MeshRenderer>();
         m_collider = GetComponent<Collider>();
         m_rb       = GetComponent<Rigidbody>();
         m_interactableComponent = GetComponent<Interactable>();
 
-        m_renderer.material = m_deactivatedMaterial;
-
-
         this.gameObject.tag = this.m_kind.ToString();
+
+        FilterManager fm = FindFirstObjectByType<FilterManager>();
+
+        if(fm != null && fm.m_filterColorData != null && fm.m_filterMaterialData != null)
+        {
+            ChangeMaterialColor(fm.m_filterColorData, fm.m_filterMaterialData);   
+        }
+    }
+
+    public void ChangeMaterialColor(FilterColorData filterColorData, FilterMaterialData material_data)
+    {
+
+        FilterColor color = filterColorData.m_Colors[(int)m_kind];
+        
+        this.m_deactivatedMaterial = material_data.m_materials[(int)color].m_deactivatedMaterial;
+        this.m_activatedMaterial   = material_data.m_materials[(int)color].m_activatedMaterial;
+
+        if(m_renderer != null)
+        {
+            m_renderer.material = m_activated ? m_activatedMaterial : m_deactivatedMaterial;
+        }
+
     }
 
     public void Activate()

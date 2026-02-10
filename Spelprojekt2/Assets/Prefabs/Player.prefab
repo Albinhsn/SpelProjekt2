@@ -336,7 +336,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 5
-  m_jumpSpeed: 6
+  m_jumpForce: 5
+  m_smoothAccelerationFactor: 0.1
 --- !u!114 &5731249618501921105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -349,7 +350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79fef4ad425fbc74f999b4169372e418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_transformRotationSpeed: 0.4
+  m_transformRotationSpeed: 0.25
 --- !u!114 &695921995035222353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,9 +364,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_pickupItemAction: {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  m_itemMaxSpeed: 3
+  m_itemDistanceFromPlayer: 2
+  m_itemFloatHeight: 0.5
   m_maxPickupDistance: 5
-  m_maxDistancePickedupItemCanBeFromPlayer: 2
-  m_speedPickedupItemMovesTowardsPlayer: 3
   m_onTriggerEnterWithFilter:
     m_PersistentCalls:
       m_Calls:
@@ -403,7 +405,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6733362284341771832}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 229ad802d75fc9c4d8b1e6251a7e50df, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -571,14 +573,14 @@ MonoBehaviour:
   Radius: 5
   Orbits:
     Top:
-      Radius: 4
-      Height: 5
+      Radius: 1
+      Height: 6
     Center:
-      Radius: 6
-      Height: 2.25
+      Radius: 4.7
+      Height: 3.7
     Bottom:
       Radius: 4
-      Height: 0.1
+      Height: 0.5
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
@@ -627,18 +629,18 @@ MonoBehaviour:
     ScreenPosition: {x: 0, y: 0}
     DeadZone:
       Enabled: 0
-      Size: {x: 0.2, y: 0.2}
+      Size: {x: 0.1, y: 0.1}
     HardLimits:
       Enabled: 0
       Size: {x: 0.8, y: 0.8}
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 0, z: 0}
-  Damping: {x: 0.5, y: 0.5}
+  Damping: {x: 0.8, y: 1.2}
   Lookahead:
-    Enabled: 0
-    Time: 0
-    Smoothing: 0
+    Enabled: 1
+    Time: 0.05
+    Smoothing: 3
     IgnoreY: 0
 --- !u!114 &7815536667233639932
 MonoBehaviour:
@@ -679,14 +681,14 @@ MonoBehaviour:
       Enabled: 1
       Input:
         InputAction: {fileID: -5630151704836100654, guid: 1d6e640e716dc4ff6989b73d02023f2b, type: 3}
-        Gain: 1
+        Gain: 1.3
         LegacyInput: 
         LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
-        AccelTime: 0.2
-        DecelTime: 0.2
+        AccelTime: 0
+        DecelTime: 0.1
     - Name: Look Orbit Y
       Owner: {fileID: 8774475054965742702}
       Enabled: 1
@@ -698,7 +700,7 @@ MonoBehaviour:
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
-        AccelTime: 0.2
+        AccelTime: 0.1
         DecelTime: 0.2
     - Name: Orbit Scale
       Owner: {fileID: 8774475054965742702}
@@ -736,7 +738,7 @@ MonoBehaviour:
     UseFollowTarget:
       Enabled: 0
       YOffset: 0
-    Damping: 0.5
+    Damping: 1.5
     SmoothingTime: 0
   TerrainResolution:
     Enabled: 0
