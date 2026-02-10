@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
@@ -17,6 +18,7 @@ public class MovementController : MonoBehaviour
     private Rigidbody m_rb;
     private bool m_isJumping;
     private Transform m_cameraTransform;
+    private Vector3 m_referenceVector = Vector3.zero;
 
     void Awake()
     {
@@ -27,8 +29,23 @@ public class MovementController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         m_isJumping = false;
+        if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
+        {
+            platform.d_onMovementChanged += UpdateReferenceVector;
+            m_referenceVector = platform.reference;
+        }
+        else m_referenceVector = Vector3.zero;
     }
-    
+
+    private void OnTriggerExit(Collider other)
+    {
+        m_isJumping = true;
+        if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
+        {
+            platform.d_onMovementChanged -= UpdateReferenceVector;
+        }
+    }
+
     void Update()
     {
         if(InputManager.Jumped() && !m_isJumping)
@@ -36,6 +53,8 @@ public class MovementController : MonoBehaviour
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
         }
+
+        m_rb.position += m_referenceVector * Time.deltaTime;
     }
 
     void FixedUpdate()
@@ -54,9 +73,16 @@ public class MovementController : MonoBehaviour
 
         // Apply movement
         m_rb.linearVelocity = Vector3.Lerp(new Vector3(
-            dir.x * m_speed,
+            dir.x * m_speed, //Input
             m_rb.linearVelocity.y,
             dir.z * m_speed
-        ), m_rb.linearVelocity, m_smoothAccelerationFactor);
+        ), m_rb.linearVelocity, m_smoothAccelerationFactor); //Acceleration
+    }
+
+    private void UpdateReferenceVector(Vector3 reference)
+    {
+        //m_rb.linearVelocity -= m_referenceVector;
+        m_referenceVector = reference;
+        //m_rb.linearVelocity += reference;
     }
 }

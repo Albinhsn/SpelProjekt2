@@ -12,7 +12,7 @@ public class MovingPlatformController : MonoBehaviour
 	[SerializeField] private int m_startIndex = 0;
 	
 
-	[SerializeField] private Transform m_platform;
+	[SerializeField] private MovingPlatformReceiver m_platform;
 
 	[SerializeField] private Transform[] m_targets = Array.Empty<Transform>();
 	private int m_currentTarget = 0;
@@ -20,13 +20,15 @@ public class MovingPlatformController : MonoBehaviour
 	private Vector3 m_movementDirection;
 	
 	public bool moving => m_currentPosition != m_currentTarget;
-	public event System.Action<Vector3> d_onDirectionChanged;
 	
 	private void OnValidate()
 	{
 		if (m_targetCount < 2) m_targetCount = 2;
 		if (m_startIndex < 0) m_targetCount = 0;
 		if (m_startIndex > m_targetCount - 1) m_startIndex = m_targetCount - 1;
+
+		m_platform = GetComponentInChildren<MovingPlatformReceiver>();
+		if (m_platform is null) Debug.LogError("MovingPlatformController found no moving platform child object. pls add one");
 		
 		if (m_targets.Length < m_targetCount) //Add new target gizmos
 		{
@@ -78,6 +80,10 @@ public class MovingPlatformController : MonoBehaviour
 
 	private void Awake()
 	{
+		m_platform = GetComponentInChildren<MovingPlatformReceiver>();
+		if (m_platform is null) Debug.LogError("MovingPlatformController found no moving platform child object. pls add one");
+		m_platform.UpdateReference(Vector3.zero);
+		
 		m_platform.transform.position = m_targets[m_startIndex].transform.position;
 		m_currentPosition = m_startIndex;
 		m_currentTarget = m_startIndex;
@@ -88,14 +94,14 @@ public class MovingPlatformController : MonoBehaviour
 		//Yes, it is unoptimized
 		if (moving)
 		{
-			if ((m_targets[m_currentTarget].position - m_platform.position).magnitude < m_speed * Time.deltaTime)//Destination reached within next update;
+			if ((m_targets[m_currentTarget].position - m_platform.transform.position).magnitude < m_speed * Time.deltaTime)//Destination reached within next update;
 			{
-				m_platform.position = m_targets[m_currentTarget].position;
+				m_platform.transform.position = m_targets[m_currentTarget].position;
 				m_currentPosition = m_currentTarget;
-				d_onDirectionChanged?.Invoke(Vector3.zero);
+				m_platform.UpdateReference(Vector3.zero);
 			}
 
-			m_platform.position += m_movementDirection * (m_speed * Time.deltaTime);//Move
+			m_platform.transform.position += m_movementDirection * (m_speed * Time.deltaTime);//Move
 		}
 	}
 
@@ -108,8 +114,8 @@ public class MovingPlatformController : MonoBehaviour
 		if (index == m_currentTarget) return;
 		
 		m_currentTarget = index;
-		m_movementDirection = (m_targets[m_currentTarget].position - m_platform.position).normalized;
-		d_onDirectionChanged?.Invoke(m_movementDirection * m_speed);
+		m_movementDirection = (m_targets[m_currentTarget].position - m_platform.transform.position).normalized;
+		m_platform.UpdateReference(m_movementDirection * m_speed);
 		
 	}
 	public void IncrementPosition()
