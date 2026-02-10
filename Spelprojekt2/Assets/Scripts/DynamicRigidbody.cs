@@ -25,10 +25,9 @@ public class DynamicRigidbody : MonoBehaviour
 
     }
 
-    void OnTriggerEnter(Collider other)
+    bool ColliderOrSelfIsFiltered(Collider other)
     {
         bool is_filtered = false;
-
         // Check other
         {
             FilterObject filter_obj = other.GetComponent<FilterObject>();
@@ -47,7 +46,12 @@ public class DynamicRigidbody : MonoBehaviour
             }
         }
 
-        if(is_filtered)
+        return is_filtered;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(ColliderOrSelfIsFiltered(other))
         {
             collision_count++;
         }
@@ -55,14 +59,9 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        FilterObject filter_obj = other.GetComponent<FilterObject>();
-        if(filter_obj != null)
+        if(ColliderOrSelfIsFiltered(other))
         {
-            if(filter_obj.m_kind == FilterManager.m_activeFilter)
-            {
-                // TODO(ah): Do this only "within some threshold"
-                collision_count--;
-            }
+            collision_count--;
         }
     }
 }
