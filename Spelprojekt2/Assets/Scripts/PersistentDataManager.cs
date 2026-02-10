@@ -21,6 +21,12 @@ using static Serialization;
 
  */
 
+public struct DeserializedPlayerResult
+{
+    public bool found;
+    public FilterKind active_filter;
+}
+
 public sealed class PersistentDataManager
 {
 
@@ -100,8 +106,6 @@ public sealed class PersistentDataManager
                 PersistentDataManager.SerializeScene(scene.name, objs.ToArray());
             }
         }
-
-        // TODO(ah): serialize player data
     }
 
     public static void SerializePlayer(Player player)
@@ -109,8 +113,8 @@ public sealed class PersistentDataManager
         // Magic, Version
         int header_size = sizeof(int) * 2;
 
-        // Filter active, Position, Rotation, spawn point, scene build index
-        int obj_size    = sizeof(float) * 10 + sizeof(int) * 2; 
+        // Filter active, Position, Rotation, spawn point position, spawn point rotation, scene build index
+        int obj_size    = sizeof(float) * 14 + sizeof(int) * 2; 
 
         int total_size = header_size + obj_size;
         byte[] buffer  = new byte[total_size];
@@ -148,13 +152,22 @@ public sealed class PersistentDataManager
         };
         offset = memcpy(ref buffer, SerializeArray(rot), offset);
 
-        float[] spawn_point = new float[3]
+        float[] spawn_point_position = new float[3]
         {
-            LevelCheckpointManager.m_currentSpawnPoint.x,
-            LevelCheckpointManager.m_currentSpawnPoint.y,
-            LevelCheckpointManager.m_currentSpawnPoint.z,
+            LevelCheckpointManager.m_currentSpawnPointPosition.x,
+            LevelCheckpointManager.m_currentSpawnPointPosition.y,
+            LevelCheckpointManager.m_currentSpawnPointPosition.z,
         };
-        offset = memcpy(ref buffer, SerializeArray(spawn_point), offset);
+        offset = memcpy(ref buffer, SerializeArray(spawn_point_position), offset);
+
+        float[] spawn_point_rotation = new float[4]
+        {
+            LevelCheckpointManager.m_currentSpawnPointRotation.x,
+            LevelCheckpointManager.m_currentSpawnPointRotation.y,
+            LevelCheckpointManager.m_currentSpawnPointRotation.z,
+            LevelCheckpointManager.m_currentSpawnPointRotation.w,
+        };
+        offset = memcpy(ref buffer, SerializeArray(spawn_point_rotation), offset);
 
         offset = SerializeScalar<int>(ref buffer, LevelCheckpointManager.m_sceneBuildIndex, offset);
 
@@ -163,14 +176,105 @@ public sealed class PersistentDataManager
 
     }
 
-    public static FilterKind DeserializePlayer(Player player)
+    private struct DeserializedPlayer
+    {
+        public uint magic;
+        public int version;
+        public int filter;
+        public Vector3 player_p;
+        public Quaternion player_r;
+        public Vector3 spawn_p;
+        public Quaternion spawn_r;
+        public int scene_index;
+    }
+
+    public static LevelData LevelToLoad(LevelsData levels)
     {
         var path = Path.Combine(Application.persistentDataPath, "player.bin");
 
-        FilterKind result = FilterKind.None;
+        LevelData result = levels.m_levels[0];
+        if(File.Exists(path))
+        {
+            byte[] buffer = File.ReadAllBytes(path);
+            DeserializedPlayer player = DeserializePlayer(buffer);
+
+            Scene saved_scene = SceneManager.GetSceneByBuildIndex(player.scene_index);
+
+            for(int i = 0; i < levels.m_levels.Length; i++)
+            {
+                LevelData level = levels.m_levels[i];
+                if(level.m_sceneName == saved_scene.name)
+                {
+                    result = level;
+                    break;
+                }
+
+                bool found = false;
+                SceneData scene_data = level.m_scene;
+                for(int j = 0; j < scene_data.m_subscenes.Length; j++)
+                {
+                    Subscene subscene = scene_data.m_subscenes[j];
+                    if(subscene.m_scene == saved_scene.name)
+                    {
+                        result = level;
+                        found = true;
+                        break;
+                    }
+
+                }
+
+                if(found) break;
+            }
+        }
+
+        return result;
+    }
+
+    private static DeserializedPlayer
+    DeserializePlayer(byte[] buffer)
+    {
+        DeserializedPlayer result = new();
+        int offset = 0;
+
+        offset = DeserializeScalar<uint>(ref result.magic, buffer, offset);
+        offset = DeserializeScalar<int>(ref result.version, buffer, offset);
+        offset = DeserializeScalar<int>(ref result.filter, buffer, offset);
+
+        // Position
+        float[] position = new float[3];
+        offset = DeserializeArray<float>(ref position, buffer, offset);
+        result.player_p = new Vector3(position[0], position[1], position[2]);
+
+        // Rotation
+        float[] rotation = new float[4];
+        offset = DeserializeArray<float>(ref rotation, buffer, offset);
+        result.player_r = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
+
+
+        float[] spawn_point_position = new float[3];
+        offset = DeserializeArray<float>(ref spawn_point_position, buffer, offset);
+        result.spawn_p = new Vector3(spawn_point_position[0], spawn_point_position[1], spawn_point_position[2]);
+
+        float[] spawn_point_rotation = new float[4];
+        offset = DeserializeArray<float>(ref spawn_point_rotation, buffer, offset);
+        result.spawn_r = new Quaternion(spawn_point_rotation[0], spawn_point_rotation[1], spawn_point_rotation[2], spawn_point_rotation[3]);
+
+        offset         = DeserializeScalar<int>(ref result.scene_index, buffer, offset);
+        return result;
+    }
+
+
+    public static DeserializedPlayerResult
+    DeserializePlayer(Player player)
+    {
+        var path = Path.Combine(Application.persistentDataPath, "player.bin");
+
+        DeserializedPlayerResult result = new();
+        result.active_filter = FilterKind.None;
 
         if(File.Exists(path))
         {
+            result.found = true;
             byte[] buffer = File.ReadAllBytes(path);
             int offset = 0;
 
@@ -193,7 +297,7 @@ public sealed class PersistentDataManager
             // Filter active
             int filter = 0;
             offset = DeserializeScalar<int>(ref filter, buffer, offset);
-            result = (FilterKind)filter;
+            result.active_filter = (FilterKind)filter;
 
             // Position
             float[] position = new float[3];
@@ -204,8 +308,15 @@ public sealed class PersistentDataManager
             offset = DeserializeArray<float>(ref rotation, buffer, offset);
 
             // spawn point
-            float[] spawn_point = new float[3];
-            offset = DeserializeArray<float>(ref spawn_point, buffer, offset);
+            float[] spawn_point_position = new float[3];
+            offset = DeserializeArray<float>(ref spawn_point_position, buffer, offset);
+
+            Vector3 spawn_point_p = new Vector3(spawn_point_position[0], spawn_point_position[1], spawn_point_position[2]);
+
+            float[] spawn_point_rotation = new float[4];
+            offset = DeserializeArray<float>(ref spawn_point_rotation, buffer, offset);
+
+            Quaternion spawn_point_r = new Quaternion(spawn_point_rotation[0], spawn_point_rotation[1], spawn_point_rotation[2], spawn_point_rotation[3]);
 
             // scene spawn point belongs to
             int scene_index = 0;
@@ -213,14 +324,14 @@ public sealed class PersistentDataManager
 
             player.gameObject.transform.position = new Vector3(position[0], position[1], position[2]);
             player.gameObject.transform.rotation = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
-            LevelCheckpointManager.SetNewSpawnPoint(new Vector3(spawn_point[0], spawn_point[1], spawn_point[2]), scene_index);
+            LevelCheckpointManager.SetNewSpawnPoint(spawn_point_p, spawn_point_r, scene_index);
         }
         else
         {
             Debug.Log("[PDM] Didn't find any player data to deserialize");
         }
-        return result;
 
+        return result;
     }
 
     public static void DeserializeScene(String name, SerializableObject[] objs)

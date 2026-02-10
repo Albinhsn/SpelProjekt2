@@ -11,5 +11,5 @@ public struct LevelData
 [CreateAssetMenu(fileName = "LevelsData", menuName = "ScriptableObjects/LevelsData")]
 public class LevelsData : ScriptableObject
 {
-    public LevelData[] levels;
+    public LevelData[] m_levels;
 }

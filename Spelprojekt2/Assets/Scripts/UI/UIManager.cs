@@ -9,12 +9,12 @@ public enum UIState
     MainMenu,
     Settings,
     PauseMenu,
+    StartingGame,
 }
 
 [RequireComponent(typeof(GlitchTransitionManager))]
 public class UIManager : MonoBehaviour
 {
-
     private static UIManager m_instance;
 
     [SerializeField]
@@ -62,9 +62,14 @@ public class UIManager : MonoBehaviour
     private UIState m_statePriorToConsole;
     
     private AudioSystem m_audioSystem;
+    private bool m_transitionFromMainMenuToGameIsDone;
+    private SceneLoader m_sceneLoader;
+    private LevelData m_loadedLevel;
 
     void Awake()
     {
+        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
+
 
         if(m_instance != null && m_instance != this)
         {
@@ -179,43 +184,80 @@ public class UIManager : MonoBehaviour
 
     }
 
-    void StartGame()
+    void SetTransitionToDone()
     {
-        InputManager.EnablePlayerInput();
-        if(m_levelData != null)
-        {
-            LevelData data = m_levelData.levels[0];
-            SceneLoader loader = new(data.m_scene, m_playerPrefab);
-            loader.Load();
-
-            // TODO(ah): stream in different levels depending on where you are
-
-            m_state = UIState.None;
-
-            SceneManager.UnloadSceneAsync("MainMenu");
-        }
+        this.m_transitionFromMainMenuToGameIsDone = true;
     }
 
     void OnGUI()
     {
         switch(m_state)
         {
+            case UIState.StartingGame:
+            {
+                bool transition_is_done = this.m_transitionFromMainMenuToGameIsDone;
+                bool levels_are_loaded  = this.m_sceneLoader.m_allScenesAreLoaded;
+
+                if(transition_is_done && levels_are_loaded)
+                {
+                    SceneManager.UnloadSceneAsync("MainMenu");
+
+                    // HACK(ah): By unloading the main menu scene before instantiating the player
+                    // The player 
+
+                    // Find initial spawn point for player
+                    Player player               = Instantiate(m_playerPrefab);
+
+                    // Deserialize player
+                    DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player);
+                    if(ok.found)
+                    {
+                        if(ok.active_filter != FilterKind.None)
+                        {
+                            FilterManager fm = Object.FindFirstObjectByType<FilterManager>();
+                            if(fm != null)
+                            {
+                                fm.ChangeFilter(ok.active_filter);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        LevelCheckpointManager.Respawn();
+                        // Find first checkpoint of the loaded level
+                    }
+
+                    InputManager.EnablePlayerInput();
+                    m_state = UIState.None;
+                }
+                break;
+            }
             case UIState.MainMenu:
             {
                 AreaBegin(m_areaWidth, m_areaHeight);
 
                 if(MenuBtn("Play"))
                 {
+                    // Query PDM for which level to load
+                    LevelData level_to_load = PersistentDataManager.LevelToLoad(m_levelData);
+
+                    // Start loading the level
+                    this.m_sceneLoader = new(level_to_load);
+                    this.m_sceneLoader.Load();
+                    this.m_loadedLevel = level_to_load;
+
                     if(m_glitchTransitionManager != null)
                     {
-                        m_glitchTransitionManager.m_onTransitionEnd.AddListener(StartGame);
+                        m_transitionFromMainMenuToGameIsDone = false;
+                        m_glitchTransitionManager.m_onTransitionEnd.AddListener(SetTransitionToDone);
                         m_glitchTransitionManager.StartTransition();
-                        m_state = UIState.None;
                     }
                     else
                     {
-                        StartGame();
+                        m_transitionFromMainMenuToGameIsDone = true;
                     }
+
+                    m_state = UIState.StartingGame;
                 }
 
                 GUILayout.Space(25);
@@ -339,12 +381,6 @@ public class UIManager : MonoBehaviour
             {
                 AreaBegin(m_areaWidth, m_areaHeight);
 
-                if(!m_firstPauseMenuFrame && Input.GetKeyUp(KeyCode.Escape))
-                {
-                    InputManager.EnablePlayerInput();
-                    m_state = UIState.None;
-                }
-
                 if(MenuBtn("Resume"))
                 {
                     InputManager.EnablePlayerInput();
@@ -392,8 +428,14 @@ public class UIManager : MonoBehaviour
 
                     m_state = UIState.MainMenu;
                     
-                    Scene scene = SceneManager.GetActiveScene();
-                    SceneManager.UnloadSceneAsync(scene.name);
+
+                    Destroy(player.gameObject);
+
+                    SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_sceneName);
+                    for(int i = 0; i < this.m_loadedLevel.m_scene.m_subscenes.Length; i++)
+                    {
+                        SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_scene.m_subscenes[i].m_scene);
+                    }
                     // TODO(ah): Use the scene loader
                     SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
                 }
