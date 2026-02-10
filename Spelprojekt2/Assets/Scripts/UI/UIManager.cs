@@ -66,10 +66,21 @@ public class UIManager : MonoBehaviour
     private SceneLoader m_sceneLoader;
     private LevelData m_loadedLevel;
 
+    void HideCursor()
+    {
+        Cursor.visible = false;
+        Cursor.lockState    = CursorLockMode.Locked;
+    }
+
+    void ShowCursor()
+    {
+        Cursor.visible   = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
     void Awake()
     {
         SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
-
 
         if(m_instance != null && m_instance != this)
         {
@@ -79,6 +90,11 @@ public class UIManager : MonoBehaviour
 
         m_instance = this;
         DontDestroyOnLoad(this.gameObject);
+
+        if(m_stateOnInitialization != UIState.MainMenu)
+        {
+            HideCursor();
+        }
 
         m_state = m_stateOnInitialization;
     }
@@ -245,6 +261,7 @@ public class UIManager : MonoBehaviour
                     this.m_sceneLoader = new(level_to_load);
                     this.m_sceneLoader.Load();
                     this.m_loadedLevel = level_to_load;
+                    HideCursor();
 
                     if(m_glitchTransitionManager != null)
                     {
@@ -383,6 +400,7 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Resume"))
                 {
+                    HideCursor();
                     InputManager.EnablePlayerInput();
                     m_state = UIState.None;
                 }
@@ -456,6 +474,7 @@ public class UIManager : MonoBehaviour
         {
             if(Input.GetKeyUp(KeyCode.Escape))
             {
+                ShowCursor();
                 m_firstPauseMenuFrame = true;
                 m_state = UIState.PauseMenu;
                 InputManager.DisablePlayerInput();
