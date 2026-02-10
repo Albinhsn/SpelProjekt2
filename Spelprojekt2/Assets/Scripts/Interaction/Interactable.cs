@@ -29,8 +29,7 @@ namespace Interaction
 
         
         public void Interact(Interactor interactor)
-        {
-            Debug.Log($"{interactor.gameObject.name} interacted with {gameObject.name}");
+        { 
             m_onInteraction.Invoke(interactor);
         }
 
