@@ -46,16 +46,17 @@ namespace Interaction.Dialogue
 
         private void InitiateDialogue(Story story)
         {
+            m_speakerName = "";
             SetFont(0, m_textOut);
             Assert.IsTrue(m_activeStory is null);
             m_dialogueContainer.SetActive(true);
             m_activeStory = story;
-            ParseGlobalTags(m_activeStory.globalTags.ToArray());
+            if(m_activeStory.globalTags is not null) ParseGlobalTags(m_activeStory.globalTags.ToArray());
             UpdateDialogue();
         }
         private void UpdateDialogue()
         {
-            ParseTags(m_activeStory.currentTags.ToArray());
+            if(m_activeStory.currentTags is not null) ParseTags(m_activeStory.currentTags.ToArray());
             Debug.Log(m_activeStory.currentText);
             
             if (m_speakerName != "")
@@ -64,7 +65,7 @@ namespace Interaction.Dialogue
             }
             else m_textOut.text = m_activeStory.currentText;
             
-            SetAlternatives(m_activeStory.currentChoices.ToArray());
+            if(m_activeStory.currentChoices is not null)SetAlternatives(m_activeStory.currentChoices.ToArray());
             m_canContinueIndicator.SetActive(m_activeStory.canContinue);
         }
         private void EndDialogue()
