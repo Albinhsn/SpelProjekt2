@@ -1,7 +1,9 @@
 using System;
 using Ink.Runtime;
 using JetBrains.Annotations;
+using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Interaction.Dialogue
 {
@@ -9,13 +11,23 @@ namespace Interaction.Dialogue
     {
         [SerializeField] private TextAsset m_inkData;
         [SerializeField] private DialogueRelay m_dlsRelay;
+        [Tooltip("Index 0 is default while interacting")][SerializeField] private CinemachineCamera[] m_cameraOverrides;
         private Story m_story;
         private bool m_interacting;
         [CanBeNull] private Interactor m_activeInteractor;
 
+        private void OnValidate()
+        {
+            Assert.IsTrue(m_cameraOverrides.Length>0, "Dialogue senders must have at least one camera override");
+        }
+
         private void Awake()
         {
             m_story = new Story(m_inkData.text);
+            foreach (CinemachineCamera obj in m_cameraOverrides)
+            {
+                obj.Priority = 0;
+            }
         }
 
         public void StartDialogue(Interactor interactor)
@@ -26,6 +38,7 @@ namespace Interaction.Dialogue
                 return;
             }
             m_activeInteractor = interactor;
+            SetActiveCamera(0);
             
             m_interacting = true;
             m_story.Continue();
@@ -34,7 +47,7 @@ namespace Interaction.Dialogue
         
         private void UpdateDialogue()
         {
-            ExecuteTagActions(m_story.currentTags.ToArray());
+            ParseTags(m_story.currentTags.ToArray());
             m_dlsRelay.UpdateDialogue();
         }
 
@@ -50,10 +63,7 @@ namespace Interaction.Dialogue
                     }
                     else if (m_story.currentChoices.Count == 0)//No more choices
                     {
-                        m_dlsRelay.ExitDialogue();
-                        m_interacting = false;
-                        m_activeInteractor.CancelInteract();
-                        m_activeInteractor = null;
+                        ExitDialogue();
                         return;
                     }
                     break;
@@ -62,13 +72,10 @@ namespace Interaction.Dialogue
                     break;
                 default:
                     m_story.ChooseChoiceIndex(selection);
-                    m_story.Continue();//Continue twice to skip reading own choice
+                    //m_story.Continue();//Continue twice to skip reading own choice
                     if (!m_story.canContinue)//Exit
                     {
-                        m_dlsRelay.ExitDialogue();
-                        m_interacting = false;
-                        m_activeInteractor.CancelInteract();
-                        m_activeInteractor = null;
+                        ExitDialogue();
                         return;
                     }
                     m_story.Continue();
@@ -76,15 +83,44 @@ namespace Interaction.Dialogue
                     break;
             }
         }
+
+        private void ExitDialogue()
+        {
+            m_dlsRelay.ExitDialogue();
+            SetActiveCamera(-1);
+            m_interacting = false;
+            m_activeInteractor.CancelInteract();
+            m_activeInteractor = null;
+            m_story.ResetState();
+        }
         
-        private void ExecuteTagActions(string[] tags)
+        private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
         {
             for (int a = 0; a < tags.Length; a++)
             {
-                switch (tags[a])
-                {//TODO: add world tags here
-                    default:{break;}
+                int value_index = tags[a].IndexOf('=');
+                if (value_index == -1)//Static tag
+                {
+                    //switch for static tags
                 }
+                else
+                {
+                    string value = tags[a].Substring(value_index + 1);
+                    switch (tags[a].Substring(0, value_index))
+                    {
+                        case "camera":
+                            SetActiveCamera(int.Parse(value));
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void SetActiveCamera(int index) //Index -1 returns to player camera
+        {
+            for (int a = 0; a < m_cameraOverrides.Length; a++)
+            {
+                m_cameraOverrides[a].Priority = a == index ? int.MaxValue : 0;
             }
         }
     }
