@@ -17,10 +17,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float m_maxPickupDistance;
 
-    [SerializeField]
-    [Range(1.0f, 5.0f)]
-    private float m_speedPickedupItemMovesTowardsPlayer = 3.0f;
-
     private Transform m_pickedupItem;
     private float m_pickedupItemDistance;
 
@@ -37,6 +33,14 @@ public class Player : MonoBehaviour
     
 
     private Rigidbody m_rb;
+
+    void OnValidate()
+    {
+        // if(m_maxPickupDistance > m_itemDistanceFromPlayer*3)
+        // {
+        //     Debug.LogError("Max pickup distance should not be higher than three times the item distance from player, otherwise the item will be dropped immediately after picking it up");
+        // }
+    }
 
     void Awake()
     {
@@ -189,7 +193,7 @@ public class Player : MonoBehaviour
             float distanceToCircleXZ = itemToPlayerDistXZ - m_itemDistanceFromPlayer;
             Vector3 itemToTargetPosDir = m_pickedupItem.transform.position + (itemToPlayerDir * distanceToCircle);
             Vector3 directionToTargetFromCircle = targetPos - itemToTargetPosDir;
-            float distanceToTargetFromItemXZ = (new Vector2(targetPos.x - m_pickedupItem.transform.position.x, targetPos.z - m_pickedupItem.transform.position.z)).magnitude;
+            float distanceToTargetFromItemXZ = new Vector2(targetPos.x - m_pickedupItem.transform.position.x, targetPos.z - m_pickedupItem.transform.position.z).magnitude;
 
             // if item is outside of the circle the value is negative, if it's inside, the value is positive
             float forwardDir = -Mathf.Sign(distanceToCircleXZ);
@@ -205,32 +209,17 @@ public class Player : MonoBehaviour
             
             float speed = Mathf.Clamp(distanceToTargetFromItemXZ*distanceToTargetFromItemXZ*2, 0, m_itemMaxSpeed);
             float verticalSpeed = Mathf.Clamp(Mathf.Abs(targetPos.y - m_pickedupItem.transform.position.y * targetPos.y - m_pickedupItem.transform.position.y * 2), 0, m_itemMaxSpeed);
-            Rigidbody rb = m_pickedupItem.transform.gameObject.GetComponent<Rigidbody>();
-            Debug.DrawLine(m_pickedupItem.transform.position, targetPos, Color.red);
+            Rigidbody rb = m_pickedupItem.gameObject.GetComponent<Rigidbody>();
             if(rb != null)
             {
                 rb.linearVelocity = m_rb.linearVelocity;
                 rb.linearVelocity += new Vector3(targetVelocity.x * Dir * speed, targetVelocity.y * verticalSpeed, targetVelocity.z * Dir * speed);
-                Debug.Log("Dir: " + Dir);
-                Debug.Log("Speed: " + speed);
-                Debug.Log("targetVelocity" + targetVelocity);
-                Debug.Log("player rb velocity" + m_rb.linearVelocity);
-                Debug.Log("item rb velocity" + rb.linearVelocity);
-
             }
-            // Vector3 dir = this.transform.position - m_pickedupItem.transform.position;
-            // if(dir.magnitude > m_itemDistanceFromPlayer * 2f)
-            // {
-            //     DropItem();
-            // }
-
-            // NOTE(ah): Some epsilon added so it's not to close when it tries to move
-            // const float DISTANCE_EPSILON = 0.3f;
-            // if(dir.magnitude > m_pickedupItemDistance + DISTANCE_EPSILON)
-            // {
-            //     rb.linearVelocity += dir.normalized * m_speedPickedupItemMovesTowardsPlayer;
-            //     Debug.Log("test");
-            // }
+            Vector3 dir = transform.position - m_pickedupItem.transform.position;
+            if(dir.magnitude > m_itemDistanceFromPlayer * 3f)
+            {
+                DropItem();
+            }
         }
     }
 }
