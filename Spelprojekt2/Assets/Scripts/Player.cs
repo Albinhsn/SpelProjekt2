@@ -2,23 +2,20 @@ using UnityEngine;
 using UnityEngine.Events;
 using static LinAlg.LinAlg;
 using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Player : MonoBehaviour
 {
     [SerializeField]
     private InputActionReference m_pickupItemAction;
+    [Header("Pickup Settings")]
+    [SerializeField] float m_itemMaxSpeed = 1f;
+    [SerializeField] float m_itemDistanceFromPlayer = 1.5f;
+    [SerializeField] float m_itemFloatHeight = 1.5f;
 
     [SerializeField]
     private float m_maxPickupDistance;
-
-    [SerializeField]
-    [Range(0.1f, 4.0f)]
-    private float m_maxDistancePickedupItemCanBeFromPlayer = 2.0f;
-
-    [SerializeField]
-    [Range(1.0f, 5.0f)]
-    private float m_speedPickedupItemMovesTowardsPlayer = 3.0f;
 
     private Transform m_pickedupItem;
     private float m_pickedupItemDistance;
@@ -33,7 +30,17 @@ public class Player : MonoBehaviour
     [SerializeField]
     public UnityEvent<FilterKind> m_onTriggerLeaveWithFilter;
 
+    
+
     private Rigidbody m_rb;
+
+    void OnValidate()
+    {
+        // if(m_maxPickupDistance > m_itemDistanceFromPlayer*3)
+        // {
+        //     Debug.LogError("Max pickup distance should not be higher than three times the item distance from player, otherwise the item will be dropped immediately after picking it up");
+        // }
+    }
 
     void Awake()
     {
@@ -100,7 +107,7 @@ public class Player : MonoBehaviour
     RaycastResult PickupRaycast(Vector3 origin)
     {
         RaycastResult result = new();
-        Vector3 direction = Rejection(Camera.main.transform.forward, new Vector3(0,1,0));
+        Vector3 direction = Rejection(this.transform.forward, new Vector3(0,1,0));
         int layer_mask    = ~LayerMask.GetMask("Player");
         result.hit = Physics.Raycast(origin, direction, out result.data, Mathf.Infinity, layer_mask);
         return result;
@@ -147,15 +154,6 @@ public class Player : MonoBehaviour
                             // ah: pick up the item
                             m_pickedupItem = hit.transform;
 
-                            // ah: transform the item to be infront of the player
-                            Bounds hit_bounds = hit.collider.bounds;
-
-                            Vector3 epsilon = new Vector3(0.1f, 0, 0.1f);
-                            Vector3 offset = hit_bounds.extents + player_bounds.extents + epsilon;
-                            offset.y = 0;
-                            hit.transform.position = this.transform.position + Hadamard(offset, Rejection(Camera.main.transform.forward, new Vector3(0,1,0)).normalized);
-                            hit.transform.rotation = this.transform.rotation;
-
                             // ah: store distance between them
                             m_pickedupItemDistance = (transform.position - hit.transform.position).magnitude;
 
@@ -177,6 +175,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        
         if(m_pickupItemAction.action.WasPressedThisFrame())
         {
             PickupItem();
@@ -184,23 +183,42 @@ public class Player : MonoBehaviour
 
         if(m_pickedupItem != null)
         {
-            Rigidbody rb = m_pickedupItem.transform.gameObject.GetComponent<Rigidbody>();
+            Vector3 targetPos = this.transform.position + this.transform.forward * m_itemDistanceFromPlayer + new Vector3(0, m_itemFloatHeight, 0);
+            Vector3 itemToPlayerDir = this.transform.position - m_pickedupItem.transform.position;
+            Vector2 itemToPlayerDirXZ = new Vector2(itemToPlayerDir.x, itemToPlayerDir.z).normalized;
+            Vector2 itemToPlayerDirXZNormal = new Vector2(-itemToPlayerDirXZ.y, itemToPlayerDirXZ.x);
+            float itemToPlayerDist = itemToPlayerDir.magnitude;
+            float itemToPlayerDistXZ = new Vector2(itemToPlayerDir.x, itemToPlayerDir.z).magnitude;
+            float distanceToCircle = itemToPlayerDist - m_itemDistanceFromPlayer;
+            float distanceToCircleXZ = itemToPlayerDistXZ - m_itemDistanceFromPlayer;
+            Vector3 itemToTargetPosDir = m_pickedupItem.transform.position + (itemToPlayerDir * distanceToCircle);
+            Vector3 directionToTargetFromCircle = targetPos - itemToTargetPosDir;
+            float distanceToTargetFromItemXZ = new Vector2(targetPos.x - m_pickedupItem.transform.position.x, targetPos.z - m_pickedupItem.transform.position.z).magnitude;
+
+            // if item is outside of the circle the value is negative, if it's inside, the value is positive
+            float forwardDir = -Mathf.Sign(distanceToCircleXZ);
+            float Dir = Mathf.Sign(Vector2.Dot(itemToPlayerDirXZNormal, new Vector2(directionToTargetFromCircle.x, directionToTargetFromCircle.z)));
+
+            float angle = Mathf.Clamp(Mathf.Abs(distanceToCircleXZ) * 100f,0,45f);
+
+            Vector3 targetVelocity = new Vector3(
+                itemToPlayerDirXZNormal.x * Mathf.Cos(Mathf.Deg2Rad*forwardDir*Dir*angle) - itemToPlayerDirXZNormal.y * Mathf.Sin(Mathf.Deg2Rad*forwardDir*Dir*angle),
+                targetPos.y - m_pickedupItem.transform.position.y,
+                itemToPlayerDirXZNormal.x * Mathf.Sin(Mathf.Deg2Rad*forwardDir*Dir*angle) + itemToPlayerDirXZNormal.y * Mathf.Cos(Mathf.Deg2Rad*forwardDir*Dir*angle)
+            );
+            
+            float speed = Mathf.Clamp(distanceToTargetFromItemXZ*distanceToTargetFromItemXZ*2, 0, m_itemMaxSpeed);
+            float verticalSpeed = Mathf.Clamp(Mathf.Abs(targetPos.y - m_pickedupItem.transform.position.y * targetPos.y - m_pickedupItem.transform.position.y * 2), 0, m_itemMaxSpeed);
+            Rigidbody rb = m_pickedupItem.gameObject.GetComponent<Rigidbody>();
             if(rb != null)
             {
                 rb.linearVelocity = m_rb.linearVelocity;
+                rb.linearVelocity += new Vector3(targetVelocity.x * Dir * speed, targetVelocity.y * verticalSpeed, targetVelocity.z * Dir * speed);
             }
-
-            Vector3 dir = this.transform.position - m_pickedupItem.transform.position;
-            if(dir.magnitude > m_maxDistancePickedupItemCanBeFromPlayer)
+            Vector3 dir = transform.position - m_pickedupItem.transform.position;
+            if(dir.magnitude > m_itemDistanceFromPlayer * 3f)
             {
                 DropItem();
-            }
-
-            // NOTE(ah): Some epsilon added so it's not to close when it tries to move
-            const float DISTANCE_EPSILON = 0.3f;
-            if(dir.magnitude > m_pickedupItemDistance + DISTANCE_EPSILON)
-            {
-                rb.linearVelocity += dir.normalized * m_speedPickedupItemMovesTowardsPlayer;
             }
         }
     }

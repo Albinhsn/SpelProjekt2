@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader
 {
+<<<<<<< HEAD
     private LevelData m_level;
     private int m_scenesRemaining;
 
@@ -13,7 +14,6 @@ public class SceneLoader
     {
         this.m_level = level;
         m_scenesRemaining =  1 + level.m_scene.m_subscenes.Length;
-
     }
 
     public bool m_allScenesAreLoaded => m_scenesRemaining == 0;
@@ -22,7 +22,7 @@ public class SceneLoader
     {
         --m_scenesRemaining;
     }
-
+    
     public void Load()
     {
         var handle = SceneManager.LoadSceneAsync(m_level.m_sceneName, LoadSceneMode.Additive);
