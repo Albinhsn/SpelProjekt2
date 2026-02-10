@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
-        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
+        // SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
 
         if(m_instance != null && m_instance != this)
         {
