@@ -24,7 +24,10 @@ namespace Interaction.Dialogue
         [SerializeField] private GameObject m_altButtonPrefab;
         [SerializeField] private float m_altButtonOffset;
         private List<Button> m_altButtons;
+        
+        //Per-interaction
         [CanBeNull] private Story m_activeStory;
+        private string m_speakerName;
 
         private void OnEnable()
         {
@@ -47,13 +50,20 @@ namespace Interaction.Dialogue
             Assert.IsTrue(m_activeStory is null);
             m_dialogueContainer.SetActive(true);
             m_activeStory = story;
+            ParseGlobalTags(m_activeStory.globalTags.ToArray());
             UpdateDialogue();
         }
         private void UpdateDialogue()
         {
             ParseTags(m_activeStory.currentTags.ToArray());
             Debug.Log(m_activeStory.currentText);
-            m_textOut.text = m_activeStory.currentText;
+            
+            if (m_speakerName != "")
+            {
+                m_textOut.text = m_speakerName + ": " + m_activeStory.currentText;
+            }
+            else m_textOut.text = m_activeStory.currentText;
+            
             SetAlternatives(m_activeStory.currentChoices.ToArray());
             m_canContinueIndicator.SetActive(m_activeStory.canContinue);
         }
@@ -61,6 +71,7 @@ namespace Interaction.Dialogue
         {
             m_dialogueContainer.SetActive(false);
             m_activeStory = null;
+            m_speakerName = "";
         }
         public void ContinueAction()
         {
@@ -110,7 +121,7 @@ namespace Interaction.Dialogue
                 int value_index = tags[a].IndexOf('=');
                 if (value_index == -1)//Static tag
                 {
-                    //switch for static tags
+                    //Switch here
                 }
                 else
                 {
@@ -124,11 +135,36 @@ namespace Interaction.Dialogue
                             m_textOut.color = m_colorSet.GetColor(value);//Color of speaker text
                             use_default_color = false;
                             break;
+                        case "speaker":
+                            m_speakerName = value;
+                            break;
                     }
                 }
             }
 
             if (use_default_color) m_textOut.color = m_colorSet.defaultColor;
+        }
+
+        private void ParseGlobalTags(string[] tags)
+        {
+            for (int a = 0; a < tags.Length; a++)
+            {
+                int value_index = tags[a].IndexOf('=');
+                if (value_index == -1)//Static tag
+                {
+                    //switch for static tags
+                }
+                else
+                {
+                    string value = tags[a].Substring(value_index + 1);
+                    switch (tags[a].Substring(0, value_index))
+                    {
+                        case "speaker":
+                            m_speakerName = value;
+                            break;
+                    }
+                }
+            }
         }
 
         private void SetFont(int font_index, TextMeshProUGUI target)
