@@ -336,7 +336,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 5
-  m_jumpSpeed: 6
+  m_jumpForce: 5
+  m_smoothAccelerationFactor: 0.1
 --- !u!114 &5731249618501921105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,9 +364,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_pickupItemAction: {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  m_itemMaxSpeed: 3
+  m_itemDistanceFromPlayer: 2
+  m_itemFloatHeight: 0.5
   m_maxPickupDistance: 5
-  m_maxDistancePickedupItemCanBeFromPlayer: 2
-  m_speedPickedupItemMovesTowardsPlayer: 3
   m_onTriggerEnterWithFilter:
     m_PersistentCalls:
       m_Calls:
