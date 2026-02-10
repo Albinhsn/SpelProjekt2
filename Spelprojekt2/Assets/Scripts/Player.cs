@@ -14,8 +14,7 @@ public class Player : MonoBehaviour
     [SerializeField] float m_itemDistanceFromPlayer = 1.5f;
     [SerializeField] float m_itemFloatHeight = 1.5f;
 
-    [SerializeField]
-    private float m_maxPickupDistance;
+    [SerializeField] float m_maxPickupDistance;
 
     private Transform m_pickedupItem;
     private float m_pickedupItemDistance;
@@ -36,10 +35,10 @@ public class Player : MonoBehaviour
 
     void OnValidate()
     {
-        // if(m_maxPickupDistance > m_itemDistanceFromPlayer*3)
-        // {
-        //     Debug.LogError("Max pickup distance should not be higher than three times the item distance from player, otherwise the item will be dropped immediately after picking it up");
-        // }
+        if(m_maxPickupDistance > m_itemDistanceFromPlayer*3)
+        {
+            Debug.LogWarning("'Max Pickup Distance' should not be higher than three times the 'Item Distance From Player', otherwise the item will be dropped immediately after picking it up");
+        }
     }
 
     void Awake()
