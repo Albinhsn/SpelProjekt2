@@ -33,7 +33,7 @@ public class MovementController : MonoBehaviour
     {
         if(InputManager.Jumped() && !m_isJumping)
         {
-            m_rb.linearVelocity += new Vector3(0, m_jumpForce = 5.0f, 0);
+            m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
         }
     }
