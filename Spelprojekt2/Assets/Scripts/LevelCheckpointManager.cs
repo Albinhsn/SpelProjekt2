@@ -2,7 +2,8 @@ using UnityEngine;
 
 public sealed class LevelCheckpointManager
 {
-    public static Vector3 m_currentSpawnPoint;
+    public static Vector3 m_currentSpawnPointPosition;
+    public static Quaternion m_currentSpawnPointRotation;
     public static int m_sceneBuildIndex;
 
     public static void Respawn()
@@ -11,14 +12,15 @@ public sealed class LevelCheckpointManager
 
         if(player != null)
         {
-            // TODO(ah): Figure out which levels to reload?
-            player.transform.position = m_currentSpawnPoint;
+            player.transform.position = m_currentSpawnPointPosition;
+            player.transform.rotation = m_currentSpawnPointRotation;
         }
     }
 
-    public static void SetNewSpawnPoint(Vector3 point, int scene_build_index)
+    public static void SetNewSpawnPoint(Vector3 p, Quaternion r, int scene_build_index)
     {
-        m_currentSpawnPoint = point;
+        m_currentSpawnPointPosition = p;
+        m_currentSpawnPointRotation = r;
         m_sceneBuildIndex   = scene_build_index;
     }
 
