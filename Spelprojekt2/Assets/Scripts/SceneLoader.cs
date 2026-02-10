@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader
 {
-<<<<<<< HEAD
     private LevelData m_level;
     private int m_scenesRemaining;
 
