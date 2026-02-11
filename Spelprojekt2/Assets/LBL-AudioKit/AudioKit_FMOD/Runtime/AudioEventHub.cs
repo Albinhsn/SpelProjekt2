@@ -32,6 +32,7 @@ namespace AudioKit.FMOD
                 DontDestroyOnLoad(gameObject);
 
             registry = AudioResources.EventRegistry;
+            
         }
 
         private void OnDestroy()
