@@ -53,8 +53,6 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GlitchTransitionManager m_glitchTransitionManager;
 
-    private bool m_firstPauseMenuFrame;
-
     private UIState m_state;
 
     // TODO(ah): Do something stack based over this nonsense
@@ -458,7 +456,6 @@ public class UIManager : MonoBehaviour
                     SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
                 }
 
-                m_firstPauseMenuFrame = false;
                 AreaEnd();
                 break;
             }
@@ -475,7 +472,6 @@ public class UIManager : MonoBehaviour
             if(Input.GetKeyUp(KeyCode.Escape))
             {
                 ShowCursor();
-                m_firstPauseMenuFrame = true;
                 m_state = UIState.PauseMenu;
                 InputManager.DisablePlayerInput();
             }
