@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 
 public sealed class InputManager
@@ -49,11 +50,25 @@ public sealed class InputManager
     public static void DisablePlayerInput()
     {
         Instance.m_inputActions.Player.Disable();
+
+        //Temp while using cinemachine for camera control
+        var camera = GameObject.FindFirstObjectByType<CinemachineInputAxisController>();
+        if(camera != null)
+        {
+            camera.enabled = false;
+        }
     }
 
     public static void EnablePlayerInput()
     {
         Instance.m_inputActions.Player.Enable();
+
+        //Temp while using cinemachine for camera control
+        var camera = GameObject.FindFirstObjectByType<CinemachineInputAxisController>();
+        if(camera != null)
+        {
+            camera.enabled = true;
+        }
     }
 
     public static bool Filter(FilterKind kind)

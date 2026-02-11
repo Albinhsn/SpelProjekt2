@@ -7,6 +7,7 @@ public class SceneLoader
 {
     private LevelData m_level;
     private int m_scenesRemaining;
+    public event Action m_onAllScenesLoaded;
 
 
     public SceneLoader(LevelData level)
@@ -20,9 +21,22 @@ public class SceneLoader
     private void OnSceneLoad(AsyncOperation handle)
     {
         --m_scenesRemaining;
+        if(m_scenesRemaining == 0)
+        {
+            m_onAllScenesLoaded?.Invoke();
+        }
     }
     
     public void Load()
+    {
+        SceneManager.LoadScene(m_level.m_sceneName, LoadSceneMode.Additive);
+        // foreach(Subscene subscene in m_level.m_scene.m_subscenes)
+        // {
+        //     SceneManager.LoadScene(subscene.m_scene, LoadSceneMode.Additive);
+        // }
+    }
+
+    public void LoadAsync()
     {
         var handle = SceneManager.LoadSceneAsync(m_level.m_sceneName, LoadSceneMode.Additive);
         handle.completed += OnSceneLoad;
@@ -30,6 +44,15 @@ public class SceneLoader
         {
             handle = SceneManager.LoadSceneAsync(subscene.m_scene, LoadSceneMode.Additive);
             handle.completed += OnSceneLoad;
+        }
+    }
+
+    public void Unload()
+    {
+        SceneManager.UnloadSceneAsync(m_level.m_sceneName);
+        foreach(Subscene subscene in m_level.m_scene.m_subscenes)
+        {
+            SceneManager.UnloadSceneAsync(subscene.m_scene);
         }
     }
 }

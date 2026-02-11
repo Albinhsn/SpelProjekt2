@@ -17,7 +17,6 @@ public class Player : MonoBehaviour
     [SerializeField] float m_maxPickupDistance;
 
     private Transform m_pickedupItem;
-    private float m_pickedupItemDistance;
 
     private Collider m_collider;
     private const int MAX_NUMBER_OF_RAYS = 3;
@@ -152,9 +151,6 @@ public class Player : MonoBehaviour
                         {
                             // ah: pick up the item
                             m_pickedupItem = hit.transform;
-
-                            // ah: store distance between them
-                            m_pickedupItemDistance = (transform.position - hit.transform.position).magnitude;
 
                             // ah: Turn off rigid body
                             Rigidbody rb = hit.transform.gameObject.GetComponent<Rigidbody>();
