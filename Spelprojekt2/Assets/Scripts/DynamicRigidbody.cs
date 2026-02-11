@@ -1,26 +1,32 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class DynamicRigidbody : MonoBehaviour
 {
-    private int collision_count;
+    private Collider m_col;
+    // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
+    private HashSet<GameObject> m_collidingWithSet;
 
     void Start()
     {
         FilterManager manager = FindFirstObjectByType<FilterManager>();
         manager.m_filterChanged.AddListener(OnFilterChange);
+        this.m_col = GetComponent<Collider>();
+
+        this.m_collidingWithSet = new();
     }
 
 
     void OnFilterChange(FilterKind kind, bool active)
     {
-        if(!active && collision_count > 0)
+        if(!active && this.m_collidingWithSet.Count > 0)
         {
             Destroy(this.gameObject);
         }
         else
         {
-            collision_count = 0;
+            this.m_collidingWithSet.Clear();
         }
 
     }
@@ -49,19 +55,29 @@ public class DynamicRigidbody : MonoBehaviour
         return is_filtered;
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerStay(Collider other)
     {
+        float EPSILON = 0.05f;
         if(ColliderOrSelfIsFiltered(other))
         {
-            collision_count++;
-        }
-    }
 
-    void OnTriggerExit(Collider other)
-    {
-        if(ColliderOrSelfIsFiltered(other))
-        {
-            collision_count--;
+            Vector3 other_pos = other.gameObject.transform.position;
+            Quaternion other_rot = other.gameObject.transform.rotation;
+
+            Vector3 dir;
+            float distance;
+            if(Physics.ComputePenetration(this.m_col, this.transform.position, this.transform.rotation,
+                        other, other_pos, other_rot, out dir, out distance))
+            {
+                if(distance > EPSILON)
+                {
+                    this.m_collidingWithSet.Add(other.gameObject);
+                }
+                else
+                {
+                    this.m_collidingWithSet.Remove(other.gameObject);
+                }
+            }
         }
     }
 }
