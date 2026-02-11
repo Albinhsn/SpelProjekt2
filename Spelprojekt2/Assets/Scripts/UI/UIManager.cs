@@ -24,7 +24,7 @@ public class UIManager : MonoBehaviour
     private UIState m_stateOnInitialization;
 
     [SerializeField]
-    private LevelsData m_levelData;
+    private LevelsData m_levelData,m_MainMenuLevelData;
 
     [SerializeField]
     private Player m_playerPrefab;
@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
-        // SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
+        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
 
         if(m_instance != null && m_instance != this)
         {
@@ -200,54 +200,37 @@ public class UIManager : MonoBehaviour
 
     }
 
-    void SetTransitionToDone()
+    void SetupScene()
     {
-        this.m_transitionFromMainMenuToGameIsDone = true;
+        Player player = Instantiate(m_playerPrefab);
+
+        // Deserialize player
+        DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player);
+        if(ok.found)
+        {
+            if(ok.active_filter != FilterKind.None)
+            {
+                FilterManager fm = Object.FindFirstObjectByType<FilterManager>();
+                if(fm != null)
+                {
+                    fm.ChangeFilter(ok.active_filter);
+                }
+            }
+        }
+        else
+        {
+            LevelCheckpointManager.Respawn();
+            // Find first checkpoint of the loaded level
+        }
+        InputManager.EnablePlayerInput();
+        m_state = UIState.None;
     }
 
     void OnGUI()
     {
         switch(m_state)
         {
-            case UIState.StartingGame:
-            {
-                bool transition_is_done = this.m_transitionFromMainMenuToGameIsDone;
-                bool levels_are_loaded  = this.m_sceneLoader.m_allScenesAreLoaded;
 
-                if(transition_is_done && levels_are_loaded)
-                {
-                    SceneManager.UnloadSceneAsync("MainMenu");
-
-                    // HACK(ah): By unloading the main menu scene before instantiating the player
-                    // The player 
-
-                    // Find initial spawn point for player
-                    Player player               = Instantiate(m_playerPrefab);
-
-                    // Deserialize player
-                    DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player);
-                    if(ok.found)
-                    {
-                        if(ok.active_filter != FilterKind.None)
-                        {
-                            FilterManager fm = Object.FindFirstObjectByType<FilterManager>();
-                            if(fm != null)
-                            {
-                                fm.ChangeFilter(ok.active_filter);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        LevelCheckpointManager.Respawn();
-                        // Find first checkpoint of the loaded level
-                    }
-
-                    InputManager.EnablePlayerInput();
-                    m_state = UIState.None;
-                }
-                break;
-            }
             case UIState.MainMenu:
             {
                 AreaBegin(m_areaWidth, m_areaHeight);
@@ -258,23 +241,25 @@ public class UIManager : MonoBehaviour
                     LevelData level_to_load = PersistentDataManager.LevelToLoad(m_levelData);
 
                     // Start loading the level
-                    this.m_sceneLoader = new(level_to_load);
-                    this.m_sceneLoader.Load();
-                    this.m_loadedLevel = level_to_load;
+                    // this.m_sceneLoader = new(level_to_load);
+                    // this.m_sceneLoader.Load();
+                    // this.m_loadedLevel = level_to_load;
                     HideCursor();
 
-                    if(m_glitchTransitionManager != null)
-                    {
-                        m_transitionFromMainMenuToGameIsDone = false;
-                        m_glitchTransitionManager.m_onTransitionEnd.AddListener(SetTransitionToDone);
-                        m_glitchTransitionManager.StartTransition();
-                    }
-                    else
-                    {
-                        m_transitionFromMainMenuToGameIsDone = true;
-                    }
-
-                    m_state = UIState.StartingGame;
+                    // if(m_glitchTransitionManager != null)
+                    // {
+                    //     m_transitionFromMainMenuToGameIsDone = false;
+                    //     m_glitchTransitionManager.m_onTransitionEnd.AddListener(SetTransitionToDone);
+                    //     m_glitchTransitionManager.StartTransition();
+                    // }
+                    // else
+                    // {
+                    //     m_transitionFromMainMenuToGameIsDone = true;
+                    // }
+                    LevelManager.m_onTransitionEnd += SetupScene;
+                    LevelManager.TransitionToSceneAsync(level_to_load);
+                    
+                    m_state = UIState.None;
                 }
 
                 GUILayout.Space(25);
@@ -449,13 +434,18 @@ public class UIManager : MonoBehaviour
 
                     Destroy(player.gameObject);
 
-                    SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_sceneName);
-                    for(int i = 0; i < this.m_loadedLevel.m_scene.m_subscenes.Length; i++)
-                    {
-                        SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_scene.m_subscenes[i].m_scene);
-                    }
-                    // TODO(ah): Use the scene loader
-                    SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
+                    LevelData level_to_load = PersistentDataManager.LevelToLoad(m_MainMenuLevelData);
+
+
+                    LevelManager.TransitionToScene(level_to_load);
+
+                    // SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_sceneName);
+                    // for(int i = 0; i < this.m_loadedLevel.m_scene.m_subscenes.Length; i++)
+                    // {
+                    //     SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_scene.m_subscenes[i].m_scene);
+                    // }
+                    // // TODO(ah): Use the scene loader
+                    // SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
                 }
 
                 m_firstPauseMenuFrame = false;
