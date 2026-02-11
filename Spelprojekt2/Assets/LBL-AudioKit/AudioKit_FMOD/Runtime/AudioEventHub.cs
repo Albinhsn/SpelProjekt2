@@ -29,11 +29,17 @@ namespace AudioKit.FMOD
             I = this;
 
             if (dontDestroyOnLoad)
+            {
+                // FIX: DontDestroyOnLoad funkar bara på root-objekt
+                if (transform.parent != null)
+                    transform.SetParent(null, true);
+
                 DontDestroyOnLoad(gameObject);
+            }
 
             registry = AudioResources.EventRegistry;
-            
         }
+
 
         private void OnDestroy()
         {

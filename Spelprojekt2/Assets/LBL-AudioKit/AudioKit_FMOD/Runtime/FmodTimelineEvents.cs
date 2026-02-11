@@ -13,7 +13,6 @@ using STOP_MODE = global::FMOD.Studio.STOP_MODE;
 // FMOD timeline-callback router:
 // - Lyssnar på TIMELINE_MARKER och TIMELINE_BEAT
 // - Köar upp data till Unity main thread och triggar UnityEvents
-// Används för att synka VFX, gameplay-ticks, musiktransitions m.m.
 
 namespace AudioKit.FMOD
 {
@@ -44,6 +43,13 @@ namespace AudioKit.FMOD
 
         private static readonly EVENT_CALLBACK Callback = TimelineCallback;
 
+        private Rigidbody cachedRb;
+
+        private void Awake()
+        {
+            cachedRb = GetComponentInParent<Rigidbody>();
+        }
+
         private void OnEnable()
         {
             if (playOnEnable) Play();
@@ -66,8 +72,13 @@ namespace AudioKit.FMOD
             if (!inst.isValid())
             {
                 inst = RuntimeManager.CreateInstance(evt);
+
                 if (!is2D)
-                    RuntimeManager.AttachInstanceToGameObject(inst, gameObject, GetComponent<Rigidbody>());
+                {
+                    // FIX: Rigidbody kan sitta på parent
+                    if (cachedRb == null) cachedRb = GetComponentInParent<Rigidbody>();
+                    RuntimeManager.AttachInstanceToGameObject(inst, gameObject, cachedRb);
+                }
 
                 info = new TimelineInfo(this);
                 gcHandle = GCHandle.Alloc(info, GCHandleType.Pinned);
@@ -103,7 +114,6 @@ namespace AudioKit.FMOD
 
         private void Update()
         {
-            // Drain queued events on main thread
             if (onMarker != null)
             {
                 lock (qLock)
@@ -200,3 +210,4 @@ namespace AudioKit.FMOD
         }
     }
 }
+

@@ -91,11 +91,22 @@ namespace AudioKit.FMOD
             if (!autoDistance) return;
             if (SfxDirector.I == null) return;
 
+            // Spela inte footsteps om vi inte är på marken
+            if (!IsGrounded())
+            {
+                accum = 0f;
+                lastPos = transform.position;
+                return;
+            }
+
             var pos = transform.position;
             var delta = pos - lastPos;
             lastPos = pos;
 
-            var speed = GetSpeed(delta);
+            // Bara horisontell rörelse för steg
+            delta.y = 0f;
+
+            var speed = GetPlanarSpeed(delta);
             if (speed < 0.1f) return;
 
             accum += delta.magnitude;
@@ -104,25 +115,41 @@ namespace AudioKit.FMOD
             if (accum >= stepDist)
             {
                 accum -= stepDist;
-                PlayFootstep(speed >= runSpeed);
+                PlayFootstep(run: speed >= runSpeed);
             }
         }
 
-        private float GetSpeed(Vector3 delta)
+        private bool IsGrounded()
         {
-            if (rb != null) return GetRigidbodySpeed(rb);
-            if (cc != null) return cc.velocity.magnitude;
+            if (cc != null) return cc.isGrounded;
 
-            return delta.magnitude / Mathf.Max(0.0001f, Time.deltaTime);
+            var origin = transform.position + Vector3.up * 0.2f;
+            return Physics.Raycast(origin, Vector3.down, rayLength, groundMask, QueryTriggerInteraction.Ignore);
         }
 
-        private static float GetRigidbodySpeed(Rigidbody body)
+        private float GetPlanarSpeed(Vector3 planarDelta)
+        {
+            if (rb != null) return GetRigidbodyPlanarSpeed(rb);
+
+            if (cc != null)
+            {
+                var v = cc.velocity;
+                v.y = 0f;
+                return v.magnitude;
+            }
+
+            return planarDelta.magnitude / Mathf.Max(0.0001f, Time.deltaTime);
+        }
+
+        private static float GetRigidbodyPlanarSpeed(Rigidbody body)
         {
 #if UNITY_6000_0_OR_NEWER
-            return body.linearVelocity.magnitude;
+            var v = body.linearVelocity;
 #else
-            return body.velocity.magnitude;
+            var v = body.velocity;
 #endif
+            v.y = 0f;
+            return v.magnitude;
         }
 
         private void PlayFootstep(bool run)
@@ -136,10 +163,42 @@ namespace AudioKit.FMOD
                 lib.TryGet(SurfaceType.Default, out set);
 
             var cue = run ? set.run : set.walk;
-            if (cue == null) cue = set.walk;
+            if (cue == null) cue = set.walk; // fallback
 
             if (cue != null)
                 SfxDirector.I.PlayCue(cue, transform.position);
+        }
+
+        private void PlayJump()
+        {
+            if (SfxDirector.I == null) return;
+
+            var lib = AudioResources.Footsteps;
+            if (lib == null) return;
+
+            var surface = ResolveSurface();
+
+            if (!lib.TryGet(surface, out var set))
+                lib.TryGet(SurfaceType.Default, out set);
+
+            if (set.jump != null)
+                SfxDirector.I.PlayCue(set.jump, transform.position);
+        }
+
+        private void PlayLand()
+        {
+            if (SfxDirector.I == null) return;
+
+            var lib = AudioResources.Footsteps;
+            if (lib == null) return;
+
+            var surface = ResolveSurface();
+
+            if (!lib.TryGet(surface, out var set))
+                lib.TryGet(SurfaceType.Default, out set);
+
+            if (set.land != null)
+                SfxDirector.I.PlayCue(set.land, transform.position);
         }
 
         private SurfaceType ResolveSurface()
@@ -155,7 +214,14 @@ namespace AudioKit.FMOD
             return SurfaceType.Default;
         }
 
+        // Animation events (om ni vill)
         public void AnimEvent_FootstepWalk() => PlayFootstep(false);
         public void AnimEvent_FootstepRun()  => PlayFootstep(true);
+        public void AnimEvent_Jump()         => PlayJump();
+        public void AnimEvent_Land()         => PlayLand();
+
+        // Movement-script kan kalla dessa direkt
+        public void PlayJumpCue() => PlayJump();
+        public void PlayLandCue() => PlayLand();
     }
 }

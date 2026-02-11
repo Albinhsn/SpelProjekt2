@@ -19,6 +19,12 @@ namespace AudioKit.FMOD
         [SerializeField] private bool fadeOut = true;
 
         private EventInstance inst;
+        private Rigidbody cachedRb;
+
+        private void Awake()
+        {
+            cachedRb = GetComponentInParent<Rigidbody>();
+        }
 
         private void OnEnable()
         {
@@ -46,7 +52,10 @@ namespace AudioKit.FMOD
             if (!inst.isValid())
             {
                 inst = RuntimeManager.CreateInstance(cue.evt);
-                RuntimeManager.AttachInstanceToGameObject(inst, gameObject, GetComponent<Rigidbody>());
+
+                // FIX: Rigidbody kan sitta på parent (t.ex. Player-root)
+                if (cachedRb == null) cachedRb = GetComponentInParent<Rigidbody>();
+                RuntimeManager.AttachInstanceToGameObject(inst, gameObject, cachedRb);
             }
 
             inst.start();

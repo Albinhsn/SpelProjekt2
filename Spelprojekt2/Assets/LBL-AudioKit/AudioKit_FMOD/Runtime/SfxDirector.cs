@@ -8,7 +8,6 @@ using STOP_MODE = global::FMOD.Studio.STOP_MODE;
 // Håller ordning på instances
 // Attach till objekt när det behövs
 
-
 namespace AudioKit.FMOD
 {
     [DisallowMultipleComponent]
@@ -44,13 +43,17 @@ namespace AudioKit.FMOD
 
         public EventInstance CreateAttachedInstance(AudioCueSO cue, Transform target, bool start)
         {
-            if (cue == null) return default(EventInstance);
-            if (cue.evt.IsNull) return default(EventInstance);
+            if (cue == null) return default;
+            if (cue.evt.IsNull) return default;
 
             cue.EnsureSampleDataLoaded();
 
             var inst = RuntimeManager.CreateInstance(cue.evt);
-            RuntimeManager.AttachInstanceToGameObject(inst, target.gameObject, target.GetComponent<Rigidbody>());
+
+            // FIX: Rigidbody sitter ofta på parent (Player root)
+            var rb = target.GetComponentInParent<Rigidbody>();
+            RuntimeManager.AttachInstanceToGameObject(inst, target.gameObject, rb);
+
             if (start) inst.start();
             return inst;
         }
