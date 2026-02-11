@@ -14,7 +14,7 @@ static class EditorSceneAutoLoader
 
     static void OnSceneOpened(Scene scene, OpenSceneMode mode)
     {
-        RootScene[] roots = UnityEngine.Object.FindObjectsOfType<RootScene>();
+        RootScene[] roots = UnityEngine.Object.FindObjectsByType<RootScene>(FindObjectsSortMode.None);
         foreach(RootScene root in roots)
         {
             if(root.gameObject.scene.name == scene.name)
