@@ -84,7 +84,6 @@ public class UIManager : MonoBehaviour
             Destroy(this.gameObject);
             return;
         }
-        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
 
 
         m_instance = this;
