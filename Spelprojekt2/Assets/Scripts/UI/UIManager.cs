@@ -242,26 +242,8 @@ public class UIManager : MonoBehaviour
                     // Query PDM for which level to load
                     LevelData level_to_load = PersistentDataManager.LevelToLoad(m_levelData);
 
-                    // Start loading the level
-                    // this.m_sceneLoader = new(level_to_load);
-                    // this.m_sceneLoader.Load();
-                    // this.m_loadedLevel = level_to_load;
                     HideCursor();
 
-                    // if(m_glitchTransitionManager != null)
-                    // {
-                    //     m_transitionFromMainMenuToGameIsDone = false;
-                    //     m_glitchTransitionManager.m_onTransitionEnd.AddListener(SetTransitionToDone);
-                    //     m_glitchTransitionManager.StartTransition();
-                    // }
-                    // else
-                    // {
-                    //     m_transitionFromMainMenuToGameIsDone = true;
-                    // }
-                    // if(LevelManager.m_currentLevel.m_scene != null)
-                    // {
-                    //     LevelManager.m_currentLevel = PersistentDataManager.LevelToLoad(m_MainMenuLevelData);
-                    // }
                     LevelManager.m_onTransitionEnd += SetupScene;
                     LevelManager.TransitionToSceneAsync(level_to_load, PersistentDataManager.LevelToLoad(m_MainMenuLevelData));
 
@@ -442,7 +424,6 @@ public class UIManager : MonoBehaviour
                     Destroy(player.gameObject);
 
                     LevelData level_to_load = PersistentDataManager.LevelToLoad(m_MainMenuLevelData);
-
 
                     LevelManager.TransitionToScene(level_to_load);
                 }

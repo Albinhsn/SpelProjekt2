@@ -58,7 +58,10 @@ public sealed class LevelManager
         Instance.m_scenesLoaded = false;
         Instance.m_nextLevel = levelData;
         Instance.m_isTransitioning = true;
-        Instance.m_currentLevel = currentLevel;
+        if(Instance.m_currentLevel.m_scene == null)
+        {
+            Instance.m_currentLevel = currentLevel;
+        }
         SceneLoader sceneLoader = new(levelData);
         sceneLoader.m_onAllScenesLoaded += SetScenesLoadedBoolTrue;
         Instance.m_glitchTransitionManager = UnityEngine.Object.FindFirstObjectByType<GlitchTransitionManager>();
