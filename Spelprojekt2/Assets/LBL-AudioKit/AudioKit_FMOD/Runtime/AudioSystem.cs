@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -83,8 +84,6 @@ namespace AudioKit.FMOD
 
             I = this;
 
-            TryEnsureListener();
-
             // VCAs / Bus
             vcaMaster = GetVCA(cfg.vcaMaster);
             vcaMusic  = GetVCA(cfg.vcaMusic);
@@ -110,6 +109,7 @@ namespace AudioKit.FMOD
             SetMusicVolume(PlayerPrefs.GetFloat(PrefMusic, cfg.musicDefault));
             SetSfxVolume(PlayerPrefs.GetFloat(PrefSfx, cfg.sfxDefault));
             SetUiVolume(PlayerPrefs.GetFloat(PrefUi, cfg.uiDefault));
+            
         }
 
         private void OnDestroy()
@@ -131,21 +131,6 @@ namespace AudioKit.FMOD
             extraVcas.Clear();
 
             I = null;
-        }
-
-        private void TryEnsureListener()
-        {
-            if (!cfg.ensureStudioListener) return;
-
-            if (AudioUnityFind.FindAny<StudioListener>(true) != null) return;
-
-            var cam = Camera.main;
-            if (cam == null) cam = AudioUnityFind.FindAny<Camera>(true);
-
-            if (cam != null)
-                cam.gameObject.AddComponent<StudioListener>();
-            else
-                Debug.LogWarning("[AudioSystem] Hittade ingen Camera att lägga StudioListener på.");
         }
 
         private static void StopAndRelease(ref EventInstance inst)
