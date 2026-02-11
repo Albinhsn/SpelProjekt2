@@ -111,6 +111,11 @@ namespace Interaction.Dialogue
                         case "camera":
                             SetActiveCamera(int.Parse(value));
                             break;
+                        case "anim":
+                        {
+                            ParseAnimatorParameters(value);
+                            break;
+                        }
                     }
                 }
             }
@@ -122,6 +127,44 @@ namespace Interaction.Dialogue
             {
                 m_cameraOverrides[a].Priority = a == index ? int.MaxValue : 0;
             }
+        }
+
+        [CanBeNull] private Animator m_animator;
+        private void ParseAnimatorParameters(string parameters)
+        {
+            if (m_animator is null)
+            {
+                if (TryGetComponent(out Animator animator))
+                {
+                    m_animator = animator;
+                }
+                else Debug.LogError("Animation-containing ink data used on animatorless dialogue trigger", gameObject);
+            }
+
+            int segment_end_index = -1;
+            do
+            {
+                int type_index = parameters.IndexOf(':', segment_end_index + 1);
+                int value_index = parameters.IndexOf('=', segment_end_index + 1);
+                string name = parameters.Substring(segment_end_index + 1, type_index - segment_end_index - 1);
+                string type = parameters.Substring(type_index + 1, value_index - type_index - 1);
+                segment_end_index = parameters.IndexOf(';', value_index);
+                string value = parameters.Substring(value_index + 1, segment_end_index - value_index - 1);
+
+                switch (type)
+                {
+                    case "int":
+                        m_animator.SetInteger(name, int.Parse(value));
+                        break;
+                    case "float":
+                        m_animator.SetFloat(name, float.Parse(value));
+                        break;
+                    case "bool":
+                        m_animator.SetBool(name, bool.Parse(value));
+                        break;
+                }
+            } while (segment_end_index < parameters.Length-1);
+
         }
     }
 }
