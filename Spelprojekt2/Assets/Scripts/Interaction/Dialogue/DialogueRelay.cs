@@ -41,7 +41,11 @@ namespace Interaction.Dialogue
         }
 
         public void UpdateDialogue() => d_onDialogueUpdate?.Invoke();
-        public void ExitDialogue() => d_onDialogueExit?.Invoke();
+        public void ExitDialogue()
+        {
+            m_activeSender = null;
+            d_onDialogueExit?.Invoke();
+        }
 
         public void Select(int alt)
         {
