@@ -46,6 +46,8 @@ namespace Interaction.Dialogue
 
         private void InitiateDialogue(Story story)
         {
+            FindAnyObjectByType<UIManager>().ShowCursor();
+            
             m_speakerName = "";
             SetFont(0, m_textOut);
             Assert.IsTrue(m_activeStory is null);
@@ -57,7 +59,6 @@ namespace Interaction.Dialogue
         private void UpdateDialogue()
         {
             if(m_activeStory.currentTags is not null) ParseTags(m_activeStory.currentTags.ToArray());
-            Debug.Log(m_activeStory.currentText);
             
             if (m_speakerName != "")
             {
@@ -73,6 +74,8 @@ namespace Interaction.Dialogue
             m_dialogueContainer.SetActive(false);
             m_activeStory = null;
             m_speakerName = "";
+            
+            FindAnyObjectByType<UIManager>().HideCursor();
         }
         public void ContinueAction()
         {
