@@ -7,11 +7,11 @@ namespace Interaction
 {
     public class Interactable : MonoBehaviour
     {
-        [SerializeField] private InstanceSet m_interactableSet;
-        [SerializeField] private bool m_active = true;
-        [SerializeField] private bool m_requireUninteract = false;
-        [SerializeField] private UnityEvent<Interactor> m_onInteraction;
-        [SerializeField] private UnityEvent<bool> m_toggleHighlighted;
+        [SerializeField] protected InstanceSet m_interactableSet;
+        [SerializeField] protected bool m_active = true;
+        [SerializeField] protected bool m_requireUninteract = false;
+        [SerializeField] protected UnityEvent<Interactor> m_onInteraction;
+        [SerializeField] protected UnityEvent<bool> m_toggleHighlighted;
         
         public Vector3 position => transform.position;
 
@@ -20,22 +20,30 @@ namespace Interaction
 
         private void OnEnable()
         {
+            VirtOnEnable();
+        }
+        protected virtual void VirtOnEnable()
+        {
             if (m_active) m_interactableSet.Add(this);
         }
         private void OnDisable()
         {
+            VirtOnDisable();
+        }
+        protected virtual void VirtOnDisable()
+        {
             if (m_active) m_interactableSet.Remove(this);
         }
 
-        
-        public void Interact(Interactor interactor)
+
+        public virtual void Interact(Interactor interactor)
         { 
             m_onInteraction.Invoke(interactor);
         }
 
-        public void SetHighlighted(bool highlight) => m_toggleHighlighted.Invoke(highlight);
+        public virtual void SetHighlighted(bool highlight) => m_toggleHighlighted.Invoke(highlight);
 
-        public void SetIsInteractable(bool active)
+        public virtual void SetIsInteractable(bool active)
         {
             if (active == m_active) return;
             m_active = active;

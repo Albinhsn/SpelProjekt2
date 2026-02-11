@@ -28,15 +28,21 @@ namespace Interaction
 
             if (m_selected is not null && m_interactAction.action.WasPressedThisFrame())
             {
-                if (m_selected.requireUninteract)
-                {
-                    m_interacting = true;
-                    m_deactivateWhileInteracting.Invoke(false);
-                    m_selected.SetHighlighted(false);
-                }
-                m_selected.Interact(this);
+                Interact(m_selected);
             }
+        }
+
+        public void Interact(Interactable interactable)
+        {
+            if(m_interacting) return;
             
+            if (interactable.requireUninteract)
+            {
+                m_interacting = true;
+                m_deactivateWhileInteracting.Invoke(false);
+                interactable.SetHighlighted(false);
+            }
+            interactable.Interact(this);
         }
 
         public void CancelInteract()
