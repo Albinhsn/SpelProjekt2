@@ -64,14 +64,22 @@ public class UIManager : MonoBehaviour
     private SceneLoader m_sceneLoader;
     private LevelData m_loadedLevel;
 
-    void HideCursor()
+
+    private int m_cursorUsages = 0;
+    public void HideCursor()
     {
-        Cursor.visible = false;
-        Cursor.lockState    = CursorLockMode.Locked;
+        m_cursorUsages--;
+        if (m_cursorUsages <= 0)
+        {
+            m_cursorUsages = 0;
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
     }
 
-    void ShowCursor()
+    public void ShowCursor()
     {
+        m_cursorUsages++;
         Cursor.visible   = true;
         Cursor.lockState = CursorLockMode.None;
     }

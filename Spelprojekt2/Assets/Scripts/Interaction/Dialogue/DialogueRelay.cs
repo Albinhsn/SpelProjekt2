@@ -14,14 +14,14 @@ namespace Interaction.Dialogue
         [CanBeNull] public event System.Action d_onDialogueExit;
         [CanBeNull] private DialogueSender m_activeSender = null;
 
-        [SerializeField] private bool m_reset;
+        [Tooltip("Reset object (fixes broken links caused by incorrect game exit)")][SerializeField] private bool m_reset;
 
         private void OnValidate()
         {
             if (m_reset)
             {
                 m_reset = false;
-                Debug.Log($"Cleared {(d_onDialogueInitiation is null? 0 : d_onDialogueInitiation.GetInvocationList().Length)} subscriber(s)");
+                Debug.Log($"Cleared subscribers");
                 d_onDialogueInitiation = null;
                 d_onDialogueUpdate = null;
                 d_onDialogueExit = null;
@@ -41,7 +41,11 @@ namespace Interaction.Dialogue
         }
 
         public void UpdateDialogue() => d_onDialogueUpdate?.Invoke();
-        public void ExitDialogue() => d_onDialogueExit?.Invoke();
+        public void ExitDialogue()
+        {
+            m_activeSender = null;
+            d_onDialogueExit?.Invoke();
+        }
 
         public void Select(int alt)
         {
