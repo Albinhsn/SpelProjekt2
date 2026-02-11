@@ -80,13 +80,14 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
-        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
 
         if(m_instance != null && m_instance != this)
         {
             Destroy(this.gameObject);
             return;
         }
+        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
+
 
         m_instance = this;
         DontDestroyOnLoad(this.gameObject);
@@ -224,6 +225,7 @@ public class UIManager : MonoBehaviour
         }
         InputManager.EnablePlayerInput();
         m_state = UIState.None;
+        LevelManager.m_onTransitionEnd -= SetupScene;
     }
 
     void OnGUI()
@@ -256,8 +258,14 @@ public class UIManager : MonoBehaviour
                     // {
                     //     m_transitionFromMainMenuToGameIsDone = true;
                     // }
+                    // if(LevelManager.m_currentLevel.m_scene != null)
+                    // {
+                    //     LevelManager.m_currentLevel = PersistentDataManager.LevelToLoad(m_MainMenuLevelData);
+                    // }
                     LevelManager.m_onTransitionEnd += SetupScene;
-                    LevelManager.TransitionToSceneAsync(level_to_load);
+                    LevelManager.TransitionToSceneAsync(level_to_load, PersistentDataManager.LevelToLoad(m_MainMenuLevelData));
+
+
                     
                     m_state = UIState.None;
                 }
@@ -428,7 +436,6 @@ public class UIManager : MonoBehaviour
                     {
                         Debug.LogWarning("Tried to save without any player?");
                     }
-
                     m_state = UIState.MainMenu;
                     
 
@@ -438,14 +445,6 @@ public class UIManager : MonoBehaviour
 
 
                     LevelManager.TransitionToScene(level_to_load);
-
-                    // SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_sceneName);
-                    // for(int i = 0; i < this.m_loadedLevel.m_scene.m_subscenes.Length; i++)
-                    // {
-                    //     SceneManager.UnloadSceneAsync(this.m_loadedLevel.m_scene.m_subscenes[i].m_scene);
-                    // }
-                    // // TODO(ah): Use the scene loader
-                    // SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
                 }
 
                 m_firstPauseMenuFrame = false;
