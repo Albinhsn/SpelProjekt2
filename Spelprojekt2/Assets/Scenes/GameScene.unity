@@ -273,6 +273,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7020526969338059507, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
+      propertyPath: m_volume
+      value: 
+      objectReference: {fileID: 849195835}
     - target: {fileID: 8153035966713843843, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
       propertyPath: m_Name
       value: UIManager
@@ -280,8 +284,33 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8153035966713843843, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 849195835}
   m_SourcePrefab: {fileID: 100100000, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
+--- !u!1 &849195834 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8153035966713843843, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
+  m_PrefabInstance: {fileID: 849195833}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &849195835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849195834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: cdee27b64d7fa8d4c819073bb0d5f3ae, type: 2}
 --- !u!1 &1060638350
 GameObject:
   m_ObjectHideFlags: 0
@@ -644,55 +673,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d31053619a0a53440a3f1fbcaabb17bf, type: 3}
---- !u!1 &1599059466
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1599059468}
-  - component: {fileID: 1599059467}
-  m_Layer: 0
-  m_Name: PostProcessVolume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1599059467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599059466}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: cdee27b64d7fa8d4c819073bb0d5f3ae, type: 2}
---- !u!4 &1599059468
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599059466}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.2437127, y: 1.4856489, z: -2.2859318}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1806685896
 GameObject:
   m_ObjectHideFlags: 0
@@ -924,7 +904,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1254137919}
-  - {fileID: 1599059468}
   - {fileID: 1060638352}
   - {fileID: 1117760898}
   - {fileID: 2109710609}
