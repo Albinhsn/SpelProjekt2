@@ -20,13 +20,16 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnFilterChange(FilterKind kind, bool active)
     {
-        if(!active && this.m_collidingWithSet.Count > 0)
+        if(kind != FilterManager.m_activeFilter)
         {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            this.m_collidingWithSet.Clear();
+            if(this.m_collidingWithSet.Count > 0)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                this.m_collidingWithSet.Clear();
+            }
         }
 
     }
