@@ -19,7 +19,7 @@ namespace Interaction
 	    public override void Interact(Interactor interactor)
 	    {
 		    base.Interact(interactor);
-		    base.m_active = false;
+		    base.m_active = !m_oneShot;
 	    }
 
 	    protected override void VirtOnDisable()
