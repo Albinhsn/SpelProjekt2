@@ -57,7 +57,7 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if(other.isTrigger)
+        if(other.isTrigger && other.gameObject.GetComponent<FilterObject>() == null)
         {
             return;
         }
@@ -83,5 +83,10 @@ public class DynamicRigidbody : MonoBehaviour
                 }
             }
         }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        this.m_collidingWithSet.Remove(other.gameObject);
     }
 }

@@ -51,6 +51,25 @@ public class InteractiveButton : MonoBehaviour
         return result;
     }
 
+    void Update()
+    {
+        if(m_collidingObjects.Count > 0)
+        {
+            for(int i = 0; i < m_collidingObjects.Count; i++)
+            {
+                if(m_collidingObjects[i] == null)
+                {
+                    m_collidingObjects.RemoveAt(i);
+                    i--;
+                    if(IsNoObjectOnTheButton(FilterManager.m_activeFilter))
+                    {
+                        m_onRelease?.Invoke();
+                    }
+                }
+            }
+        }
+    }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -66,6 +85,7 @@ public class InteractiveButton : MonoBehaviour
             m_onClick?.Invoke();
         }
         m_collidingObjects.Add(other.gameObject);
+        Debug.Log("entered");
     }
 
     private void OnTriggerExit(Collider other)
@@ -85,6 +105,7 @@ public class InteractiveButton : MonoBehaviour
                 m_onRelease?.Invoke();
             }
         }
+        Debug.Log("exited");
     }
 
     public void HandleFilterChange(FilterKind kind, bool activate)
