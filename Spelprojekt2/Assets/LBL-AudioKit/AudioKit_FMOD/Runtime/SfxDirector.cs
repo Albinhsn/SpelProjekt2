@@ -26,6 +26,7 @@ namespace AudioKit.FMOD
             if (I == this) I = null;
         }
 
+
         public void PlayCue(AudioCueSO cue, Vector3 pos)
         {
             if (cue == null) return;
@@ -39,6 +40,14 @@ namespace AudioKit.FMOD
 
             if (cue.is2D) RuntimeManager.PlayOneShot(cue.evt);
             else RuntimeManager.PlayOneShot(cue.evt, pos);
+        }
+
+        public static void PlayCue2(AudioCueSO cue, Vector3 pos)
+        {
+            if(I != null)
+            {
+                I.PlayCue(cue, pos);
+            }
         }
 
         public EventInstance CreateAttachedInstance(AudioCueSO cue, Transform target, bool start)

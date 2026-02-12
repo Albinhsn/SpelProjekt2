@@ -46,7 +46,8 @@ namespace Interaction.Dialogue
 
         private void InitiateDialogue(Story story)
         {
-            FindAnyObjectByType<UIManager>().ShowCursor();
+            UIManager? ui_manager = FindAnyObjectByType<UIManager>();
+            ui_manager?.ShowCursor();
             
             m_speakerName = "";
             SetFont(0, m_textOut);
@@ -75,7 +76,8 @@ namespace Interaction.Dialogue
             m_activeStory = null;
             m_speakerName = "";
             
-            FindAnyObjectByType<UIManager>().HideCursor();
+            UIManager? ui_manager = FindAnyObjectByType<UIManager>();
+            ui_manager?.ShowCursor();
         }
         public void ContinueAction()
         {

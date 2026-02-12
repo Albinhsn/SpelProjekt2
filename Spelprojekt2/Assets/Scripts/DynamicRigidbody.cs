@@ -22,6 +22,8 @@ public class DynamicRigidbody : MonoBehaviour
     {
         if(!active && this.m_collidingWithSet.Count > 0)
         {
+            Material material = GetComponent<MeshRenderer>().material;
+            ParticleManager.PlayParticleEffect(transform.position, transform.rotation, Vector3.one, material);
             Destroy(this.gameObject);
         }
         else
@@ -57,6 +59,10 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
+        if(other.isTrigger && other.gameObject.GetComponent<FilterObject>() == null)
+        {
+            return;
+        }
         float EPSILON = 0.05f;
         if(ColliderOrSelfIsFiltered(other))
         {
@@ -79,5 +85,10 @@ public class DynamicRigidbody : MonoBehaviour
                 }
             }
         }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        this.m_collidingWithSet.Remove(other.gameObject);
     }
 }
