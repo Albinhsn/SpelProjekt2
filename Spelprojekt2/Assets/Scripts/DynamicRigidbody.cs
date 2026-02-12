@@ -22,6 +22,8 @@ public class DynamicRigidbody : MonoBehaviour
     {
         if(!active && this.m_collidingWithSet.Count > 0)
         {
+            Material material = GetComponent<MeshRenderer>().material;
+            ParticleManager.PlayParticleEffect(transform.position, transform.rotation, Vector3.one, material);
             Destroy(this.gameObject);
         }
         else
