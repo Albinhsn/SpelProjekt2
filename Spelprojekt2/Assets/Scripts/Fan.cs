@@ -15,7 +15,7 @@ public class Fan : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player") && other.gameObject.GetComponent<DynamicRigidbody>() == null) return;
 
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb == null) return;
