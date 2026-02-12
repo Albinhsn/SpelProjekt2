@@ -24,7 +24,8 @@ namespace Interaction.Dialogue
         {
             foreach (string obj in story.variablesState)
             {
-                if(story.variablesState.GlobalVariableExistsWithName(obj)) m_instance.m_inkVariables[obj] = story.variablesState[obj];
+                if (m_instance.m_inkVariables.ContainsKey(obj)) m_instance.m_inkVariables[obj] = story.variablesState[obj];
+                else m_instance.m_inkVariables.Add(obj, story.variablesState[obj]);
             }
         }
         
