@@ -26,6 +26,8 @@ public class MovementController : MonoBehaviour
     private Transform m_cameraTransform;
     private Vector3 m_referenceVector = Vector3.zero;
 
+    private float jumpCooldown = 0;
+
     void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
@@ -57,22 +59,26 @@ public class MovementController : MonoBehaviour
             platform.d_onMovementChanged -= UpdateReferenceVector;
         }
     }
-
-    private void OnDisable()
+    void OnTriggerStay(Collider other)
     {
-        m_rb.linearVelocity = new Vector3(0, m_rb.linearVelocity.y, 0);
+        if(!other.isTrigger)
+        {
+            m_isJumping = false;
+        }
     }
 
     void Update()
     {
-        if(InputManager.Jumped() && !m_isJumping)
+        if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
         {
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
+            jumpCooldown = 0.5f;
         }
 
         m_rb.position += m_referenceVector * Time.deltaTime;
+        jumpCooldown -= Time.deltaTime;
     }
 
     void FixedUpdate()
