@@ -57,6 +57,10 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
+        if(other.isTrigger)
+        {
+            return;
+        }
         float EPSILON = 0.05f;
         if(ColliderOrSelfIsFiltered(other))
         {
