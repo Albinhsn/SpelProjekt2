@@ -58,6 +58,11 @@ public class MovementController : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        m_rb.linearVelocity = new Vector3(0, m_rb.linearVelocity.y, 0);
+    }
+
     void Update()
     {
         if(InputManager.Jumped() && !m_isJumping)
