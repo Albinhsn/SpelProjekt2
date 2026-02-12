@@ -24,15 +24,21 @@ namespace Interaction.Dialogue
         {
             foreach (string obj in story.variablesState)
             {
-                if(story.variablesState.GlobalVariableExistsWithName(obj)) m_instance.m_inkVariables[obj] = story.variablesState[obj];
+                if (m_instance.m_inkVariables.ContainsKey(obj)) m_instance.m_inkVariables[obj] = story.variablesState[obj];
+                else m_instance.m_inkVariables.Add(obj, story.variablesState[obj]);
             }
         }
         
         public static void SyncDown(Story story) //Update local from global
         {
+            List<string> vars = new List<string>(); //Collection was modified, may not enumerate workaround
             foreach (string obj in story.variablesState)
             {
-                story.variablesState[obj] = m_instance.m_inkVariables[obj]; //Update only included variables
+                vars.Add(obj);
+            }
+            for (int a = 0; a < vars.Count; a++)
+            {
+                if (m_instance.m_inkVariables.ContainsKey(vars[a])) story.variablesState[vars[a]] = m_instance.m_inkVariables[vars[a]]; //Update only included variables
             }
         }
     }
