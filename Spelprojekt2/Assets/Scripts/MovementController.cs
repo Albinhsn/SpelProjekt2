@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections;
 using static LinAlg.LinAlg;
@@ -7,6 +8,10 @@ using static LinAlg.LinAlg;
 [RequireComponent(typeof(Rigidbody))]
 public class MovementController : MonoBehaviour
 {
+
+    [SerializeField]
+    private UnityEvent m_playerJumped;
+
     [Header("Movement")]
     [SerializeField, Tooltip("The movement speed of the player")]
     private float m_speed;
@@ -52,6 +57,7 @@ public class MovementController : MonoBehaviour
         {
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
+            m_playerJumped?.Invoke();
         }
 
         m_rb.position += m_referenceVector * Time.deltaTime;
