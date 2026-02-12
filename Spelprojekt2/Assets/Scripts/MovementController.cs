@@ -34,7 +34,10 @@ public class MovementController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        m_isJumping = false;
+        if(!other.isTrigger)
+        {
+            m_isJumping = false;
+        }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
             platform.d_onMovementChanged += UpdateReferenceVector;
@@ -45,7 +48,10 @@ public class MovementController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        m_isJumping = true;
+        if(!other.isTrigger)
+        {
+            m_isJumping = true;
+        }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
             platform.d_onMovementChanged -= UpdateReferenceVector;
@@ -58,7 +64,7 @@ public class MovementController : MonoBehaviour
         {
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
-            SfxDirector.PlayCue(m_playerJumpSound, this.transform.position);
+            SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
         }
 
         m_rb.position += m_referenceVector * Time.deltaTime;
