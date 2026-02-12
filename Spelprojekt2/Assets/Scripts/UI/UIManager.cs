@@ -24,7 +24,10 @@ public class UIManager : MonoBehaviour
     private UIState m_stateOnInitialization;
 
     [SerializeField]
-    private LevelsData m_levelData,m_MainMenuLevelData;
+    private LevelsData m_levelData;
+
+    [SerializeField]
+    private LevelsData m_MainMenuLevelData;
 
     [SerializeField]
     private Player m_playerPrefab;
@@ -93,6 +96,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
+        LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
 
         m_instance = this;
         DontDestroyOnLoad(this.gameObject);
@@ -250,7 +254,7 @@ public class UIManager : MonoBehaviour
                     HideCursor();
 
                     LevelManager.m_onTransitionEnd += SetupScene;
-                    LevelManager.TransitionToSceneAsync(level_to_load, PersistentDataManager.LevelToLoad(m_MainMenuLevelData));
+                    LevelManager.TransitionToSceneAsync(level_to_load);
 
 
                     
@@ -428,9 +432,7 @@ public class UIManager : MonoBehaviour
 
                     Destroy(player.gameObject);
 
-                    LevelData level_to_load = PersistentDataManager.LevelToLoad(m_MainMenuLevelData);
-
-                    LevelManager.TransitionToScene(level_to_load);
+                    LevelManager.TransitionToScene(m_MainMenuLevelData.m_levels[0]);
                 }
 
                 AreaEnd();

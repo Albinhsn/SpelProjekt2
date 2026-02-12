@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8153035966713843843
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4365943673824385308}
+  - component: {fileID: 7020526969338059507}
+  - component: {fileID: 358372983514085806}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4365943673824385308
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8153035966713843843}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -577.51624, y: 187.75548, z: -1365.7577}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7020526969338059507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8153035966713843843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdc53de7ddc53323cb7ae30281f116c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_onTransitionEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  m_volume: {fileID: 0}
+  m_transitionTime: 3
+  m_startIntensity: 0
+--- !u!114 &358372983514085806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8153035966713843843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64b0aee4a03fbd2ddbf764f86dd76cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  font: {fileID: 12800000, guid: 716c86c6e19ae62468194e0157c0d564, type: 3}
+  m_stateOnInitialization: 0
+  m_levelData: {fileID: 11400000, guid: 7d2c949e06f714be6a248de8c1ef8ecb, type: 2}
+  m_MainMenuLevelData: {fileID: 11400000, guid: bfaeaabd5491a094cb97060b3d81b80d, type: 2}
+  m_playerPrefab: {fileID: 695921995035222353, guid: 61ea1e72f96eacd4e87c9c6045eaee4f, type: 3}
+  m_areaWidth: 150
+  m_areaHeight: 200
+  m_btnWidth: 125
+  m_btnHeight: 20
+  m_sliderWidth: 150
+  m_btnTexture: {fileID: 2800000, guid: 40848578d1961334d820821bec6175a4, type: 3}
+  m_pauseMenuBG: {fileID: 0}
+  m_glitchTransitionManager: {fileID: 7020526969338059507}
