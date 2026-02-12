@@ -33,7 +33,7 @@ namespace Interaction.Dialogue
         {
             foreach (string obj in story.variablesState)
             {
-                story.variablesState[obj] = m_instance.m_inkVariables[obj]; //Update only included variables
+                if(m_instance.m_inkVariables.ContainsKey(obj))story.variablesState[obj] = m_instance.m_inkVariables[obj]; //Update only included variables
             }
         }
     }
