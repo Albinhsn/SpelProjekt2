@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
 namespace Interaction.Dialogue
 {
@@ -32,6 +33,8 @@ namespace Interaction.Dialogue
 
         public void StartDialogue(Interactor interactor)
         {
+            GlobalInkVariableManager.SyncDown(m_story);
+            
             if (!m_story.canContinue)
             {
                 interactor.CancelInteract();
@@ -86,6 +89,7 @@ namespace Interaction.Dialogue
 
         private void ExitDialogue()
         {
+            GlobalInkVariableManager.SyncUp(m_story);
             m_dlsRelay.ExitDialogue();
             SetActiveCamera(-1);
             m_interacting = false;
