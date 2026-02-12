@@ -34,6 +34,12 @@ public sealed class LevelManager
         }
     }
 
+    // NOTE(ah): This is just for initialization
+    public static void SetCurrentLevel(LevelData levelData)
+    {
+        Instance.m_currentLevel = levelData;
+    }
+
     public static void TransitionToScene(LevelData levelData)
     {
         if(Instance.m_isTransitioning)
@@ -47,7 +53,8 @@ public sealed class LevelManager
         sceneLoader.Load();
         FinishTransition();
     }
-    public static void TransitionToSceneAsync(LevelData levelData, LevelData currentLevel)
+
+    public static void TransitionToSceneAsync(LevelData levelData)
     {
         if(Instance.m_isTransitioning)
         {
@@ -58,10 +65,6 @@ public sealed class LevelManager
         Instance.m_scenesLoaded = false;
         Instance.m_nextLevel = levelData;
         Instance.m_isTransitioning = true;
-        if(Instance.m_currentLevel.m_scene == null)
-        {
-            Instance.m_currentLevel = currentLevel;
-        }
         SceneLoader sceneLoader = new(levelData);
         sceneLoader.m_onAllScenesLoaded += SetScenesLoadedBoolTrue;
         Instance.m_glitchTransitionManager = UnityEngine.Object.FindFirstObjectByType<GlitchTransitionManager>();
