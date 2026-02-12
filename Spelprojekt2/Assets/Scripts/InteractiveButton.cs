@@ -85,7 +85,6 @@ public class InteractiveButton : MonoBehaviour
             m_onClick?.Invoke();
         }
         m_collidingObjects.Add(other.gameObject);
-        Debug.Log("entered");
     }
 
     private void OnTriggerExit(Collider other)
@@ -105,7 +104,6 @@ public class InteractiveButton : MonoBehaviour
                 m_onRelease?.Invoke();
             }
         }
-        Debug.Log("exited");
     }
 
     public void HandleFilterChange(FilterKind kind, bool activate)
