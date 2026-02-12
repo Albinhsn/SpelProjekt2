@@ -20,7 +20,7 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnFilterChange(FilterKind kind, bool active)
     {
-        if(kind != FilterManager.m_activeFilter)
+        if(kind != FilterManager.m_activeFilter && !active)
         {
             if(this.m_collidingWithSet.Count > 0)
             {
