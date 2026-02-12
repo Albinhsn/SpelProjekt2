@@ -357,21 +357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e35ff277eaeb64aa98ed97688efc08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerJumped:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+  m_playerJumpSound: {fileID: 0}
   m_speed: 5
   m_jumpForce: 5
   m_smoothAccelerationFactor: 0.1
@@ -400,11 +386,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f274888a78a31f428c9ae5fca4ccdd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_pickupCue: {fileID: 0}
   m_pickupItemAction: {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
-  m_itemMaxSpeed: 3
-  m_itemDistanceFromPlayer: 2
+  m_itemMaxSpeed: 15
+  m_itemDistanceFromPlayer: 1.5
   m_itemFloatHeight: 0.5
-  m_maxPickupDistance: 5
+  m_maxPickupDistance: 4
   m_onTriggerEnterWithFilter:
     m_PersistentCalls:
       m_Calls:
