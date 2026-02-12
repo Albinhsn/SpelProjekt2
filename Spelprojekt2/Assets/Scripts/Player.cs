@@ -2,11 +2,16 @@ using UnityEngine;
 using UnityEngine.Events;
 using static LinAlg.LinAlg;
 using UnityEngine.InputSystem;
+using AudioKit.FMOD;
 using Unity.VisualScripting;
 
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Player : MonoBehaviour
 {
+
+    [SerializeField]
+    private AudioCueSO m_pickupCue;
+
     [SerializeField]
     private InputActionReference m_pickupItemAction;
     [Header("Pickup Settings")]
@@ -151,6 +156,9 @@ public class Player : MonoBehaviour
                         {
                             // ah: pick up the item
                             m_pickedupItem = hit.transform;
+
+                            // Play pickup sound
+                            SfxDirector.PlayCue2(m_pickupCue, hit.transform.position);
 
                             // ah: Turn off rigid body
                             Rigidbody rb = hit.transform.gameObject.GetComponent<Rigidbody>();

@@ -1,12 +1,18 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections;
+using AudioKit.FMOD;
 using static LinAlg.LinAlg;
 
 [RequireComponent(typeof(Rigidbody))]
 public class MovementController : MonoBehaviour
 {
+
+    [SerializeField]
+    private AudioCueSO m_playerJumpSound;
+
     [Header("Movement")]
     [SerializeField, Tooltip("The movement speed of the player")]
     private float m_speed;
@@ -28,7 +34,10 @@ public class MovementController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        m_isJumping = false;
+        if(!other.isTrigger)
+        {
+            m_isJumping = false;
+        }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
             platform.d_onMovementChanged += UpdateReferenceVector;
@@ -39,7 +48,10 @@ public class MovementController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        m_isJumping = true;
+        if(!other.isTrigger)
+        {
+            m_isJumping = true;
+        }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
             platform.d_onMovementChanged -= UpdateReferenceVector;
@@ -52,6 +64,7 @@ public class MovementController : MonoBehaviour
         {
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
+            SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
         }
 
         m_rb.position += m_referenceVector * Time.deltaTime;
