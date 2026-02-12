@@ -39,7 +39,6 @@ public class MovementController : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        m_isJumping = true;
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
             platform.d_onMovementChanged -= UpdateReferenceVector;
