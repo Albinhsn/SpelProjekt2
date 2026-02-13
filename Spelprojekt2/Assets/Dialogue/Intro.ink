@@ -7,7 +7,7 @@ What's going on?
  I look metallic and constructed. My face feels ithcy.
  -> choice
  + [Purpose.]
- I was born, or, eh. <em>Built</em> for a reason, probably. Not really sure what for.
+ I was born, or, eh. Built for a reason, probably. Not really sure what for.
  -> choice
  * [No more questions.]
 Nothing else to do, ah! There's a door ahead of me. How can I get through?

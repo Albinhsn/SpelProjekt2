@@ -77,7 +77,7 @@ namespace Interaction.Dialogue
             m_speakerName = "";
             
             UIManager? ui_manager = FindAnyObjectByType<UIManager>();
-            ui_manager?.ShowCursor();
+            ui_manager?.HideCursor();
         }
         public void ContinueAction()
         {
