@@ -39,6 +39,7 @@ namespace Interaction.Dialogue
         {
             if (m_activeSender is not null && m_activeSender != sender)
             {
+                Debug.Log("Can't initiate dialogue relay");
                 return;
             }
 

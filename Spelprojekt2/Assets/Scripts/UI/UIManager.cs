@@ -491,15 +491,13 @@ public class UIManager : MonoBehaviour
                     if(player != null)
                     {
                         PersistentDataManager.SerializePlayer(player);
+                        Destroy(player.gameObject);
                     }
                     else
                     {
                         Debug.LogWarning("Tried to save without any player?");
                     }
                     EnterState(UIState.MainMenu);
-                    
-
-                    Destroy(player.gameObject);
 
                     LevelManager.TransitionToScene(m_MainMenuLevelData.m_levels[0]);
                 }

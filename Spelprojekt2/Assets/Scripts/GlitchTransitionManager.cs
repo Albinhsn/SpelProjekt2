@@ -29,7 +29,7 @@ public class GlitchTransitionManager : MonoBehaviour
         {
             Debug.LogError("[GTM] Need a volume for transition");
         }
-        else
+        else if(m_glitchVolume == null)
         {
             m_volume.profile.TryGet(out m_glitchVolume);
 
@@ -43,7 +43,10 @@ public class GlitchTransitionManager : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        StartTransition();
+        if(other.tag == "Player")
+        {
+            StartTransition();
+        }
     }
 
     public void RespawnPlayer()

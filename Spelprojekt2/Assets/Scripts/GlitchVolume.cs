@@ -20,6 +20,7 @@ public sealed class GlitchVolume : CustomPostProcessVolumeComponent, IPostProces
     public ClampedFloatParameter m_intensity = new ClampedFloatParameter(0f, 0f, 1f);
 
     public bool IsActive() => m_Material != null;
+    public bool IsActive2() => m_Material != null && m_intensity.value > 0;
 
     // Do not forget to add this post process in the Custom Post Process Orders list (Project Settings > Graphics > HDRP Global Settings).
     public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.AfterPostProcess;
@@ -36,7 +37,7 @@ public sealed class GlitchVolume : CustomPostProcessVolumeComponent, IPostProces
 
     public override void Render(CommandBuffer cmd, HDCamera camera, RTHandle source, RTHandle destination)
     {
-        if (!IsActive())
+        if (!IsActive2())
             return;
 
         m_Material.SetFloat("_ScanlineSpeed", m_scanlineSpeed.value * m_intensity.value);

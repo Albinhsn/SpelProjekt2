@@ -103,6 +103,7 @@ public sealed class LevelManager
         {
             FinishTransition();
         }
+            Instance.m_glitchTransitionManager.m_onTransitionEnd.RemoveListener(SetGlitchBoolTrue);
     }
 
     static void SetScenesLoadedBoolTrue()
