@@ -30,6 +30,8 @@ public class Fan : MonoBehaviour
             if (other.gameObject.GetComponent<Rigidbody>().isKinematic) return;
         }
 
+        if(gameObject.GetComponentInParent<FilterObject>() != null && gameObject.GetComponentInParent<FilterObject>().Activated) return;
+
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb == null) return;
 
