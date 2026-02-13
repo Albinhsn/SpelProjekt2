@@ -24,6 +24,11 @@ public class Fan : MonoBehaviour
     {
         if (!other.CompareTag("Player") && other.gameObject.GetComponent<DynamicRigidbody>() == null) return;
 
+        if(other.gameObject.GetComponent<DynamicRigidbody>() != null)
+        {
+            if (other.gameObject.GetComponent<Rigidbody>().isKinematic) return;
+        }
+
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb == null) return;
 
