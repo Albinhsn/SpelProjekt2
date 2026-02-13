@@ -10,12 +10,27 @@ public class Fan : MonoBehaviour
     [SerializeField] float m_bobAmplitude = 0.5f;
     [SerializeField] float m_bobSpeed = 2f;
 
-    [Header("Centering Force")]
-    [SerializeField] float m_XZcenteringStrength = 10f;
+    private float m_colliderHeight;
+    private CapsuleCollider m_collider;
+    float timer = 0f;
+    void OnValidate()
+    {
+        m_collider = GetComponent<CapsuleCollider>();
+        m_colliderHeight = m_maxHeight + 5f;
+        m_collider.height = m_colliderHeight;
+        m_collider.center = new Vector3(0f, m_colliderHeight / 2f, 0f);
+    }
 
     void OnTriggerStay(Collider other)
     {
         if (!other.CompareTag("Player") && other.gameObject.GetComponent<DynamicRigidbody>() == null) return;
+
+        if(other.gameObject.GetComponent<DynamicRigidbody>() != null)
+        {
+            if (other.gameObject.GetComponent<Rigidbody>().isKinematic) return;
+        }
+
+        if(gameObject.GetComponentInParent<FilterObject>() != null && gameObject.GetComponentInParent<FilterObject>().Activated) return;
 
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb == null) return;
@@ -24,16 +39,23 @@ public class Fan : MonoBehaviour
 
         float topStartHeight = m_maxHeight - (m_bobAmplitude*2);
 
+        timer += Time.deltaTime;
+
         if (height < topStartHeight)
         {
-            float heightRatio = 1f - (height / m_maxHeight);
-            float windForce = m_windStrength * heightRatio;
+            float targetY = other.transform.position.y + m_windStrength * .1f;
+            rb.MovePosition(new Vector3(
+                other.transform.position.x,
+                targetY,
+                other.transform.position.z
+            ));
 
-            rb.AddForce(transform.up * windForce, ForceMode.Acceleration);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            timer = 0f;
         }
         else
         {
-            float bobOffset = Mathf.Sin(Time.time * m_bobSpeed) * m_bobAmplitude;
+            float bobOffset = Mathf.Sin(timer * m_bobSpeed) * m_bobAmplitude;
             float targetY = transform.position.y + m_maxHeight + bobOffset;
 
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
@@ -52,11 +74,11 @@ public class Fan : MonoBehaviour
         }
 
 
-
         Vector2 xzDistance = XZDistanceToCenter(other.transform);
-        rb.AddForce(
-            new Vector3(-xzDistance.x, 0, -xzDistance.y) * m_XZcenteringStrength,
-            ForceMode.Acceleration
+        rb.linearVelocity = new Vector3(
+            -xzDistance.x,
+            rb.linearVelocity.y,
+            -xzDistance.y
         );
     }
 

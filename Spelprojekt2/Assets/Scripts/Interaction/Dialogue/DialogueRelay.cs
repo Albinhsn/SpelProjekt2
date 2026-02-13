@@ -1,13 +1,14 @@
 using System;
 using Ink.Runtime;
 using JetBrains.Annotations;
+using srUtils.Unity;
 using UnityEngine;
 
 namespace Interaction.Dialogue
 {
     [ExecuteAlways]
     [CreateAssetMenu(menuName = "Data/DialogueSystem/DialogueSysRelay")]
-    public class DialogueRelay : ScriptableObject
+    public class DialogueRelay : ResettableScriptableObject
     {
         [CanBeNull] public event System.Action<Story> d_onDialogueInitiation;
         [CanBeNull] public event System.Action d_onDialogueUpdate;
@@ -22,11 +23,16 @@ namespace Interaction.Dialogue
             {
                 m_reset = false;
                 Debug.Log($"Cleared subscribers");
-                d_onDialogueInitiation = null;
-                d_onDialogueUpdate = null;
-                d_onDialogueExit = null;
-                m_activeSender = null;
+                Reset();
             }
+        }
+
+        public override void Reset()
+        {
+            d_onDialogueInitiation = null;
+            d_onDialogueUpdate = null;
+            d_onDialogueExit = null;
+            m_activeSender = null;
         }
 
         public void Initiate(Story story, DialogueSender sender)
