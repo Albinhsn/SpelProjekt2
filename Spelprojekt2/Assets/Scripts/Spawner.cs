@@ -39,7 +39,7 @@ public class Spawner : MonoBehaviour
         if(CanSpawn())
         {
             Despawn();
-            this.m_object = Instantiate(this.m_objectToSpawn, this.transform.position, Quaternion.identity);;
+            this.m_object = Instantiate(this.m_objectToSpawn, this.transform.position, this.transform.rotation);
 
             Rigidbody rb = this.m_object.GetComponent<Rigidbody>();
             if(rb != null)
