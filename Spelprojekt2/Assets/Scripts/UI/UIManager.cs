@@ -9,7 +9,6 @@ public enum UIState
     MainMenu,
     Settings,
     PauseMenu,
-    StartingGame,
 }
 
 [RequireComponent(typeof(GlitchTransitionManager))]
@@ -56,17 +55,30 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GlitchTransitionManager m_glitchTransitionManager;
 
+    [SerializeField]
+    private AudioCueSO m_onButtonHoverCue;
+
     private UIState m_state;
 
     // TODO(ah): Do something stack based over this nonsense
     private UIState m_statePriorToSettingsMenu;
-    private UIState m_statePriorToConsole;
     
     private AudioSystem m_audioSystem;
     private bool m_transitionFromMainMenuToGameIsDone;
     private SceneLoader m_sceneLoader;
     private LevelData m_loadedLevel;
 
+
+    // (ah): Signal state
+    struct UI_Signal
+    {
+        public bool m_hot;
+        public bool m_active;
+    }
+
+    private Dictionary<string, UI_Signal> m_buttonSignals;
+    private int m_selectedIndex = 0;
+    private bool m_useSelected;
 
     private int m_cursorUsages = 0;
     public void HideCursor()
@@ -87,6 +99,42 @@ public class UIManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
+
+    private void EnterState(UIState state)
+    {
+        switch(state)
+        {
+            case UIState.Settings:
+            {
+                ShowCursor();
+                InputManager.DisablePlayerInput();
+                m_statePriorToSettingsMenu = m_state;
+                break;
+            }
+            case UIState.None:
+            {
+                HideCursor();
+                InputManager.EnablePlayerInput();
+                break;
+            }
+            case UIState.MainMenu:
+            {
+                ShowCursor();
+                InputManager.DisablePlayerInput();
+                break;
+            }
+            case UIState.PauseMenu:
+            {
+                ShowCursor();
+                InputManager.DisablePlayerInput();
+                break;
+            }
+        }
+
+        m_selectedIndex = 0;
+        this.m_state   = state;
+    }
+
     void Awake()
     {
 
@@ -99,14 +147,10 @@ public class UIManager : MonoBehaviour
         LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
 
         m_instance = this;
+        m_buttonSignals = new();
         DontDestroyOnLoad(this.gameObject);
 
-        if(m_stateOnInitialization != UIState.MainMenu)
-        {
-            HideCursor();
-        }
-
-        m_state = m_stateOnInitialization;
+        EnterState(m_stateOnInitialization);
     }
 
     void Start()
@@ -114,8 +158,12 @@ public class UIManager : MonoBehaviour
         m_audioSystem = FindFirstObjectByType<AudioSystem>();
     }
 
-    bool MenuBtn(string text)
+
+    bool MenuBtn(string text, int index)
     {
+
+        UI_Signal signal = new();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
 
@@ -123,11 +171,40 @@ public class UIManager : MonoBehaviour
         button_options[0] = GUILayout.Width(m_btnWidth);
         button_options[1] = GUILayout.Height(m_btnHeight);
 
+        UI_Signal prev_signal = new();
+        m_buttonSignals.TryGetValue(text, out prev_signal);
+
         GUIStyle btn_style = new GUIStyle(GUI.skin.button);
-        btn_style.normal.background = m_btnTexture;
+        btn_style.normal.background = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
+        btn_style.hover.background  = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
         btn_style.font = font;
 
-        bool result = GUILayout.Button(text, btn_style, button_options);
+        bool result = GUILayout.Button(text, btn_style, button_options) || (index == m_selectedIndex && m_useSelected);
+
+        Rect btn_rect = GUILayoutUtility.GetLastRect();
+
+        // HACK(ah): God i fucking hate unity with a passion
+        if(Event.current.type == EventType.Repaint)
+        {
+            // Create signal
+            signal.m_active = result;
+            signal.m_hot    = btn_rect.Contains(Event.current.mousePosition);
+
+            if(m_buttonSignals.ContainsKey(text))
+            {
+                if(!prev_signal.m_hot && signal.m_hot)
+                {
+                    SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
+                    m_selectedIndex = index;
+                }
+            }
+            else if(signal.m_hot)
+            {
+                SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
+            }
+            m_buttonSignals[text] = signal;
+        }
+
 
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -232,13 +309,13 @@ public class UIManager : MonoBehaviour
             LevelCheckpointManager.Respawn();
             // Find first checkpoint of the loaded level
         }
-        InputManager.EnablePlayerInput();
-        m_state = UIState.None;
+        EnterState(UIState.None);
         LevelManager.m_onTransitionEnd -= SetupScene;
     }
 
     void OnGUI()
     {
+        int btn_index = 0;
         switch(m_state)
         {
 
@@ -246,36 +323,31 @@ public class UIManager : MonoBehaviour
             {
                 AreaBegin(m_areaWidth, m_areaHeight);
 
-                if(MenuBtn("Play"))
+                if(MenuBtn("Play", btn_index++))
                 {
                     // Query PDM for which level to load
                     LevelData level_to_load = PersistentDataManager.LevelToLoad(m_levelData);
 
-                    HideCursor();
-
                     LevelManager.m_onTransitionEnd += SetupScene;
                     LevelManager.TransitionToSceneAsync(level_to_load);
-
-
                     
-                    m_state = UIState.None;
+                    EnterState(UIState.None);
                 }
 
                 GUILayout.Space(25);
-                if(MenuBtn("Settings"))
+                if(MenuBtn("Settings", btn_index++))
                 {
-                    m_statePriorToSettingsMenu = UIState.MainMenu;
-                    m_state = UIState.Settings;
+                    EnterState(UIState.Settings);
                 }
 
 
-                if(MenuBtn("Delete save"))
+                if(MenuBtn("Delete save", btn_index++))
                 {
                     PersistentDataManager.RemoveAllSerializedData();
                 }
 
                 GUILayout.Space(25);
-                if(MenuBtn("Quit"))
+                if(MenuBtn("Quit", btn_index++))
                 {
                     PersistentDataManager.RemoveAllSerializedData();
                 #if UNITY_EDITOR
@@ -370,9 +442,9 @@ public class UIManager : MonoBehaviour
 
                 GUILayout.Space(15);
 
-                if(MenuBtn("Back"))
+                if(MenuBtn("Back", btn_index++))
                 {
-                    m_state = m_statePriorToSettingsMenu;
+                    EnterState(m_statePriorToSettingsMenu);
                 }
 
                 AreaEnd();
@@ -382,14 +454,12 @@ public class UIManager : MonoBehaviour
             {
                 AreaBegin(m_areaWidth, m_areaHeight);
 
-                if(MenuBtn("Resume"))
+                if(MenuBtn("Resume", btn_index++))
                 {
-                    HideCursor();
-                    InputManager.EnablePlayerInput();
-                    m_state = UIState.None;
+                    EnterState(UIState.None);
                 }
 
-                if(MenuBtn("Save"))
+                if(MenuBtn("Save", btn_index++))
                 {
                     PersistentDataManager.SerializeLoadedLevels();
 
@@ -404,18 +474,17 @@ public class UIManager : MonoBehaviour
                     }
                 }
 
-                if(MenuBtn("Reset to checkpoint"))
+                if(MenuBtn("Reset to checkpoint", btn_index++))
                 {
                     LevelCheckpointManager.ResetToCheckpoint();
                 }
 
-                if(MenuBtn("Settings"))
+                if(MenuBtn("Settings", btn_index++))
                 {
-                    m_statePriorToSettingsMenu = UIState.PauseMenu;
-                    m_state = UIState.Settings;
+                    EnterState(UIState.Settings);
                 }
 
-                if(MenuBtn("Main Menu"))
+                if(MenuBtn("Main Menu", btn_index++))
                 {
                     PersistentDataManager.SerializeLoadedLevels();
                     Player player = FindFirstObjectByType<Player>();
@@ -427,7 +496,7 @@ public class UIManager : MonoBehaviour
                     {
                         Debug.LogWarning("Tried to save without any player?");
                     }
-                    m_state = UIState.MainMenu;
+                    EnterState(UIState.MainMenu);
                     
 
                     Destroy(player.gameObject);
@@ -441,18 +510,45 @@ public class UIManager : MonoBehaviour
             default:{ break;}
         }
 
+        // HACK(ah): (:
+        if(Event.current.type == EventType.KeyUp && btn_index > 0)
+        {
+            if(Input.GetKeyUp(KeyCode.UpArrow))
+            {
+                m_selectedIndex--;
+                if(m_selectedIndex < 0)
+                {
+                    m_selectedIndex = btn_index - 1;
+                }
+                SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
+            }
+            if(Input.GetKeyUp(KeyCode.DownArrow))
+            {
+                m_selectedIndex++;
+                if(m_selectedIndex >= btn_index)
+                {
+                    m_selectedIndex = 0;
+                }
+                SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
+            }
+        }
+
+        m_useSelected = false;
     }
 
     void Update()
     {
+        if(Input.GetKeyUp(KeyCode.Return))
+        {
+            m_useSelected = true;
+        }
+        
 
         if(m_state == UIState.None)
         {
             if(Input.GetKeyUp(KeyCode.Escape))
             {
-                ShowCursor();
-                m_state = UIState.PauseMenu;
-                InputManager.DisablePlayerInput();
+                EnterState(UIState.PauseMenu);
             }
         }
     }

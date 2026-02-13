@@ -177,6 +177,7 @@ namespace AudioKit.FMOD
             if (!music.isValid()) return;
 
             music.stop(fade ? STOP_MODE.ALLOWFADEOUT : STOP_MODE.IMMEDIATE);
+            music.setUserData(IntPtr.Zero);
             music.release();
             music.clearHandle();
             started = false;
