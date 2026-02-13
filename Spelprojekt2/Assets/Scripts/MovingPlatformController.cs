@@ -108,7 +108,6 @@ public class MovingPlatformController : MonoBehaviour
 	//Controls
 	public void MoveToIndex(int index)
 	{
-		if (moving) return;//May be subject to change
 		Assert.IsTrue(index < m_targetCount);
 
 		if (index == m_currentTarget) return;
