@@ -576,14 +576,14 @@ MonoBehaviour:
   Radius: 5
   Orbits:
     Top:
-      Radius: 1
-      Height: 6
+      Radius: 2
+      Height: 5
     Center:
-      Radius: 4.7
-      Height: 3.7
+      Radius: 3
+      Height: 2.5
     Bottom:
-      Radius: 4
-      Height: 0.5
+      Radius: 2
+      Height: -0.5
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
@@ -639,9 +639,9 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 0, z: 0}
-  Damping: {x: 0.8, y: 1.2}
+  Damping: {x: 0, y: 0}
   Lookahead:
-    Enabled: 1
+    Enabled: 0
     Time: 0.05
     Smoothing: 3
     IgnoreY: 0
@@ -741,7 +741,7 @@ MonoBehaviour:
     UseFollowTarget:
       Enabled: 0
       YOffset: 0
-    Damping: 1.5
+    Damping: 0.9
     SmoothingTime: 0
   TerrainResolution:
     Enabled: 0
