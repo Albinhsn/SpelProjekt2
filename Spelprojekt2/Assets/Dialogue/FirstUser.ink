@@ -1,18 +1,18 @@
-What are you? #font=0
-I am the USER and your creator. #font=1
+What are you? #font=0 #camera=0 #speaker=Alea
+I am the USER and your creator. #speaker=USER
 It can be disorienting in the beginning, but you will get used to the feeling, Alea.
-What are you saying? #font=0
-You can't understand me... Then I will just tell you this with the little clarity I can give: #font=1
-Go to the <color="purple">Bearing</color>. #font=0
-Wait! Can't you... Nevermind.
+What do you mean? #speaker=Alea
+I'm giving you a directive, your goal is: #speaker=USER
+Go to the <color="purple">Bearing</color>. You will be able to gt further instructions there. #camera=1
+Wait! Can't you... Nevermind. #speaker=Alea #camera=0
 -> choice
 === choice ===
  + [The <color="purple">Bearing</color>.]
- Must be one of the islands, the one furthest away maybe?
+ The island looks different, although I have to go through another one before it seems.
  -> choice
- + [The Light.]+
+ + [The USER.]
  A strange thing, a guiding light maybe?
  -> choice
  * [Move on.]
- There's another door, must be the exit.
+ There's another door ahead, must be the way forward.
     -> END
