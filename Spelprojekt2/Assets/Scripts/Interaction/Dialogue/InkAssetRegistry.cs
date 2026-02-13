@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Interaction.Dialogue
 {
-    public class InkAssetRegister : MonoBehaviour
+    public class InkAssetRegistry : MonoBehaviour
     {
         [SerializeField] private Entry[] m_assets;
         private int m_activeAssetIndex = 0;

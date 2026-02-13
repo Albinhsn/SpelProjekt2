@@ -16,7 +16,7 @@ namespace Interaction.Dialogue
         private Story m_story;
         private bool m_interacting;
         [CanBeNull] private Interactor m_activeInteractor;
-        [CanBeNull] private InkAssetRegister m_assetRegister = null;
+        [CanBeNull] private InkAssetRegistry m_assetRegistry = null;
 
         private void OnValidate()
         {
@@ -31,12 +31,12 @@ namespace Interaction.Dialogue
                 obj.Priority = 0;
             }
 
-            if (TryGetComponent(out InkAssetRegister register)) m_assetRegister = register;
+            if (TryGetComponent(out InkAssetRegistry register)) m_assetRegistry = register;
         }
 
         public void StartDialogue(Interactor interactor)
         {
-            if (m_assetRegister is not null) m_story = new Story(m_assetRegister.activeInkAsset.text);
+            if (m_assetRegistry is not null) m_story = new Story(m_assetRegistry.activeInkAsset.text);
             
             GlobalInkVariableManager.SyncDown(m_story);
             
