@@ -526,10 +526,34 @@ MonoBehaviour:
   m_requireUninteract: 0
   m_onInteraction:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6175116479147199660}
+        m_TargetAssemblyTypeName: Interaction.Dialogue.DialogueSender, Assembly-CSharp
+        m_MethodName: StartDialogue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_toggleHighlighted:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 879281434}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!65 &205438412
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1035,7 +1059,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 4e6e728d92dfdfa4bb9dded9e39a0407, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2001,6 +2025,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3176023773755229823, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
   m_PrefabInstance: {fileID: 6175116479147199658}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6175116479147199660 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7144553607210423886, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+  m_PrefabInstance: {fileID: 6175116479147199658}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b309b15986d14776a712f32d288e1281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
