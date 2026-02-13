@@ -29,6 +29,23 @@ namespace Interaction.Dialogue
         [CanBeNull] private Story m_activeStory;
         private string m_speakerName;
 
+        void Awake()
+        {
+            m_relay.d_onDialogueInitiation += InitiateDialogue;
+            m_relay.d_onDialogueUpdate += UpdateDialogue;
+            m_relay.d_onDialogueExit += EndDialogue;
+            m_dialogueContainer.SetActive(false);
+            if (m_altButtons is null) m_altButtons = new List<Button>();
+        }
+
+        void OnDestroy()
+        {
+            m_relay.d_onDialogueInitiation -= InitiateDialogue;
+            m_relay.d_onDialogueUpdate -= UpdateDialogue;
+            m_relay.d_onDialogueExit -= EndDialogue;
+        }
+
+#if false
         private void OnEnable()
         {
             m_relay.d_onDialogueInitiation += InitiateDialogue;
@@ -37,12 +54,14 @@ namespace Interaction.Dialogue
             m_dialogueContainer.SetActive(false);
             if (m_altButtons is null) m_altButtons = new List<Button>();
         }
+
         private void OnDisable()
         {
             m_relay.d_onDialogueInitiation -= InitiateDialogue;
             m_relay.d_onDialogueUpdate -= UpdateDialogue;
             m_relay.d_onDialogueExit -= EndDialogue;
         }
+#endif
 
         private void InitiateDialogue(Story story)
         {
