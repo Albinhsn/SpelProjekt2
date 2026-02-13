@@ -56,6 +56,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GlitchTransitionManager m_glitchTransitionManager;
 
+    [SerializeField]
+    private AudioCueSO m_onButtonHoverCue;
+
     private UIState m_state;
 
     // TODO(ah): Do something stack based over this nonsense
@@ -99,6 +102,7 @@ public class UIManager : MonoBehaviour
         LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
 
         m_instance = this;
+        m_buttonSignals = new();
         DontDestroyOnLoad(this.gameObject);
 
         if(m_stateOnInitialization != UIState.MainMenu)
@@ -114,8 +118,19 @@ public class UIManager : MonoBehaviour
         m_audioSystem = FindFirstObjectByType<AudioSystem>();
     }
 
+    struct UI_Signal
+    {
+        public bool m_hot;
+        public bool m_active;
+    }
+
+    Dictionary<string, UI_Signal> m_buttonSignals;
+
     bool MenuBtn(string text)
     {
+
+        UI_Signal signal = new();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
 
@@ -128,6 +143,32 @@ public class UIManager : MonoBehaviour
         btn_style.font = font;
 
         bool result = GUILayout.Button(text, btn_style, button_options);
+
+
+        Rect btn_rect = GUILayoutUtility.GetLastRect();
+
+        if(Event.current.type == EventType.Repaint)
+        {
+            // Create signal
+            signal.m_active = result;
+            signal.m_hot    = btn_rect.Contains(Event.current.mousePosition);
+
+            if(m_buttonSignals.ContainsKey(text))
+            {
+                UI_Signal prev_signal = m_buttonSignals[text];
+
+                if(!prev_signal.m_hot && signal.m_hot)
+                {
+                    SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
+                }
+            }
+            else if(signal.m_hot)
+            {
+                SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
+            }
+            m_buttonSignals[text] = signal;
+        }
+
 
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
