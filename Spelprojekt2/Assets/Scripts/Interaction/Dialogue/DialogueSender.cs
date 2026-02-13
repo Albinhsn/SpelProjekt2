@@ -16,6 +16,7 @@ namespace Interaction.Dialogue
         private Story m_story;
         private bool m_interacting;
         [CanBeNull] private Interactor m_activeInteractor;
+        [CanBeNull] private InkAssetRegistry m_assetRegistry = null;
 
         private void OnValidate()
         {
@@ -29,10 +30,14 @@ namespace Interaction.Dialogue
             {
                 obj.Priority = 0;
             }
+
+            if (TryGetComponent(out InkAssetRegistry register)) m_assetRegistry = register;
         }
 
         public void StartDialogue(Interactor interactor)
         {
+            if (m_assetRegistry is not null) m_story = new Story(m_assetRegistry.activeInkAsset.text);
+            
             GlobalInkVariableManager.SyncDown(m_story);
             
             if (!m_story.canContinue)
