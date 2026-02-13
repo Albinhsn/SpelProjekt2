@@ -111,7 +111,8 @@ public class MovingPlatformController : MonoBehaviour
 		Assert.IsTrue(index < m_targetCount);
 
 		if (index == m_currentTarget) return;
-		
+
+		m_currentPosition = m_currentTarget;
 		m_currentTarget = index;
 		m_movementDirection = (m_targets[m_currentTarget].position - m_platform.transform.position).normalized;
 		m_platform.UpdateReference(m_movementDirection * m_speed);
