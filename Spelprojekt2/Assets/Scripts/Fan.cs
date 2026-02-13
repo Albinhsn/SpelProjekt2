@@ -10,8 +10,15 @@ public class Fan : MonoBehaviour
     [SerializeField] float m_bobAmplitude = 0.5f;
     [SerializeField] float m_bobSpeed = 2f;
 
-    [Header("Centering Force")]
-    [SerializeField] float m_XZcenteringStrength = 10f;
+    private float m_colliderHeight;
+    private CapsuleCollider m_collider;
+    void OnValidate()
+    {
+        m_collider = GetComponent<CapsuleCollider>();
+        m_colliderHeight = m_maxHeight + 5f;
+        m_collider.height = m_colliderHeight;
+        m_collider.center = new Vector3(0f, m_colliderHeight / 2f, 0f);
+    }
 
     void OnTriggerStay(Collider other)
     {
@@ -26,10 +33,14 @@ public class Fan : MonoBehaviour
 
         if (height < topStartHeight)
         {
-            float heightRatio = 1f - (height / m_maxHeight);
-            float windForce = m_windStrength * heightRatio;
+            float targetY = other.transform.position.y + m_windStrength * .1f;
+            rb.MovePosition(new Vector3(
+                other.transform.position.x,
+                targetY,
+                other.transform.position.z
+            ));
 
-            rb.AddForce(transform.up * windForce, ForceMode.Acceleration);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         }
         else
         {
@@ -52,11 +63,11 @@ public class Fan : MonoBehaviour
         }
 
 
-
         Vector2 xzDistance = XZDistanceToCenter(other.transform);
-        rb.AddForce(
-            new Vector3(-xzDistance.x, 0, -xzDistance.y) * m_XZcenteringStrength,
-            ForceMode.Acceleration
+        rb.linearVelocity = new Vector3(
+            -xzDistance.x,
+            rb.linearVelocity.y,
+            -xzDistance.y
         );
     }
 
