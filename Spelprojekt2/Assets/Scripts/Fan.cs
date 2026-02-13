@@ -12,6 +12,7 @@ public class Fan : MonoBehaviour
 
     private float m_colliderHeight;
     private CapsuleCollider m_collider;
+    float timer = 0f;
     void OnValidate()
     {
         m_collider = GetComponent<CapsuleCollider>();
@@ -36,6 +37,8 @@ public class Fan : MonoBehaviour
 
         float topStartHeight = m_maxHeight - (m_bobAmplitude*2);
 
+        timer += Time.deltaTime;
+
         if (height < topStartHeight)
         {
             float targetY = other.transform.position.y + m_windStrength * .1f;
@@ -46,10 +49,11 @@ public class Fan : MonoBehaviour
             ));
 
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            timer = 0f;
         }
         else
         {
-            float bobOffset = Mathf.Sin(Time.time * m_bobSpeed) * m_bobAmplitude;
+            float bobOffset = Mathf.Sin(timer * m_bobSpeed) * m_bobAmplitude;
             float targetY = transform.position.y + m_maxHeight + bobOffset;
 
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
