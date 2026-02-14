@@ -28,14 +28,37 @@ namespace Interaction.Dialogue
         //Per-interaction
         [CanBeNull] private Story m_activeStory;
         private string m_speakerName;
+        private bool m_subscribed;
 
-        void Awake()
+        private void Awake()
         {
-            m_relay.d_onDialogueInitiation += InitiateDialogue;
-            m_relay.d_onDialogueUpdate += UpdateDialogue;
-            m_relay.d_onDialogueExit += EndDialogue;
-            m_dialogueContainer.SetActive(false);
-            if (m_altButtons is null) m_altButtons = new List<Button>();
+            m_subscribed = false;
+        }
+
+        void Start()
+        {
+            if (!m_subscribed)
+            {
+                m_relay.d_onDialogueInitiation += InitiateDialogue;
+                m_relay.d_onDialogueUpdate += UpdateDialogue;
+                m_relay.d_onDialogueExit += EndDialogue;
+                m_dialogueContainer.SetActive(false);
+                if (m_altButtons is null) m_altButtons = new List<Button>();
+                m_subscribed = true;
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (!m_subscribed)
+            {
+                m_relay.d_onDialogueInitiation += InitiateDialogue;
+                m_relay.d_onDialogueUpdate += UpdateDialogue;
+                m_relay.d_onDialogueExit += EndDialogue;
+                m_dialogueContainer.SetActive(false);
+                if (m_altButtons is null) m_altButtons = new List<Button>();
+                m_subscribed = true;
+            }
         }
 
         void OnDestroy()
@@ -43,6 +66,7 @@ namespace Interaction.Dialogue
             m_relay.d_onDialogueInitiation -= InitiateDialogue;
             m_relay.d_onDialogueUpdate -= UpdateDialogue;
             m_relay.d_onDialogueExit -= EndDialogue;
+            m_subscribed = false;
         }
 
 #if false
