@@ -15,6 +15,10 @@ public sealed class FilterToMusicParams : MonoBehaviour
     [SerializeField] private float onValue = 1f;
     [SerializeField] private float offValue = 0f;
 
+    [Header("Invert")]
+    [Tooltip("Om FMOD är normalt (0=OFF,1=ON) och din logik känns baklänges, slå på detta.")]
+    [SerializeField] private bool invertValueBeforeSend = true;
+
     [Header("Driver")]
     [SerializeField] private string sourceId = "filter";
     [SerializeField] private int priority = 200;
@@ -98,7 +102,7 @@ public sealed class FilterToMusicParams : MonoBehaviour
 
     private void ResolveKindsFromGameData()
     {
-        // Default
+        // fallback
         redKind = FilterKind.Primary;
         blueKind = FilterKind.Secondary;
 
@@ -112,7 +116,6 @@ public sealed class FilterToMusicParams : MonoBehaviour
         var primary = colors[(int)FilterKind.Primary];
         var secondary = colors[(int)FilterKind.Secondary];
 
-        // Läs hur spelet definierar färgerna (ingen gissning)
         if (primary == FilterColor.Red) redKind = FilterKind.Primary;
         if (secondary == FilterColor.Red) redKind = FilterKind.Secondary;
 
@@ -124,10 +127,17 @@ public sealed class FilterToMusicParams : MonoBehaviour
     {
         if (!driver) return;
 
-        float t = turningOn ? fadeOnSeconds : fadeOffSeconds;
+        // Invertera värdet mellan offValue<->onValue (fungerar även om du byter nivåer)
+        float sendValue = value;
+        if (invertValueBeforeSend)
+        {
+            float t = Mathf.InverseLerp(offValue, onValue, value);     // 0..1
+            sendValue = Mathf.Lerp(offValue, onValue, 1f - t);         // inverterad
+        }
+
+        float fade = turningOn ? fadeOnSeconds : fadeOffSeconds;
 
         // (sourceId, paramKeyOrName, value, active, priority, fadeSeconds)
-        driver.SetSourceActive(sourceId, key, value, true, priority, t);
+        driver.SetSourceActive(sourceId, key, sendValue, true, priority, fade);
     }
 }
-
