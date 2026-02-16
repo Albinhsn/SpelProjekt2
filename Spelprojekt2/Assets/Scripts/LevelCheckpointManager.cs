@@ -21,7 +21,7 @@ public sealed class LevelCheckpointManager
     {
         m_currentSpawnPointPosition = p;
         m_currentSpawnPointRotation = r;
-        m_sceneBuildIndex   = scene_build_index;
+        m_sceneBuildIndex           = scene_build_index;
     }
 
     public static void ResetToCheckpoint()
