@@ -34,6 +34,12 @@ public class MovementController : MonoBehaviour
         m_cameraTransform = Camera.main.transform;
     }
 
+    private void OnDisable()
+    {
+        //Fix for continued movement while interacting (3rd or 4th time's the charm!)
+        m_rb.linearVelocity = new Vector3(0, m_rb.linearVelocity.y, 0);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if(!other.isTrigger)
