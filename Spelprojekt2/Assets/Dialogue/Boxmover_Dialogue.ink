@@ -12,16 +12,16 @@ VAR isAllowedToMoveBoxes = false
 
 = first
 ...
-    * [...hi?]
+    * [...hello?]
         ~ isFirstInteraction = false
-        <i>He ignores you</i>
+        <i>He ignores you.</i>
         ->DONE
 
 ->DONE
 = second
 ...
-    * [HelloOOoo?]
-        <i>He ignores you harder</i>
+    * [<i>Hellooooo?</i>]
+        <i>He ignores you harder.</i>
         ->DONE
 ->DONE
 
@@ -32,8 +32,8 @@ VAR isAllowedToMoveBoxes = false
 {isAllowedToMoveBoxes: ->movedBox.yesBox |->movedBox.noBox}
 = noBox
 HEY! What do you think you're doing moving those boxes?!
-    *[oh...Sorry I... I didn't know they were yours]
-        They <i>aren't.</i> They're the USER's. It's m... eh forget it; someone like you wouldn't udnerstand anyway. Just don't touch anymore boxes.
+    *[oh...Sorry I... I didn't know they were yours.]
+        They <i>aren't.</i> They're the USER's. It's m... eh forget it; someone like you wouldn't understand anyway. Just don't touch anymore boxes.
    ->DONE
 ->DONE
 
