@@ -15,6 +15,14 @@ public class LevelCheckpoint : MonoBehaviour
         }
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(245 / 255.0f, 40 / 255.0f, 145 / 255.0f, 0.8f);
+        BoxCollider col = GetComponent<BoxCollider>();
+        Gizmos.DrawCube(this.transform.position + col.center, col.size);
+
+    }
+
     void OnTriggerEnter(Collider other)
     {
         Debug.Log($"Settings new spawn points {this.gameObject.scene.buildIndex} in scene {this.gameObject.scene.name}");
