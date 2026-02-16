@@ -100,6 +100,20 @@ public class UIManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
+    private int m_pauseOverrideCount = 0;
+    public void AllowPause()
+    {
+        --m_pauseOverrideCount;
+        if (m_pauseOverrideCount < 1)
+        {
+            m_pauseOverrideCount = 0;
+        }
+    }
+    public void DisallowPause()
+    {
+        ++m_pauseOverrideCount;
+    }
+
 
     private void EnterState(UIState state)
     {
@@ -552,7 +566,7 @@ public class UIManager : MonoBehaviour
 
         if(m_state == UIState.None)
         {
-            if(Input.GetKeyUp(KeyCode.Escape))
+            if(Input.GetKeyUp(KeyCode.Escape) && m_pauseOverrideCount == 0)
             {
                 EnterState(UIState.PauseMenu);
             }
