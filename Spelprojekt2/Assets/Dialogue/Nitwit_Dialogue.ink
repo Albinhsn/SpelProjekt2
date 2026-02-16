@@ -42,14 +42,6 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
     -> DONE
 
 = Calm
-{PickItUp: ->Calm | ->Do}
-~PickItUp = true
     If you haven't picked up the thingy yet, you should. #speaker=Nitwit
     I'm kinda blind right now so I can't tell if you did. #speaker=Nitwit
     -> DONE
-= Do
-// ~Turns++
-    Pick it up. #speaker=Nitwit
-    -> DONE
-// = Girl
-//   Girl. #speaker=Nitwit
