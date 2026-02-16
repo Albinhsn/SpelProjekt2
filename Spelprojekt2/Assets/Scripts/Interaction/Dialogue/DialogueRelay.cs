@@ -22,7 +22,6 @@ namespace Interaction.Dialogue
             if (m_reset)
             {
                 m_reset = false;
-                Debug.Log($"Cleared subscribers");
                 Reset();
             }
         }

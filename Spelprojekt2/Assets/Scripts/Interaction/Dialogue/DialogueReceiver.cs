@@ -29,15 +29,17 @@ namespace Interaction.Dialogue
         [CanBeNull] private Story m_activeStory;
         private string m_speakerName;
         private bool m_subscribed;
+        private bool m_initialSubscribed;
 
         private void Awake()
         {
             m_subscribed = false;
+            m_initialSubscribed = false;
         }
 
         void Start()
         {
-            if (!m_subscribed)
+            if (!m_subscribed && !m_initialSubscribed)
             {
                 m_relay.d_onDialogueInitiation += InitiateDialogue;
                 m_relay.d_onDialogueUpdate += UpdateDialogue;
@@ -45,12 +47,13 @@ namespace Interaction.Dialogue
                 m_dialogueContainer.SetActive(false);
                 if (m_altButtons is null) m_altButtons = new List<Button>();
                 m_subscribed = true;
+                m_initialSubscribed = true;
             }
         }
 
         private void OnEnable()
         {
-            if (!m_subscribed)
+            if (!m_subscribed && m_initialSubscribed)
             {
                 m_relay.d_onDialogueInitiation += InitiateDialogue;
                 m_relay.d_onDialogueUpdate += UpdateDialogue;
@@ -58,7 +61,16 @@ namespace Interaction.Dialogue
                 m_dialogueContainer.SetActive(false);
                 if (m_altButtons is null) m_altButtons = new List<Button>();
                 m_subscribed = true;
+                
             }
+        }
+        void OnDisable()
+        {
+            m_relay.d_onDialogueInitiation -= InitiateDialogue;
+            m_relay.d_onDialogueUpdate -= UpdateDialogue;
+            m_relay.d_onDialogueExit -= EndDialogue;
+            m_subscribed = false;
+            
         }
 
         void OnDestroy()
@@ -67,25 +79,8 @@ namespace Interaction.Dialogue
             m_relay.d_onDialogueUpdate -= UpdateDialogue;
             m_relay.d_onDialogueExit -= EndDialogue;
             m_subscribed = false;
+            
         }
-
-#if false
-        private void OnEnable()
-        {
-            m_relay.d_onDialogueInitiation += InitiateDialogue;
-            m_relay.d_onDialogueUpdate += UpdateDialogue;
-            m_relay.d_onDialogueExit += EndDialogue;
-            m_dialogueContainer.SetActive(false);
-            if (m_altButtons is null) m_altButtons = new List<Button>();
-        }
-
-        private void OnDisable()
-        {
-            m_relay.d_onDialogueInitiation -= InitiateDialogue;
-            m_relay.d_onDialogueUpdate -= UpdateDialogue;
-            m_relay.d_onDialogueExit -= EndDialogue;
-        }
-#endif
 
         private void InitiateDialogue(Story story)
         {
