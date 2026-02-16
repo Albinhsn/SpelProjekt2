@@ -33,10 +33,6 @@ public class FilterObject : MonoBehaviour
 
     private Material m_deactivatedMaterial;
     private Material m_activatedMaterial;
-    // private float m_distanceToPlayer;
-    // private FilterManager m_fm;
-    // private GameObject m_player;
-    
 
 
     public static int TagIsFilter(string tag)
@@ -65,8 +61,6 @@ public class FilterObject : MonoBehaviour
 
         this.gameObject.tag = this.m_kind.ToString();
 
-        // m_player = GameObject.FindGameObjectWithTag("Player");
-
         FilterManager fm = FindFirstObjectByType<FilterManager>();
 
         if(fm != null && fm.m_filterColorData != null && fm.m_filterMaterialData != null)
@@ -74,26 +68,6 @@ public class FilterObject : MonoBehaviour
             ChangeMaterialColor(fm.m_filterColorData, fm.m_filterMaterialData);   
         }
     }
-
-    // void Update()
-    // {
-    //     m_distanceToPlayer = Vector3.Distance(m_player.transform.position, transform.position);
-
-    //     if(m_distanceToPlayer > m_fm.m_filterEffectDistance)
-    //     {
-    //         if(Activated)
-    //         {
-    //             Deactivate();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         if(m_kind == FilterManager.m_activeFilter && !Activated)
-    //         {
-    //             Activate();
-    //         }
-    //     }
-    // }
 
     public void ChangeMaterialColor(FilterColorData filterColorData, FilterMaterialData material_data)
     {
