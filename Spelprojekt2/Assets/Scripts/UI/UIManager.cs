@@ -77,6 +77,7 @@ public class UIManager : MonoBehaviour
     }
 
     private Dictionary<string, UI_Signal> m_buttonSignals;
+    private bool m_selectedButtonEnabled;
     private int m_selectedIndex = 0;
     private bool m_useSelected;
 
@@ -108,24 +109,28 @@ public class UIManager : MonoBehaviour
             {
                 ShowCursor();
                 InputManager.DisablePlayerInput();
+                m_selectedButtonEnabled = false;
                 m_statePriorToSettingsMenu = m_state;
                 break;
             }
             case UIState.None:
             {
                 HideCursor();
+                m_selectedButtonEnabled = false;
                 InputManager.EnablePlayerInput();
                 break;
             }
             case UIState.MainMenu:
             {
                 ShowCursor();
+                m_selectedButtonEnabled = true;
                 InputManager.DisablePlayerInput();
                 break;
             }
             case UIState.PauseMenu:
             {
                 ShowCursor();
+                m_selectedButtonEnabled = true;
                 InputManager.DisablePlayerInput();
                 break;
             }
@@ -175,8 +180,11 @@ public class UIManager : MonoBehaviour
         m_buttonSignals.TryGetValue(text, out prev_signal);
 
         GUIStyle btn_style = new GUIStyle(GUI.skin.button);
-        btn_style.normal.background = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
-        btn_style.hover.background  = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
+        if(m_selectedButtonEnabled)
+        {
+            btn_style.normal.background = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
+            btn_style.hover.background  = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
+        }
         btn_style.font = font;
 
         bool result = GUILayout.Button(text, btn_style, button_options) || (index == m_selectedIndex && m_useSelected);
@@ -509,7 +517,7 @@ public class UIManager : MonoBehaviour
         }
 
         // HACK(ah): (:
-        if(Event.current.type == EventType.KeyUp && btn_index > 0)
+        if(Event.current.type == EventType.KeyUp && btn_index > 0 && m_selectedButtonEnabled)
         {
             if(Input.GetKeyUp(KeyCode.UpArrow))
             {
