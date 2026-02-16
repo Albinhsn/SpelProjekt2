@@ -77,12 +77,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fda40e38af25abd4e847c617b1086d5e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8818508010855472992}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fda40e38af25abd4e847c617b1086d5e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3928683340282458183}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fda40e38af25abd4e847c617b1086d5e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1469564289208751192}
   m_SourcePrefab: {fileID: 100100000, guid: fda40e38af25abd4e847c617b1086d5e, type: 3}
 --- !u!1 &3441544461675699435 stripped
 GameObject:
@@ -170,38 +164,6 @@ HingeJoint:
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
---- !u!138 &3928683340282458183
-FixedJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3441544461675699435}
-  serializedVersion: 1
-  m_ConnectedBody: {fileID: 0}
-  m_ConnectedArticulationBody: {fileID: 0}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
---- !u!138 &1469564289208751192
-FixedJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3441544461675699435}
-  serializedVersion: 1
-  m_ConnectedBody: {fileID: 0}
-  m_ConnectedArticulationBody: {fileID: 0}
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_EnableCollision: 0
