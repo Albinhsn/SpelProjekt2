@@ -24,18 +24,57 @@ namespace Interaction.Dialogue
         [SerializeField] private GameObject m_altButtonPrefab;
         [SerializeField] private float m_altButtonOffset;
         private List<Button> m_altButtons;
+
+        private UIManager m_uiManager;
         
         //Per-interaction
         [CanBeNull] private Story m_activeStory;
         private string m_speakerName;
+        private bool m_subscribed;
+        private bool m_initialSubscribed;
 
-        void Awake()
+        private void Awake()
         {
-            m_relay.d_onDialogueInitiation += InitiateDialogue;
-            m_relay.d_onDialogueUpdate += UpdateDialogue;
-            m_relay.d_onDialogueExit += EndDialogue;
-            m_dialogueContainer.SetActive(false);
-            if (m_altButtons is null) m_altButtons = new List<Button>();
+            m_subscribed = false;
+            m_initialSubscribed = false;
+        }
+
+        void Start()
+        {
+            m_uiManager = FindAnyObjectByType<UIManager>();
+            
+            if (!m_subscribed && !m_initialSubscribed)
+            {
+                m_relay.d_onDialogueInitiation += InitiateDialogue;
+                m_relay.d_onDialogueUpdate += UpdateDialogue;
+                m_relay.d_onDialogueExit += EndDialogue;
+                m_dialogueContainer.SetActive(false);
+                if (m_altButtons is null) m_altButtons = new List<Button>();
+                m_subscribed = true;
+                m_initialSubscribed = true;
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (!m_subscribed && m_initialSubscribed)
+            {
+                m_relay.d_onDialogueInitiation += InitiateDialogue;
+                m_relay.d_onDialogueUpdate += UpdateDialogue;
+                m_relay.d_onDialogueExit += EndDialogue;
+                m_dialogueContainer.SetActive(false);
+                if (m_altButtons is null) m_altButtons = new List<Button>();
+                m_subscribed = true;
+                
+            }
+        }
+        void OnDisable()
+        {
+            m_relay.d_onDialogueInitiation -= InitiateDialogue;
+            m_relay.d_onDialogueUpdate -= UpdateDialogue;
+            m_relay.d_onDialogueExit -= EndDialogue;
+            m_subscribed = false;
+            
         }
 
         void OnDestroy()
@@ -43,30 +82,14 @@ namespace Interaction.Dialogue
             m_relay.d_onDialogueInitiation -= InitiateDialogue;
             m_relay.d_onDialogueUpdate -= UpdateDialogue;
             m_relay.d_onDialogueExit -= EndDialogue;
+            m_subscribed = false;
+            
         }
-
-#if false
-        private void OnEnable()
-        {
-            m_relay.d_onDialogueInitiation += InitiateDialogue;
-            m_relay.d_onDialogueUpdate += UpdateDialogue;
-            m_relay.d_onDialogueExit += EndDialogue;
-            m_dialogueContainer.SetActive(false);
-            if (m_altButtons is null) m_altButtons = new List<Button>();
-        }
-
-        private void OnDisable()
-        {
-            m_relay.d_onDialogueInitiation -= InitiateDialogue;
-            m_relay.d_onDialogueUpdate -= UpdateDialogue;
-            m_relay.d_onDialogueExit -= EndDialogue;
-        }
-#endif
 
         private void InitiateDialogue(Story story)
         {
-            UIManager? ui_manager = FindAnyObjectByType<UIManager>();
-            ui_manager?.ShowCursor();
+            m_uiManager.ShowCursor();
+            m_uiManager.DisallowPause();
             
             m_speakerName = "";
             SetFont(0, m_textOut);
@@ -95,8 +118,9 @@ namespace Interaction.Dialogue
             m_activeStory = null;
             m_speakerName = "";
             
-            UIManager? ui_manager = FindAnyObjectByType<UIManager>();
-            ui_manager?.HideCursor();
+            
+            m_uiManager.HideCursor();
+            m_uiManager.AllowPause();
         }
         public void ContinueAction()
         {
