@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class FilterManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class FilterManager : MonoBehaviour
     public static FilterKind m_activeFilter = FilterKind.None;
     public FilterColorData m_filterColorData;
     public FilterMaterialData m_filterMaterialData;
+    public float m_filterEffectDistance = 30.0f;
 
 
     void OnEnable()
@@ -121,6 +123,42 @@ public class FilterManager : MonoBehaviour
                 if(InputManager.Filter((FilterKind)i))
                 {
                     ChangeFilter((FilterKind)i);
+                }
+            }
+        }
+
+        FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
+        for(int j = 0; j < objects.Length; j++)
+        {
+            float distanceToPlayer = Vector3.Distance(objects[j].transform.position, FindFirstObjectByType<Player>().transform.position);
+            if(distanceToPlayer > m_filterEffectDistance)
+            {
+                if(objects[j].Activated)
+                {
+                    objects[j].Deactivate();
+                    
+                    DynamicRigidbody[] rbs = FindObjectsByType<DynamicRigidbody>(FindObjectsSortMode.None);
+                    for(int i = 0; i < rbs.Length; i++)
+                    {
+                        if(rbs[i].m_collidingWithSet.Contains(objects[j].gameObject))
+                        {
+                            rbs[i].DestroyOnCollision();
+                        }
+                    }
+
+                    DynamicRigidbody rb = objects[j].GetComponent<DynamicRigidbody>();
+
+                    if(rb != null)
+                    {
+                        rb.DestroyOnCollision();   
+                    }
+                }
+            }
+            else
+            {
+                if(objects[j].m_kind == m_activeFilter && !objects[j].Activated)
+                {
+                    objects[j].Activate();
                 }
             }
         }

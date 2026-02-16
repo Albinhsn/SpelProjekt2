@@ -6,7 +6,7 @@ public class DynamicRigidbody : MonoBehaviour
 {
     private Collider m_col;
     // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
-    private HashSet<GameObject> m_collidingWithSet;
+    [HideInInspector] public HashSet<GameObject> m_collidingWithSet;
 
     void Start()
     {
@@ -22,7 +22,13 @@ public class DynamicRigidbody : MonoBehaviour
     {
         if(kind != FilterManager.m_activeFilter || !active)
         {
-            if(this.m_collidingWithSet.Count > 0)
+            DestroyOnCollision();
+        }
+    }
+
+    public void DestroyOnCollision()
+    {
+        if(this.m_collidingWithSet.Count > 0)
             {
                 Material material = GetComponent<MeshRenderer>().material;
                 ParticleManager.PlayParticleEffect(transform.position, transform.rotation, Vector3.one, material);
@@ -32,11 +38,8 @@ public class DynamicRigidbody : MonoBehaviour
             {
                 this.m_collidingWithSet.Clear();
             }
-    
-        }
-        
-
     }
+
 
     bool ColliderOrSelfIsFiltered(Collider other)
     {
