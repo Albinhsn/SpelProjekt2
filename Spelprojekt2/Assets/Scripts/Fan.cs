@@ -25,7 +25,7 @@ public class Fan : MonoBehaviour
 
     public void TurnOff()
     {
-        m_isActive = true;
+        m_isActive = false;
         StopSound();
     }
 
