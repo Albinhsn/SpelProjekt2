@@ -4,7 +4,7 @@ What's going on?
 -> choice
 === choice ===
  + [Identity.]
- I look metallic and constructed. My face feels ithcy.
+ I look metallic and constructed. My face feels itchy.
  -> choice
  + [Purpose.]
  I was born, or, eh. Built for a reason, probably. Not really sure what for.

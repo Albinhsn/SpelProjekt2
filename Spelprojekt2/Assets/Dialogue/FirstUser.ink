@@ -3,7 +3,7 @@ I am the USER and your creator. #speaker=USER
 It can be disorienting in the beginning, but you will get used to the feeling, Alea.
 What do you mean? #speaker=Alea
 I'm giving you a directive, your goal is: #speaker=USER
-Go to the <color="purple">Bearing</color>. You will be able to go further instructions there. #camera=1
+Go to the <color="purple">Bearing</color>. You will be able to get further instructions there. #camera=1
 Wait! Can't you... Nevermind. #speaker=Alea #camera=0
 -> choice
 === choice ===

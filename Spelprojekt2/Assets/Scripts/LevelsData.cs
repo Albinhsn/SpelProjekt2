@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public struct LevelData
 {
     public string m_sceneName;
+    public string m_scenePath;
     public SceneData m_scene;
 }
 

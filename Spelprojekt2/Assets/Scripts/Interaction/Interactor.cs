@@ -41,6 +41,7 @@ namespace Interaction
                 m_interacting = true;
                 m_deactivateWhileInteracting.Invoke(false);
                 interactable.SetHighlighted(false);
+                InputManager.DisablePlayerInput();
             }
             interactable.Interact(this);
         }
@@ -50,6 +51,7 @@ namespace Interaction
             Assert.IsTrue(m_interacting, "cancelInteract called on non-interacting interactor");
             m_interacting = false;
             m_deactivateWhileInteracting.Invoke(true);
+            InputManager.EnablePlayerInput();
         }
 
         private void SearchFrustum()
