@@ -2,9 +2,8 @@
 
 VAR isInteractedWith = true
 VAR isFirstInteraction = true
-VAR isAllowedToMoveBoxes = false
 
-{isInteractedWith: ->main | ->movedBox}
+->main
 === main ===
 
 
@@ -12,7 +11,7 @@ VAR isAllowedToMoveBoxes = false
 
 = first
 ...
-    * [...hello?]
+    + [...hello?]
         ~ isFirstInteraction = false
         <i>He ignores you.</i>
         ->DONE
@@ -20,26 +19,12 @@ VAR isAllowedToMoveBoxes = false
 ->DONE
 = second
 ...
-    * [<i>Hellooooo?</i>]
+    + [<i>Hellooooo?</i>]
         <i>He ignores you harder.</i>
         ->DONE
 ->DONE
 
 ->END
-
-
-=== movedBox ===
-{isAllowedToMoveBoxes: ->movedBox.yesBox |->movedBox.noBox}
-= noBox
-HEY! What do you think you're doing moving those boxes?!
-    *[oh...Sorry I... I didn't know they were yours.]
-        They <i>aren't.</i> They're the USER's. It's m... eh forget it; someone like you wouldn't understand anyway. Just don't touch anymore boxes.
-   ->DONE
-->DONE
-
-= yesBox
-
-->DONE
 
 
 
