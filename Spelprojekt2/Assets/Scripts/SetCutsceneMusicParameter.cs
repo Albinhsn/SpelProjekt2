@@ -8,8 +8,11 @@ public class SetCutsceneMusicParameter : MonoBehaviour
 
     public void SetGlobalParameter()
     {
-        var hub = AudioEventHub.I;
-        if(hub != null) hub.SetEventParam(m_eventID, m_parameter, 1.0f);
+        if(!string.IsNullOrEmpty(m_parameter) && !string.IsNullOrEmpty(m_parameter))
+        {
+            var hub = AudioEventHub.I;
+            if(hub != null) hub.SetEventParam(m_eventID, m_parameter, 1.0f);
+        }
 
         Destroy(this.gameObject);
     }
