@@ -40,6 +40,12 @@ public class FilterManager : MonoBehaviour
         {
             objects[j].ChangeMaterialColor(m_filterColorData, m_filterMaterialData);
         }
+
+        FilterDistanceChange distanceChangeObject = FindFirstObjectByType<FilterDistanceChange>();
+        if(distanceChangeObject != null)
+        {
+            distanceChangeObject.ChangeMaterialColor(m_filterColorData, m_filterMaterialData);
+        }
     }
 
     private bool CanDeactivateCurrentFilter()
