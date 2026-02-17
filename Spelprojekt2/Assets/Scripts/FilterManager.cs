@@ -11,7 +11,7 @@ public class FilterManager : MonoBehaviour
     [SerializeField]
     public UnityEvent<FilterKind, bool> m_filterChanged;
 
-    public static bool m_filterUnlocked     = false;
+    public static bool m_filterUnlocked     = true;
     public static FilterKind m_activeFilter = FilterKind.None;
     public FilterColorData m_filterColorData;
     public FilterMaterialData m_filterMaterialData;
@@ -35,6 +35,11 @@ public class FilterManager : MonoBehaviour
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
 
         ChangeFilterColor();
+#if UNITY_EDITOR
+            FilterManager.m_filterUnlocked = true;
+#else
+            FilterManager.m_filterUnlocked = false;
+            #endif
     }
 
     public void ChangeFilterColor()
