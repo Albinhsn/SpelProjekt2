@@ -33,7 +33,6 @@ public class FilterObject : MonoBehaviour
 
     private Material m_deactivatedMaterial;
     private Material m_activatedMaterial;
-    
 
 
     public static int TagIsFilter(string tag)
