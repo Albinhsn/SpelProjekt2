@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using AudioKit.FMOD;
+using UnityEngine.InputSystem;
 
 public enum UIState
 {
@@ -67,6 +68,7 @@ public class UIManager : MonoBehaviour
     private bool m_transitionFromMainMenuToGameIsDone;
     private SceneLoader m_sceneLoader;
     private LevelData m_loadedLevel;
+    private float m_menuScrollTimer = 0f;
 
 
     // (ah): Signal state
@@ -531,10 +533,11 @@ public class UIManager : MonoBehaviour
         }
 
         // HACK(ah): (:
-        if(Event.current.type == EventType.KeyUp && btn_index > 0 && m_selectedButtonEnabled)
+        if(btn_index > 0 && m_selectedButtonEnabled)
         {
-            if(Input.GetKeyUp(KeyCode.UpArrow))
+            if(InputManager.ReadUINavigationValue().y > 0.5f && m_menuScrollTimer <= 0f)
             {
+                m_menuScrollTimer = 0.25f;
                 m_selectedIndex--;
                 if(m_selectedIndex < 0)
                 {
@@ -542,8 +545,9 @@ public class UIManager : MonoBehaviour
                 }
                 SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
             }
-            if(Input.GetKeyUp(KeyCode.DownArrow))
+            if(InputManager.ReadUINavigationValue().y < -0.5f && m_menuScrollTimer <= 0f)
             {
+                m_menuScrollTimer = 0.25f;
                 m_selectedIndex++;
                 if(m_selectedIndex >= btn_index)
                 {
@@ -558,7 +562,8 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyUp(KeyCode.Return))
+        m_menuScrollTimer -= Time.deltaTime;
+        if(InputManager.SelectUIOption())
         {
             m_useSelected = true;
         }
@@ -566,12 +571,25 @@ public class UIManager : MonoBehaviour
 
         if(m_state == UIState.None)
         {
-            if(Input.GetKeyUp(KeyCode.Escape) && m_pauseOverrideCount == 0)
+            if(InputManager.Paused() && m_pauseOverrideCount == 0)
             {
                 EnterState(UIState.PauseMenu);
             }
         }
+        else if(m_state == UIState.PauseMenu)
+        {
+            if(InputManager.Unpaused())
+            {
+                EnterState(UIState.None);
+            }
+        }
+        else if(m_state == UIState.Settings)
+        {
+            if(InputManager.Unpaused())
+            {
+                EnterState(UIState.PauseMenu);
+            }
+        }
+        // InputManager.MoveCursor(Mouse.current.position.ReadValue());
     }
-
-
 }
