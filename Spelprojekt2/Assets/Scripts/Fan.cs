@@ -19,6 +19,9 @@ public class Fan : MonoBehaviour
     private CapsuleCollider m_collider;
     private bool m_soundIsPlaying;
 
+    [SerializeField]
+    private bool m_isActive;
+
     float timer = 0f;
     void OnValidate()
     {
@@ -28,65 +31,90 @@ public class Fan : MonoBehaviour
         m_collider.center = new Vector3(0f, m_colliderHeight / 2f, 0f);
     }
 
+    public void TurnOff()
+    {
+        m_isActive = true;
+        StopSound();
+    }
+
+    public void TurnOn()
+    {
+        m_isActive = true;
+        bool should_play_sound = true;
+        FilterObject filter = GetComponentInParent<FilterObject>();
+        if(filter != null)
+        {
+            should_play_sound = filter.m_kind != FilterManager.m_activeFilter;
+        }
+
+        if(should_play_sound)
+        {
+            PlaySound();
+        }
+    }
+
     void OnTriggerStay(Collider other)
     {
-        if (!other.CompareTag("Player") && other.gameObject.GetComponent<DynamicRigidbody>() == null) return;
-
-        if(other.gameObject.GetComponent<DynamicRigidbody>() != null)
+        if(m_isActive)
         {
-            if (other.gameObject.GetComponent<Rigidbody>().isKinematic) return;
-        }
+            if (!other.CompareTag("Player") && other.gameObject.GetComponent<DynamicRigidbody>() == null) return;
 
-        if(gameObject.GetComponentInParent<FilterObject>() != null && gameObject.GetComponentInParent<FilterObject>().Activated) return;
+            if(other.gameObject.GetComponent<DynamicRigidbody>() != null)
+            {
+                if (other.gameObject.GetComponent<Rigidbody>().isKinematic) return;
+            }
 
-        Rigidbody rb = other.GetComponent<Rigidbody>();
-        if (rb == null) return;
+            if(gameObject.GetComponentInParent<FilterObject>() != null && gameObject.GetComponentInParent<FilterObject>().Activated) return;
 
-        float height = DistanceToFanBase(other.transform);
+            Rigidbody rb = other.GetComponent<Rigidbody>();
+            if (rb == null) return;
 
-        float topStartHeight = m_maxHeight - (m_bobAmplitude*2);
+            float height = DistanceToFanBase(other.transform);
 
-        timer += Time.deltaTime;
+            float topStartHeight = m_maxHeight - (m_bobAmplitude*2);
 
-        if (height < topStartHeight)
-        {
-            float targetY = other.transform.position.y + m_windStrength * .1f;
-            rb.MovePosition(new Vector3(
-                other.transform.position.x,
-                targetY,
-                other.transform.position.z
-            ));
+            timer += Time.deltaTime;
 
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-            timer = 0f;
-        }
-        else
-        {
-            float bobOffset = Mathf.Sin(timer * m_bobSpeed) * m_bobAmplitude;
-            float targetY = transform.position.y + m_maxHeight + bobOffset;
+            if (height < topStartHeight)
+            {
+                float targetY = other.transform.position.y + m_windStrength * .1f;
+                rb.MovePosition(new Vector3(
+                    other.transform.position.x,
+                    targetY,
+                    other.transform.position.z
+                ));
 
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+                timer = 0f;
+            }
+            else
+            {
+                float bobOffset = Mathf.Sin(timer * m_bobSpeed) * m_bobAmplitude;
+                float targetY = transform.position.y + m_maxHeight + bobOffset;
 
-            Vector3 targetPosition = new Vector3(
-                other.transform.position.x,
-                targetY,
-                other.transform.position.z
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
+                Vector3 targetPosition = new Vector3(
+                    other.transform.position.x,
+                    targetY,
+                    other.transform.position.z
+                );
+
+                rb.MovePosition(Vector3.Lerp(
+                    other.transform.position,
+                    targetPosition,
+                    Time.deltaTime * 5f
+                ));
+            }
+
+
+            Vector2 xzDistance = XZDistanceToCenter(other.transform);
+            rb.linearVelocity = new Vector3(
+                -xzDistance.x,
+                rb.linearVelocity.y,
+                -xzDistance.y
             );
-
-            rb.MovePosition(Vector3.Lerp(
-                other.transform.position,
-                targetPosition,
-                Time.deltaTime * 5f
-            ));
         }
-
-
-        Vector2 xzDistance = XZDistanceToCenter(other.transform);
-        rb.linearVelocity = new Vector3(
-            -xzDistance.x,
-            rb.linearVelocity.y,
-            -xzDistance.y
-        );
     }
 
     float DistanceToFanBase(Transform playerTransform)
@@ -116,22 +144,24 @@ public class Fan : MonoBehaviour
 
     void Update()
     {
-        bool should_play_sound = true;
-        FilterObject filter = GetComponentInParent<FilterObject>();
-        if(filter != null)
+        if(m_isActive)
         {
-            should_play_sound = filter.m_kind != FilterManager.m_activeFilter;
-        }
+            bool should_play_sound = true;
+            FilterObject filter = GetComponentInParent<FilterObject>();
+            if(filter != null)
+            {
+                should_play_sound = filter.m_kind != FilterManager.m_activeFilter;
+            }
 
-        if(should_play_sound && !m_soundIsPlaying)
-        {
-            PlaySound();
-        }
+            if(should_play_sound && !m_soundIsPlaying)
+            {
+                PlaySound();
+            }
 
-        if(!should_play_sound && m_soundIsPlaying)
-        {
-            StopSound();
+            if(!should_play_sound && m_soundIsPlaying)
+            {
+                StopSound();
+            }
         }
-
     }
 }
