@@ -20,7 +20,7 @@ public class FilterDistanceChange : MonoBehaviour
         fm.m_filterChanged.AddListener(HandleColorChange);
         if(fm != null && fm.m_filterColorData != null && fm.m_filterMaterialData != null)
         {
-            transform.localScale = Vector3.one * fm.m_filterEffectDistance;
+            transform.localScale = Vector3.one * fm.m_filterEffectDistance * 2.0f;
             ChangeMaterialColor(fm.m_filterColorData, fm.m_filterMaterialData);   
         }
     }
