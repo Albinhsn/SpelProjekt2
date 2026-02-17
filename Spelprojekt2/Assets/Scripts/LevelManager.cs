@@ -1,4 +1,5 @@
 using System;
+using AudioKit.FMOD;
 using UnityEngine;
 
 public sealed class LevelManager
@@ -94,6 +95,13 @@ public sealed class LevelManager
         Instance.m_currentLevel = Instance.m_nextLevel;
         Instance.m_isTransitioning = false;
         Instance.m_onTransitionEnd_?.Invoke();
+
+        // ah: Change music
+        AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
+        if(audio != null)
+        {
+            audio.ApplyActions();
+        }
     }
 
     static void SetGlitchBoolTrue()

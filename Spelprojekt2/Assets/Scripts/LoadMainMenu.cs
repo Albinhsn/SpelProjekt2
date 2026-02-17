@@ -1,13 +1,28 @@
 using UnityEngine;
+using AudioKit.FMOD;
 using UnityEngine.SceneManagement;
 
 public class LoadMainMenu : MonoBehaviour
 {
     public string m_scene;
 
-    void Awake()
+    void FinishMainMenu(AsyncOperation op)
     {
-        SceneManager.LoadSceneAsync(m_scene, LoadSceneMode.Additive);
+        // ah: Change music
+        AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
+        if(audio != null)
+        {
+            audio.ApplyActions();
+        }
+        Debug.Log(audio);
+
         Destroy(this.gameObject);
+    }
+
+    void Start()
+    {
+        var handle = SceneManager.LoadSceneAsync(m_scene, LoadSceneMode.Additive);
+        handle.completed += FinishMainMenu;
+
     }
 }
