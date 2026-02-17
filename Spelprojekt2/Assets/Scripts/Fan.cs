@@ -1,12 +1,7 @@
 using UnityEngine;
-using AudioKit.FMOD;
 
 public class Fan : MonoBehaviour
 {
-    [Header("Audio")]
-    [SerializeField] private AudioAction m_onActiveSound;
-    [SerializeField] private AudioAction m_onDeactiveSound;
-
     [Header("Lift Settings")]
     [SerializeField] float m_windStrength = 15f;
     [SerializeField] float m_maxHeight = 10f;
