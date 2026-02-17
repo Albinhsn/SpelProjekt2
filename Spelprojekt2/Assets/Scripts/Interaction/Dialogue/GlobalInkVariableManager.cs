@@ -41,5 +41,18 @@ namespace Interaction.Dialogue
                 if (m_instance.m_inkVariables.ContainsKey(vars[a])) story.variablesState[vars[a]] = m_instance.m_inkVariables[vars[a]]; //Update only included variables
             }
         }
+
+        public static void ClearAll()
+        {
+            m_instance.m_inkVariables.Clear();
+        }
+
+        public static void ClearSelected(string[] selection)
+        {
+            for (int a = 0; a < selection.Length; a++)
+            {
+                m_instance.m_inkVariables.Remove(selection[a]);
+            }
+        }
     }
 }

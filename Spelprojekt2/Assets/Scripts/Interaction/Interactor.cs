@@ -11,6 +11,7 @@ namespace Interaction
     public class Interactor : MonoBehaviour
     {
         [SerializeField] private InstanceSet m_interactableSet;
+        [SerializeField] private Transform m_targetOrigin;
         [SerializeField] private float m_range;
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
@@ -61,7 +62,7 @@ namespace Interaction
             
             foreach (Interactable obj in m_interactableSet.GetEnumerable())
             {
-                Vector3 obj_relative_position = obj.position - transform.position;
+                Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
                 float obj_linear_distance = Vector3.Dot(obj_relative_position, transform.forward);
                 
                 if(obj_linear_distance < 0 || obj_linear_distance > m_range) continue; //Out of range
@@ -83,7 +84,7 @@ namespace Interaction
             m_selected = sel;
             m_selected?.SetHighlighted(true);
         }
-
+        
 
         private void OnDrawGizmosSelected()
         {
@@ -135,9 +136,11 @@ namespace Interaction
             cone_verts[CONE_VERT_COUNT * 4 + 7] = (new Vector3(0, -top_rad, m_range));
 
             //Transform
+            Matrix4x4 visual_transform = Matrix4x4.Translate(m_targetOrigin.position);
+            visual_transform *= Matrix4x4.Rotate(transform.rotation);
             for (int a = 0; a < CONE_VERT_COUNT*4+8; a++)
             {
-                cone_verts[a] = transform.TransformPoint(cone_verts[a]);
+                cone_verts[a] = visual_transform.MultiplyPoint(cone_verts[a]);
             }
             
             Gizmos.DrawLineList(cone_verts);
