@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &676805823423482103
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 84247538685420441}
+  m_Layer: 0
+  m_Name: Interaction targeting origin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &84247538685420441
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676805823423482103}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.569, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8509082170579520562}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &983941998729600054
 GameObject:
   m_ObjectHideFlags: 0
@@ -45,9 +76,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
-  m_range: 15
-  m_coneBaseRad: 0.76
-  m_coneFactor: 0.27
+  m_targetOrigin: {fileID: 84247538685420441}
+  m_range: 7.44
+  m_coneBaseRad: 1.32
+  m_coneFactor: 0.52
   m_interactAction: {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
   m_deactivateWhileInteracting:
     m_PersistentCalls:
@@ -268,6 +300,7 @@ Transform:
   - {fileID: 2278894199433542286}
   - {fileID: 5743394868718873319}
   - {fileID: 6415284357628143359}
+  - {fileID: 84247538685420441}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &9082466895557383042
