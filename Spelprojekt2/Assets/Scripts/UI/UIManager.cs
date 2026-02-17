@@ -203,7 +203,7 @@ public class UIManager : MonoBehaviour
         }
         btn_style.font = font;
 
-        bool result = GUILayout.Button(text, btn_style, button_options) || (index == m_selectedIndex && m_useSelected);
+        bool result = GUILayout.Button(text, btn_style, button_options) || (index == m_selectedIndex && m_useSelected && m_selectedButtonEnabled);
 
         Rect btn_rect = GUILayoutUtility.GetLastRect();
 
@@ -289,6 +289,12 @@ public class UIManager : MonoBehaviour
         GUIStyle style  = new(GUI.skin.button);
         style.fontSize -= 10;
         style.font      = font;
+        
+        GUIStyle selected_style = new(GUI.skin.button);
+        selected_style.fontSize = style.fontSize;
+        selected_style.font = font;
+        selected_style.normal = selected_style.active;
+        selected_style.hover = selected_style.active;
 
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
@@ -303,7 +309,17 @@ public class UIManager : MonoBehaviour
 
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        int new_value = GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
+        int new_value  = prev_value;  //GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
+        for(int i = 0; i < (int)FilterColor.COUNT; i++)
+        {
+            bool pressed = GUILayout.Button(selections[i], i == prev_value ? selected_style : style);
+            Rect btn_rect = GUILayoutUtility.GetLastRect();
+            pressed = pressed || (btn_rect.Contains(Event.current.mousePosition) && InputManager.SelectUIOption());
+            if(pressed)
+            {
+                new_value = i;
+            }
+        }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
 
