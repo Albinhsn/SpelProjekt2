@@ -106,14 +106,12 @@ public class Fan : MonoBehaviour
     {
         m_soundIsPlaying = true;
         m_onActiveSound.Run(this.transform.position);
-        Debug.Log("Started playing sound");
     }
 
     void StopSound()
     {
         m_soundIsPlaying = false;
         m_onDeactiveSound.Run(this.transform.position);
-        Debug.Log("Stopped playing sound");
     }
 
     void Update()
