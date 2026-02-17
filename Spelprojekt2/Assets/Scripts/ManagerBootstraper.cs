@@ -18,6 +18,9 @@ public static class ManagerBootstraper
         {
             FilterManager fm = go.AddComponent<FilterManager>();
             fm.m_filterChanged = new();
+            #if UNITY_EDITOR
+            FilterManager.m_filterUnlocked = true;
+            #endif
         }
     }
 }

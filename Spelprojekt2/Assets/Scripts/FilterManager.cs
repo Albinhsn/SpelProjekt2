@@ -11,9 +11,15 @@ public class FilterManager : MonoBehaviour
     [SerializeField]
     public UnityEvent<FilterKind, bool> m_filterChanged;
 
+    public static bool m_filterUnlocked     = false;
     public static FilterKind m_activeFilter = FilterKind.None;
     public FilterColorData m_filterColorData;
     public FilterMaterialData m_filterMaterialData;
+
+    public void Unlock()
+    {
+        m_filterUnlocked = true;
+    }
 
 
     void OnEnable()
@@ -43,7 +49,11 @@ public class FilterManager : MonoBehaviour
     private bool CanDeactivateCurrentFilter()
     {
         bool result = true;
-        if(m_activeFilter != FilterKind.None)
+        if(!FilterManager.m_filterUnlocked)
+        {
+            result = false;
+        }
+        else if(m_activeFilter != FilterKind.None)
         {
             result = m_collidingWithCount[(int)m_activeFilter] == 0;
         }
