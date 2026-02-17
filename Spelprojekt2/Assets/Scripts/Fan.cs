@@ -1,7 +1,12 @@
 using UnityEngine;
+using AudioKit.FMOD;
 
 public class Fan : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField] private AudioAction m_onActiveSound;
+    [SerializeField] private AudioAction m_onDeactiveSound;
+
     [Header("Lift Settings")]
     [SerializeField] float m_windStrength = 15f;
     [SerializeField] float m_maxHeight = 10f;
@@ -12,6 +17,8 @@ public class Fan : MonoBehaviour
 
     private float m_colliderHeight;
     private CapsuleCollider m_collider;
+    private bool m_soundIsPlaying;
+
     float timer = 0f;
     void OnValidate()
     {
@@ -93,5 +100,40 @@ public class Fan : MonoBehaviour
             playerTransform.position.x - transform.position.x,
             playerTransform.position.z - transform.position.z
         );
+    }
+
+    void PlaySound()
+    {
+        m_soundIsPlaying = true;
+        m_onActiveSound.Run(this.transform.position);
+        Debug.Log("Started playing sound");
+    }
+
+    void StopSound()
+    {
+        m_soundIsPlaying = false;
+        m_onDeactiveSound.Run(this.transform.position);
+        Debug.Log("Stopped playing sound");
+    }
+
+    void Update()
+    {
+        bool should_play_sound = true;
+        FilterObject filter = GetComponentInParent<FilterObject>();
+        if(filter != null)
+        {
+            should_play_sound = filter.m_kind != FilterManager.m_activeFilter;
+        }
+
+        if(should_play_sound && !m_soundIsPlaying)
+        {
+            PlaySound();
+        }
+
+        if(!should_play_sound && m_soundIsPlaying)
+        {
+            StopSound();
+        }
+
     }
 }
