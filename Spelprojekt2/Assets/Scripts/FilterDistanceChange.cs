@@ -33,16 +33,20 @@ public class FilterDistanceChange : MonoBehaviour
             {
                 m_renderer.material = m_primaryMaterial;
                 m_primaryActive = true;
+                m_secondaryActive = false;
             }
             else if(kind == FilterKind.Secondary)
             {
                 m_renderer.material = m_secondaryMaterial;
                 m_secondaryActive = true;
+                m_primaryActive = false;
             }
         }
         if(!active)
         {
             m_renderer.material = m_startMaterial;
+            m_primaryActive = false;
+            m_secondaryActive = false;
         }
     }
 
