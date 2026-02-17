@@ -1,4 +1,6 @@
 using UnityEngine;
+using AudioKit.FMOD;
+using FMODUnity;
 
 public enum DoorDirection
 {
@@ -10,6 +12,18 @@ public enum DoorDirection
 [RequireComponent(typeof(Collider))]
 public class Door : MonoBehaviour
 {
+    enum DoorSoundState
+    {
+        Freeze,
+        Unfreeze,
+        Off
+    }
+
+    [SerializeField]
+    private AudioCueSO m_sound;
+
+    private FMOD.Studio.EventInstance m_soundInstance;
+
     [SerializeField]
     private float m_timeToOpen;
 
@@ -23,16 +37,15 @@ public class Door : MonoBehaviour
     [SerializeField]
     private DoorDirection direction; 
 
-   private Vector3 m_direction => direction == DoorDirection.Up ? new Vector3(0,1,0) : 
+
+    private Vector3 m_direction => direction == DoorDirection.Up ? new Vector3(0,1,0) : 
        direction == DoorDirection.Sideways ? new Vector3(1,0,0) : new Vector3(0,0,1);
-        
-   // private Vector3 m_direction;
-    
 
     private float m_timeRemaining;
     private bool  m_closing;
     private bool  m_opening;
     private Vector3 m_closePosition;
+    private bool m_isNotFiltered;
 
     private Collider m_collider;
 
@@ -40,9 +53,36 @@ public class Door : MonoBehaviour
     {
         m_closePosition = this.transform.position;
         m_collider      = GetComponent<Collider>();
-        
-      
-        
+
+        m_isNotFiltered = IsNotFiltered();
+
+        m_soundInstance = RuntimeManager.CreateInstance(m_sound.evt);
+        SetSoundEventParam(DoorSoundState.Off);
+    }
+
+    private void SetSoundEventParam(DoorSoundState state)
+    {
+        float val = 0.0f;
+        switch(state)
+        {
+            case DoorSoundState.Freeze:
+            {
+                val = 2.0f;
+                break;
+            }
+            case DoorSoundState.Unfreeze:
+            {
+                val = 1.0f;
+                break;
+            }
+            case DoorSoundState.Off:
+            {
+                val = 0.0f;
+                break;
+            }
+        }
+        m_soundInstance.setParameterByName("state", val);
+
     }
 
     public void Open()
@@ -51,6 +91,7 @@ public class Door : MonoBehaviour
         {
             m_opening = true;
             m_closing = false;
+
             float current_ratio = 0;
             if(direction == DoorDirection.Up)
             {
@@ -65,6 +106,8 @@ public class Door : MonoBehaviour
                 current_ratio = 1.0f - (this.transform.position.z - m_closePosition.z) / m_openDistance;
             }
             m_timeRemaining = m_timeToOpen * current_ratio;
+
+            SetSoundEventParam(DoorSoundState.Off);
         }
     }
 
@@ -88,6 +131,9 @@ public class Door : MonoBehaviour
                 current_ratio = (this.transform.position.z - m_closePosition.z) / m_openDistance;
             }
             m_timeRemaining = m_timeToClose * current_ratio;
+
+            SetSoundEventParam(DoorSoundState.Off);
+            AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Off", 1.0f);
         }
     }
 
@@ -97,42 +143,59 @@ public class Door : MonoBehaviour
         return !m_collider.isTrigger;
     }
 
+
     void Update()
     {
-        if(m_timeRemaining != 0 && IsNotFiltered())
+        if(m_timeRemaining != 0)
         {
-            m_timeRemaining = Mathf.Max(0, m_timeRemaining - Time.deltaTime);
-
-            if(m_opening)
+            if(IsNotFiltered())
             {
-                float ratio       = 1.0f - m_timeRemaining / m_timeToOpen;
-                float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
-                this.transform.position = m_closePosition + m_direction * additional_distance;
+                m_timeRemaining = Mathf.Max(0, m_timeRemaining - Time.deltaTime);
 
-            }
-            else if(m_closing)
-            {
-                float ratio = m_timeRemaining / m_timeToClose;
-                float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
-                this.transform.position = m_closePosition + m_direction * additional_distance;
+                if(m_opening)
+                {
+                    float ratio       = 1.0f - m_timeRemaining / m_timeToOpen;
+                    float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
+                    this.transform.position = m_closePosition + m_direction * additional_distance;
+
+                }
+                else if(m_closing)
+                {
+                    float ratio = m_timeRemaining / m_timeToClose;
+                    float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
+                    this.transform.position = m_closePosition + m_direction * additional_distance;
+                }
+                else
+                {
+                    // ah: This should never happen
+                    Debug.LogError("Invalid door state");
+                    m_opening = false;
+                    m_closing = false;
+                    m_timeRemaining = 0;
+                    this.transform.position = m_closePosition;
+                }
+
+                if(m_timeRemaining == 0)
+                {
+                    SetSoundEventParam(DoorSoundState.Freeze);
+                    AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Freeze", 1.0f);
+                    m_closing  = false;
+                    m_opening  = false;
+                }
+                else if(m_isNotFiltered)
+                {
+                    m_isNotFiltered = false;
+                    SetSoundEventParam(DoorSoundState.Unfreeze);
+                    AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Unfreeze", 1.0f);
+                }
             }
             else
             {
-                // ah: This should never happen
-                Debug.LogError("Invalid door state");
-                m_opening = false;
-                m_closing = false;
-                m_timeRemaining = 0;
-                this.transform.position = m_closePosition;
+                m_isNotFiltered = true;
+                SetSoundEventParam(DoorSoundState.Freeze);
+                AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Freeze", 1.0f);
+
             }
-
-            if(m_timeRemaining == 0)
-            {
-                m_closing  = false;
-                m_opening  = false;
-            }
-
-
         }
     }
 }
