@@ -154,7 +154,6 @@ public class Door : MonoBehaviour
             m_timeRemaining = m_timeToClose * current_ratio;
 
             SetSoundEventParam(DoorSoundState.Off);
-            AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Off", 1.0f);
         }
     }
 
