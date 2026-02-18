@@ -1,4 +1,6 @@
-//Catwalk polisher
+// Early Catwalk polisher
+
+# font=0
 
 VAR firstInteraction = true
 
@@ -8,25 +10,23 @@ VAR firstInteraction = true
 
 = stich1
 ~firstInteraction = false
-NO! Don't take another step! I've had it with these catwalks! #speaker=Catwalk Lady
-They are supposed to shine but everyone keeps using them with their dirtcovered boots!
-I'm stopping this! No one is allowed to use the catwalks anymore. <i>Hmpf</i>
-->DONE
+NO! Don't you <i>dare</i> take another step! I've had it with these catwalks! #speaker=Unknown
+They are supposed to shine! But everyone keeps using them with their nasty dirtcovered- Ugh! # speaker=Catwalk Lady
+No one, not a singular <i>person</i> is allowed to use the catwalks anymore, period.
+    * [I wont use the catwalks, I promise.] I just wanted to talk. # speaker=Alea
+        You want to talk to me? Oh, eh... I'm not sure. #speaker=Catwalk Lady
+        We're not really supposed to talk with people like you. 
+        ** [Why not?]
+            Because you're weird and different. #speaker=Catwalk Lady
+            Can't really do anything about it...
+        -> DONE
+    * [Yeah, sure.] I wont use the catwalks. # speaker=Alea
+        Good! Good. Right, great that we could clear that up. # speaker=Catwalk Lady
+        ...
+        Please leave now.
+        -> DONE
 
 = stich2
-I said no!!! #speaker=Catwalk Lady
-    + [I wont use the catwalks, I promise. I just wanted to talk.]
-        You want to talk to me? Oh, ehm... I don't know. We're not really supposed to talk with you. #speaker=Catwalk Lady
-        ++ [Why not?]
-            Because you're weird and different. #speaker=Catwalk Lady
-            <i>Dialogue tree follows</i>
-        ->DONE
-    + [Yeah, no. Sure I wont use the catwalks]
-        Good! Good. Right, great we can clear that up. 
-        ...
-        You can leave now.
-        -> DONE
-->DONE
-
-
-->END
+    I said no! #speaker=Catwalk Lady
+    <i>Leave</i>.
+-> DONE
