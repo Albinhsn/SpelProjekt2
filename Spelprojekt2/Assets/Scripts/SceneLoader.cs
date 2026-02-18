@@ -30,10 +30,10 @@ public class SceneLoader
     public void Load()
     {
         SceneManager.LoadScene(m_level.m_sceneName, LoadSceneMode.Additive);
-        // foreach(Subscene subscene in m_level.m_scene.m_subscenes)
-        // {
-        //     SceneManager.LoadScene(subscene.m_scene, LoadSceneMode.Additive);
-        // }
+        foreach(Subscene subscene in m_level.m_scene.m_subscenes)
+        {
+            SceneManager.LoadScene(subscene.m_scene, LoadSceneMode.Additive);
+        }
     }
 
     public void LoadAsync()
@@ -49,10 +49,12 @@ public class SceneLoader
 
     public void Unload()
     {
-        SceneManager.UnloadSceneAsync(m_level.m_sceneName);
+        var handle = SceneManager.UnloadSceneAsync(m_level.m_sceneName);
+        handle.completed += OnSceneLoad;
         foreach(Subscene subscene in m_level.m_scene.m_subscenes)
         {
-            SceneManager.UnloadSceneAsync(subscene.m_scene);
+            handle = SceneManager.UnloadSceneAsync(subscene.m_scene);
+            handle.completed += OnSceneLoad;
         }
     }
 }
