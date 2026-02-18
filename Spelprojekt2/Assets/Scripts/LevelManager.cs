@@ -21,6 +21,7 @@ public sealed class LevelManager
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
     private bool m_scenesLoaded;
+    private bool m_scenesUnloaded;
     private Action m_onTransitionEnd_;
     public static event Action m_onTransitionEnd
     {
@@ -86,17 +87,20 @@ public sealed class LevelManager
             }
         }
         sceneLoader.LoadAsync();
+
+        // ah: unload current scene async
+        if(Instance.m_currentLevel.m_scene != null)
+        {
+            SceneLoader sl = new(Instance.m_currentLevel);
+            sl.m_onAllScenesLoaded += SetScenesUnloadedBoolTrue;
+            sl.Unload();        
+            Debug.Log($"Unloaded scene {Instance.m_currentLevel.m_sceneName}");
+        }
     }
 
     public static void FinishTransition()
     {
         Debug.Log("Finishing transition");
-        if(Instance.m_currentLevel.m_scene != null)
-        {
-            SceneLoader sceneLoader = new(Instance.m_currentLevel);
-            sceneLoader.Unload();        
-            Debug.Log($"Unloaded scene {Instance.m_currentLevel.m_sceneName}");
-        }
         Instance.m_isGlitchingDone = false;
         Instance.m_scenesLoaded = false;
         Instance.m_currentLevel = Instance.m_nextLevel;
@@ -109,22 +113,38 @@ public sealed class LevelManager
         {
             audio.ApplyActions();
         }
+
+        // ah: Change sky
+        SkySettings sky = UnityEngine.Object.FindFirstObjectByType<SkySettings>();
+        if(sky != null)
+        {
+            sky.Apply();
+        }
     }
 
     static void SetGlitchBoolTrue()
     {
         Instance.m_isGlitchingDone = true;
-        if(Instance.m_scenesLoaded)
+        if(Instance.m_scenesLoaded && Instance.m_scenesUnloaded)
         {
             FinishTransition();
         }
-            GlitchTransitionManager.m_onTransitionEnd.RemoveListener(SetGlitchBoolTrue);
+        GlitchTransitionManager.m_onTransitionEnd.RemoveListener(SetGlitchBoolTrue);
+    }
+
+    static void SetScenesUnloadedBoolTrue()
+    {
+        Instance.m_scenesUnloaded = true;
+        if(Instance.m_isGlitchingDone && Instance.m_scenesLoaded)
+        {
+            FinishTransition();
+        }
     }
 
     static void SetScenesLoadedBoolTrue()
     {
         Instance.m_scenesLoaded = true;
-        if(Instance.m_isGlitchingDone)
+        if(Instance.m_isGlitchingDone && Instance.m_scenesUnloaded)
         {
             FinishTransition();
         }
