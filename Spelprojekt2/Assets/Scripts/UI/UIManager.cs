@@ -86,8 +86,8 @@ public class UIManager : MonoBehaviour
         if (m_cursorUsages <= 0)
         {
             m_cursorUsages = 0;
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            // Cursor.visible = false;
+            // Cursor.lockState = CursorLockMode.Locked;
         }
     }
 
