@@ -31,7 +31,7 @@ public sealed class FilterToMusicParams : MonoBehaviour
     private FilterKind redKind = FilterKind.Primary;
     private FilterKind blueKind = FilterKind.Secondary;
 
-    private void Awake()
+    private void Start()
     {
         filterManager = FindFirstObjectByType<FilterManager>();
         if (!driver) driver = FindFirstObjectByType<AudioParameterDriver>();
