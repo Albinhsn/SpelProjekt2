@@ -23,6 +23,7 @@ public class Door : MonoBehaviour
     private AudioCueSO m_sound;
 
     private FMOD.Studio.EventInstance m_soundInstance;
+    private FMOD.Studio.PARAMETER_ID m_freezeID;
 
     [SerializeField]
     private float m_timeToOpen;
@@ -56,8 +57,28 @@ public class Door : MonoBehaviour
 
         m_isNotFiltered = IsNotFiltered();
 
-        m_soundInstance = RuntimeManager.CreateInstance(m_sound.evt);
-        SetSoundEventParam(DoorSoundState.Off);
+        // Create sound instance and get id for freeze event
+        {
+            m_soundInstance = RuntimeManager.CreateInstance(m_sound.evt);
+
+            FMOD.Studio.EventDescription freezeEventDescription;
+            m_soundInstance.getDescription(out freezeEventDescription);
+            FMOD.Studio.PARAMETER_DESCRIPTION freezeParameterDescription;
+
+            int count;
+            freezeEventDescription.getParameterDescriptionCount(out count);
+            FMOD.RESULT ok = freezeEventDescription.getParameterDescriptionByName("freeze", out freezeParameterDescription);
+            m_freezeID = freezeParameterDescription.id;
+
+            m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(this.transform.position));
+            SetSoundEventParam(DoorSoundState.Freeze);
+            m_soundInstance.start();
+        }
+    }
+
+    void OnDestroy()
+    {
+        m_soundInstance.release();
     }
 
     private void SetSoundEventParam(DoorSoundState state)
@@ -67,22 +88,22 @@ public class Door : MonoBehaviour
         {
             case DoorSoundState.Freeze:
             {
-                val = 2.0f;
+                val = 1.0f;
                 break;
             }
             case DoorSoundState.Unfreeze:
             {
-                val = 1.0f;
+                val = 0.0f;
                 break;
             }
             case DoorSoundState.Off:
             {
-                val = 0.0f;
+                val = 2.0f;
                 break;
             }
         }
-        m_soundInstance.setParameterByName("state", val);
 
+        m_soundInstance.setParameterByID(m_freezeID, val);
     }
 
     public void Open()
@@ -178,23 +199,19 @@ public class Door : MonoBehaviour
                 if(m_timeRemaining == 0)
                 {
                     SetSoundEventParam(DoorSoundState.Freeze);
-                    AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Freeze", 1.0f);
                     m_closing  = false;
                     m_opening  = false;
                 }
-                else if(m_isNotFiltered)
+                else if(!m_isNotFiltered)
                 {
-                    m_isNotFiltered = false;
+                    m_isNotFiltered = true;
                     SetSoundEventParam(DoorSoundState.Unfreeze);
-                    AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Unfreeze", 1.0f);
                 }
             }
             else
             {
-                m_isNotFiltered = true;
+                m_isNotFiltered = false;
                 SetSoundEventParam(DoorSoundState.Freeze);
-                AudioEventHub.I.SetEventParam(m_sound.evt.Path, "Freeze", 1.0f);
-
             }
         }
     }
