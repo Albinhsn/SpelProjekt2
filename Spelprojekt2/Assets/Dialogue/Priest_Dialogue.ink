@@ -51,6 +51,8 @@ Very well. What do you want to know?
             Go to the roof, if you're a chosen then access the terminal there. It will help you.
             Thank you. # speaker=Alea
             Don't, I wont accept it. # speaker=Priest
+            [The terminal will be added in a later version of the game!] # speaker=SYSTEM
+            [Thank you for playing so far! :D]
             ->DONE
 = stitch3
 Why? I don't understand...
