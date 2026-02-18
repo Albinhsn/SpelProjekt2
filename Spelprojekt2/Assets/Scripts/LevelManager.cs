@@ -109,6 +109,13 @@ public sealed class LevelManager
         {
             audio.ApplyActions();
         }
+
+        // ah: Change sky
+        SkySettings sky = UnityEngine.Object.FindFirstObjectByType<SkySettings>();
+        if(sky != null)
+        {
+            sky.Apply();
+        }
     }
 
     static void SetGlitchBoolTrue()
