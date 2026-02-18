@@ -22,7 +22,7 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
             =choice
             + [Localites?]
             It's the name of our people. The USER gave it to us. #speaker=Nitwit
-            Also be wary, we're typically not really accepting of outsiders. #speaker=Nitwit
+            Also be wary, we're not really accepting of outsiders. #speaker=Nitwit
             -> choice
             + [The Construction Site.]
             It's been a work in progress since... #speaker=Nitwit
@@ -35,7 +35,7 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
             * [Move on.]
             Great! Well, you should pick up that thing over there. Seems mysterious. #speaker=Nitwit
             Also if you really want to get to the <color="purple">Bearing</color> then you need to get rid of those glitches over there. #speaker=Nitwit #camera=1
-            The Priest should know more, he's on the roof of the second building there. #speaker=Nitwit #camera=2
+            The Priest should know more, he's by the roof of the buildings in his study. #speaker=Nitwit #camera=2
             Well, good luck! #speaker=Nitwit #camera=0
             -> DONE
     -> DONE
