@@ -8,7 +8,7 @@ public class DynamicRigidbody : MonoBehaviour
     // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
     [HideInInspector] public HashSet<GameObject> m_collidingWithSet;
 
-    void Start()
+    void Awake()
     {
         FilterManager manager = FindFirstObjectByType<FilterManager>();
         manager.m_filterChanged.AddListener(OnFilterChange);
