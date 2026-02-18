@@ -59,8 +59,9 @@ public class GlitchTransitionManager : MonoBehaviour
         bool result = false;
         if(!I.m_transitioning)
         {
-            I.m_transitionTimeRemaining = time;
             I.m_transitioning           = true;
+            I.m_transitionTime          = time;
+            I.m_transitionTimeRemaining = time;
             I.m_startIntensity          = start_intensity;
             I.StartCoroutine(UpdateTransition());
             result = true;
@@ -77,19 +78,25 @@ public class GlitchTransitionManager : MonoBehaviour
 
     static IEnumerator UpdateTransition()
     {
-        Debug.Log($"Updating transition with {I.m_transitionTimeRemaining}");
-        I.m_transitionTimeRemaining -= Time.deltaTime;
-        float t = Mathf.Lerp(I.m_startIntensity, 1.0f, 1.0f - I.m_transitionTimeRemaining / I.m_transitionTime);
-        I.m_glitchVolume.m_intensity.value = t;
-        if(I.m_transitionTimeRemaining <= 0)
+        for(;;)
         {
-            EndTransition();
-            I.m_glitchVolume.m_intensity.value = 0;
+            I.m_transitionTimeRemaining -= Time.deltaTime;
+            float t = Mathf.Lerp(I.m_startIntensity, 1.0f, 1.0f - I.m_transitionTimeRemaining / I.m_transitionTime);
+            I.m_glitchVolume.m_intensity.value = t;
+
+            if(I.m_transitionTimeRemaining > 0)
+            {
+                yield return null;
+            }
+            else
+            {
+                break;
+            }
+
         }
-        else
-        {
-            yield return null;
-        }
+
+        EndTransition();
+        I.m_glitchVolume.m_intensity.value = 0;
     }
 
 }
