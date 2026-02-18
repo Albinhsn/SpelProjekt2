@@ -33,6 +33,7 @@ public class FilterManager : MonoBehaviour
     {
         m_filterMaterialData = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
         m_filterColorData    = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
+        m_filterChanged = new();
 
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
 
