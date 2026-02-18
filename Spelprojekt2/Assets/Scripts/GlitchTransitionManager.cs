@@ -1,30 +1,43 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
+using System.Collections;
 
+[RequireComponent(typeof(Volume))]
 public class GlitchTransitionManager : MonoBehaviour
 {
-    [SerializeField]
-    public UnityEvent m_onTransitionEnd;
 
-    [SerializeField]
+    private static GlitchTransitionManager I;
+
+    // Volume data
     private Volume m_volume;
-
     private GlitchVolume m_glitchVolume;
 
-    [SerializeField]
-    private float m_transitionTime;
+    // Events
+    private UnityEvent m_onTransitionEnd_;
+    public static UnityEvent m_onTransitionEnd => I.m_onTransitionEnd_;
 
+    // Transition settings
+    private float m_transitionTime;
     private float m_transitionTimeRemaining;
     private bool m_transitioning;
-
-    [SerializeField]
-    [Range(0.0f, 1.0f)]
     private float m_startIntensity;
 
 
     void Awake()
     {
+        Debug.Log("Trying to wake");
+        if(I != null && I != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+        Debug.Log("Awoken");
+
+        I = this;
+        m_onTransitionEnd_ = new();
+        m_volume = GetComponent<Volume>();
+
         if(m_volume == null)
         {
             Debug.LogError("[GTM] Need a volume for transition");
@@ -41,45 +54,41 @@ public class GlitchTransitionManager : MonoBehaviour
 
     }
 
-    void OnTriggerEnter(Collider other)
+    public static bool StartTransition(float time, float start_intensity)
     {
-        if(other.tag == "Player")
+        bool result = false;
+        if(!I.m_transitioning)
         {
-            StartTransition();
+            I.m_transitionTimeRemaining = time;
+            I.m_transitioning           = true;
+            I.m_startIntensity          = start_intensity;
+            I.StartCoroutine(UpdateTransition());
+            result = true;
         }
+        return result;
     }
 
-    public void RespawnPlayer()
+    private static void EndTransition()
     {
-        LevelCheckpointManager.Respawn();
+        I.m_transitionTimeRemaining = 0;
+        I.m_transitioning           = false;
+        I.m_onTransitionEnd_?.Invoke();
     }
 
-    public void StartTransition()
+    static IEnumerator UpdateTransition()
     {
-        m_transitionTimeRemaining = m_transitionTime;
-        m_transitioning = true;
-    }
-
-    void EndTransition()
-    {
-        m_transitionTimeRemaining = 0;
-        m_transitioning           = false;
-        m_onTransitionEnd?.Invoke();
-    }
-
-    void Update()
-    {
-
-        if(m_transitioning)
+        Debug.Log($"Updating transition with {I.m_transitionTimeRemaining}");
+        I.m_transitionTimeRemaining -= Time.deltaTime;
+        float t = Mathf.Lerp(I.m_startIntensity, 1.0f, 1.0f - I.m_transitionTimeRemaining / I.m_transitionTime);
+        I.m_glitchVolume.m_intensity.value = t;
+        if(I.m_transitionTimeRemaining <= 0)
         {
-            m_transitionTimeRemaining -= Time.deltaTime;
-            float t = Mathf.Lerp(m_startIntensity, 1.0f, 1.0f - m_transitionTimeRemaining / m_transitionTime);
-            m_glitchVolume.m_intensity.value = t;
-            if(m_transitionTimeRemaining <= 0)
-            {
-                EndTransition();
-                m_glitchVolume.m_intensity.value = 0;
-            }
+            EndTransition();
+            I.m_glitchVolume.m_intensity.value = 0;
+        }
+        else
+        {
+            yield return null;
         }
     }
 

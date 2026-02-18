@@ -12,7 +12,6 @@ public enum UIState
     PauseMenu,
 }
 
-[RequireComponent(typeof(GlitchTransitionManager))]
 public class UIManager : MonoBehaviour
 {
     private static UIManager m_instance;
@@ -52,9 +51,6 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private Texture2D m_pauseMenuBG;
-
-    [SerializeField]
-    private GlitchTransitionManager m_glitchTransitionManager;
 
     [SerializeField]
     private AudioCueSO m_onButtonHoverCue;

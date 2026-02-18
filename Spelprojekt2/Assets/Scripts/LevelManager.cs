@@ -17,7 +17,6 @@ public sealed class LevelManager
     }
     private LevelData m_currentLevel;
     private LevelData m_nextLevel;
-    private GlitchTransitionManager m_glitchTransitionManager;
 
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
@@ -68,15 +67,23 @@ public sealed class LevelManager
         Instance.m_isTransitioning = true;
         SceneLoader sceneLoader = new(levelData);
         sceneLoader.m_onAllScenesLoaded += SetScenesLoadedBoolTrue;
-        Instance.m_glitchTransitionManager = UnityEngine.Object.FindFirstObjectByType<GlitchTransitionManager>();
-        if(Instance.m_glitchTransitionManager == null)
+        var gtm = UnityEngine.Object.FindFirstObjectByType<GlitchTransitionManager>();
+        if(gtm == null)
         {
             SetGlitchBoolTrue();
         }
         else
         {
-            Instance.m_glitchTransitionManager.m_onTransitionEnd.AddListener(SetGlitchBoolTrue);
-            Instance.m_glitchTransitionManager.StartTransition();
+            if(GlitchTransitionManager.m_onTransitionEnd == null)
+            {
+                Debug.Log("Transition end is null?");
+            }
+            GlitchTransitionManager.m_onTransitionEnd.AddListener(SetGlitchBoolTrue);
+            if(!GlitchTransitionManager.StartTransition(4.0f, 0.0f))
+            {
+                Debug.LogError("[LevelManager] A transition is already happening when we're trying to start a new one");
+
+            }
         }
         sceneLoader.LoadAsync();
     }
@@ -111,7 +118,7 @@ public sealed class LevelManager
         {
             FinishTransition();
         }
-            Instance.m_glitchTransitionManager.m_onTransitionEnd.RemoveListener(SetGlitchBoolTrue);
+            GlitchTransitionManager.m_onTransitionEnd.RemoveListener(SetGlitchBoolTrue);
     }
 
     static void SetScenesLoadedBoolTrue()
