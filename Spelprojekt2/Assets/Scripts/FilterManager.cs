@@ -149,38 +149,42 @@ public class FilterManager : MonoBehaviour
         }
 
         FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
-        for(int j = 0; j < objects.Length; j++)
+        Player player = FindFirstObjectByType<Player>();
+        if(player != null)
         {
-            float distanceToPlayer = Vector3.Distance(objects[j].transform.position, FindFirstObjectByType<Player>().transform.position);
-            if(distanceToPlayer > m_filterEffectDistance)
+            for(int j = 0; j < objects.Length; j++)
             {
-                if(objects[j].Activated)
+                float distanceToPlayer = Vector3.Distance(objects[j].transform.position, player.transform.position);
+                if(distanceToPlayer > m_filterEffectDistance)
                 {
-                    objects[j].Deactivate();
-                    
-                    DynamicRigidbody[] rbs = FindObjectsByType<DynamicRigidbody>(FindObjectsSortMode.None);
-                    for(int i = 0; i < rbs.Length; i++)
+                    if(objects[j].Activated)
                     {
-                        if(rbs[i].m_collidingWithSet == null) continue;
-                        if(rbs[i].m_collidingWithSet.Contains(objects[j].gameObject))
+                        objects[j].Deactivate();
+                        
+                        DynamicRigidbody[] rbs = FindObjectsByType<DynamicRigidbody>(FindObjectsSortMode.None);
+                        for(int i = 0; i < rbs.Length; i++)
                         {
-                            rbs[i].DestroyOnCollision();
+                            if(rbs[i].m_collidingWithSet == null) continue;
+                            if(rbs[i].m_collidingWithSet.Contains(objects[j].gameObject))
+                            {
+                                rbs[i].DestroyOnCollision();
+                            }
+                        }
+
+                        DynamicRigidbody rb = objects[j].GetComponent<DynamicRigidbody>();
+
+                        if(rb != null)
+                        {
+                            rb.DestroyOnCollision();   
                         }
                     }
-
-                    DynamicRigidbody rb = objects[j].GetComponent<DynamicRigidbody>();
-
-                    if(rb != null)
-                    {
-                        rb.DestroyOnCollision();   
-                    }
                 }
-            }
-            else
-            {
-                if(objects[j].m_kind == m_activeFilter && !objects[j].Activated)
+                else
                 {
-                    objects[j].Activate();
+                    if(objects[j].m_kind == m_activeFilter && !objects[j].Activated)
+                    {
+                        objects[j].Activate();
+                    }
                 }
             }
         }
