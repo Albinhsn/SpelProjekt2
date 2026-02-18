@@ -43,7 +43,10 @@ public class SceneLoader
         foreach(Subscene subscene in m_level.m_scene.m_subscenes)
         {
             handle = SceneManager.LoadSceneAsync(subscene.m_scene, LoadSceneMode.Additive);
-            handle.completed += OnSceneLoad;
+            if(handle != null)
+            {
+                handle.completed += OnSceneLoad;
+            }
         }
     }
 
