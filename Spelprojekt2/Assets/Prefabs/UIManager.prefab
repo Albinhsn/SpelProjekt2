@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4365943673824385308}
-  - component: {fileID: 7020526969338059507}
   - component: {fileID: 358372983514085806}
   m_Layer: 0
   m_Name: UIManager
@@ -33,24 +32,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7020526969338059507
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8153035966713843843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdc53de7ddc53323cb7ae30281f116c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_onTransitionEnd:
-    m_PersistentCalls:
-      m_Calls: []
-  m_volume: {fileID: 0}
-  m_transitionTime: 3
-  m_startIntensity: 0
 --- !u!114 &358372983514085806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75,5 +56,4 @@ MonoBehaviour:
   m_sliderWidth: 150
   m_btnTexture: {fileID: 2800000, guid: 40848578d1961334d820821bec6175a4, type: 3}
   m_pauseMenuBG: {fileID: 0}
-  m_glitchTransitionManager: {fileID: 7020526969338059507}
   m_onButtonHoverCue: {fileID: 11400000, guid: c38f236b9102cfaf096c18522e91fab0, type: 2}

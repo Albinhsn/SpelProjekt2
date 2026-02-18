@@ -14,8 +14,6 @@ public class LoadMainMenu : MonoBehaviour
         {
             audio.ApplyActions();
         }
-        Debug.Log(audio);
-
         Destroy(this.gameObject);
     }
 

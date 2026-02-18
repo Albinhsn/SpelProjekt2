@@ -1,6 +1,12 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
+public enum Dir
+{
+    Y,
+    X
+}
 public sealed class InputManager
 {
     private static InputManager _instance;
@@ -28,6 +34,19 @@ public sealed class InputManager
         Vector2 movement = Instance.m_inputActions.Player.Move.ReadValue<Vector2>();
         return movement;
     }
+    public static Vector2 ReadUINavigationValue()
+    {
+        return Instance.m_inputActions.UI.Navigate.ReadValue<Vector2>() + Instance.m_inputActions.UI.NavigateController.ReadValue<Vector2>();    
+    }
+    public static void MoveCursor(Vector2 cursorPos)
+    {
+        Vector2 newPos = cursorPos + new Vector2(0,-1) + new Vector2(500,500) * Time.deltaTime *ReadUINavigationValue();
+        Mouse.current.WarpCursorPosition(newPos);
+    }
+    public static bool SelectUIOption()
+    {
+        return Instance.m_inputActions.UI.Select.WasPressedThisFrame();
+    }
     public static bool Jumped()
     {
         return Instance.m_inputActions.Player.Jump.WasPressedThisFrame();
@@ -39,12 +58,12 @@ public sealed class InputManager
     }
     public static bool Paused()
     {
-        DisablePlayerInput();
+        // DisablePlayerInput();
         return Instance.m_inputActions.UI.Pause.WasPressedThisFrame();
     }
     public static bool Unpaused()
     {
-        EnablePlayerInput();
+        // EnablePlayerInput();
         return Instance.m_inputActions.UI.Pause.WasPressedThisFrame();
     }
     public static void DisablePlayerInput()

@@ -161,6 +161,7 @@ public class FilterManager : MonoBehaviour
                     DynamicRigidbody[] rbs = FindObjectsByType<DynamicRigidbody>(FindObjectsSortMode.None);
                     for(int i = 0; i < rbs.Length; i++)
                     {
+                        if(rbs[i].m_collidingWithSet == null) continue;
                         if(rbs[i].m_collidingWithSet.Contains(objects[j].gameObject))
                         {
                             rbs[i].DestroyOnCollision();

@@ -1,8 +1,7 @@
-//The Early Nitwit Dialogue
+// Early Nitwit Dialogue
 
 VAR FirstIneractionN = false
 VAR PickItUp = false
-VAR Turns = 0
 
 -> main
 === main ===
@@ -17,7 +16,7 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
         Who are you stranger? What are you doing here in the localites sacred land? #speaker=Unknown
         ** [I'm Alea, my directive is to go to the <color="purple">Bearing</color>.]
             Huh, I didn't expect that. Must be important if you need to get to the </color="purple">Bearing</color>. 
-            But hello Alea, welcome to the <color="yellow">Construction Site!</color We build... here. #speaker=Unknown
+            But hello Alea, welcome to the <color="yellow">Construction Site!</color> We build... here. #speaker=Unknown
             If you have any questions then shoot! I have literally <i>nothing</i> better to do! #speaker=Nitwit
             -> choice
             =choice
@@ -42,6 +41,6 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
     -> DONE
 
 = Calm
-    If you haven't picked up the thingy yet, you should. #speaker=Nitwit
+    If you haven't picked up the thingy yet, you should. #speaker=Nitwit #camera=0
     I'm kinda blind right now so I can't tell if you did. #speaker=Nitwit
     -> DONE

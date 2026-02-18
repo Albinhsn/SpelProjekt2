@@ -28,6 +28,7 @@ public class DynamicRigidbody : MonoBehaviour
 
     public void DestroyOnCollision()
     {
+        if(this.m_collidingWithSet == null) return;
         if(this.m_collidingWithSet.Count > 0)
         {
             Material material = GetComponent<MeshRenderer>().material;
