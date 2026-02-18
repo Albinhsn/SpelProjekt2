@@ -2967,6 +2967,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 7888c23907fd9d741b4a46041eb7bef9, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 57c902869d67549cf8efa72fa52977f8, type: 2}
     - target: {fileID: 919132149155446097, guid: 7888c23907fd9d741b4a46041eb7bef9, type: 3}
       propertyPath: m_Name
       value: FactoryPuzzleBlock_WIP1
@@ -3167,6 +3171,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5324f376efccdf6489266d0734addad9, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: add940bd1bd6ee0408615f94ca42c621, type: 2}
     - target: {fileID: 919132149155446097, guid: 5324f376efccdf6489266d0734addad9, type: 3}
       propertyPath: m_Name
       value: Barrel_prop_WIP
@@ -3189,8 +3197,8 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5324f376efccdf6489266d0734addad9, type: 3}
   m_PrefabInstance: {fileID: 756044284}
   m_PrefabAsset: {fileID: 0}
---- !u!136 &756044287
-CapsuleCollider:
+--- !u!65 &756044287
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3207,10 +3215,8 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5778024
-  m_Height: 2.430728
-  m_Direction: 1
+  serializedVersion: 3
+  m_Size: {x: 1.1556048, y: 2.430728, z: 3}
   m_Center: {x: 0, y: -0.0000009536743, z: 0.00000023841858}
 --- !u!43 &760672796
 Mesh:
