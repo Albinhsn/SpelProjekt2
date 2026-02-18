@@ -349,11 +349,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4396306381682660189, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.19
+      value: -0.37
       objectReference: {fileID: 0}
     - target: {fileID: 4396306381682660189, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.51
+      value: 4.86
       objectReference: {fileID: 0}
     - target: {fileID: 4396306381682660189, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       propertyPath: m_LocalRotation.w
@@ -453,7 +453,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5820872621943005246, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
-      value: UnityEngine.Animation, UnityEngine
+      value: UnityEditor.Animations.AnimatorController, UnityEditor.CoreModule
       objectReference: {fileID: 0}
     - target: {fileID: 5820872621943005246, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
@@ -493,9 +493,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 112969674964652768, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       insertIndex: -1
       addedObject: {fileID: 984768459}
-    - targetCorrespondingSourceObject: {fileID: 112969674964652768, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 984768461}
   m_SourcePrefab: {fileID: 100100000, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
 --- !u!4 &984768456 stripped
 Transform:
@@ -533,24 +530,6 @@ MonoBehaviour:
   m_assets:
   - m_name: Priest1
     m_inkAsset: {fileID: 4900000, guid: e017fcec38bcc4e53b4c3f342471aa40, type: 3}
---- !u!111 &984768461
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 984768457}
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: c9a74470cc1f54f12a296f04a90250be, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: c9a74470cc1f54f12a296f04a90250be, type: 2}
-  - {fileID: 7400000, guid: ebc697d3dfb284e7dab32198f8af7f29, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_UpdateMode: 0
-  m_CullingType: 0
 --- !u!1 &1252861163
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,7 +778,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 90551468}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 99daf22ab5f4443bdbb8e3e46967162c, type: 2}
   m_CullingMode: 0
@@ -820,12 +799,11 @@ Animation:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 90551468}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Animation: {fileID: 7400000, guid: c9a74470cc1f54f12a296f04a90250be, type: 2}
   m_Animations:
   - {fileID: 7400000, guid: c9a74470cc1f54f12a296f04a90250be, type: 2}
-  - {fileID: 7400000, guid: ebc697d3dfb284e7dab32198f8af7f29, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
