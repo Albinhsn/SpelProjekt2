@@ -23,7 +23,7 @@ No one, not a singular <i>person</i> is allowed to use the catwalks anymore, per
     * [Yeah, sure.] I wont use the catwalks. # speaker=Alea
         Good! Good. Right, great that we could clear that up. # speaker=Catwalk Lady
         ...
-        Please leave now.
+        Please leave, now.
         -> DONE
 
 = stich2
