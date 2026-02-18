@@ -1,31 +1,22 @@
 //Early iteration of Boxmover NPC
 
-VAR isInteractedWith = true
+# font=0
+
 VAR isFirstInteraction = true
 
 ->main
 === main ===
 
-
 {isFirstInteraction: ->main.first|->main.second}
 
 = first
-...
-    + [...hello?]
+... #Speaker=Unknown
+    * [Hello?]
         ~ isFirstInteraction = false
-        <i>He ignores you.</i>
-        ->DONE
-
-->DONE
+        <i>He ignores you.</i> #speaker=Unknown
+        -> DONE
 = second
 ...
-    + [<i>Hellooooo?</i>]
-        <i>He ignores you harder.</i>
-        ->DONE
-->DONE
-
-->END
-
-
-
-->END
+    + [Hellooooo?]
+        <i>He ignores you harder.</i> #speaker=Unknown
+        -> DONE
