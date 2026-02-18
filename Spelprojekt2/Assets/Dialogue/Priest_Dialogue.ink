@@ -20,7 +20,12 @@ VAR first = true
 
 = stitch2
 That would be the good-for-nothing Nitwit I presume. They are the only one who would even think to help an outsider. Very well; what do you want to know?
-            <i>Dialogue tree follows</i>
+        <i>Dialogue tree follows</i>
+        + [why is a priest in a construction site?]
+        + [about my purpose]
+        + [about the glitches]
+        + [about what I heard you mumble]
+            
             ->DONE
 ->DONE
 
