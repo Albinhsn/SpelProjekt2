@@ -49,10 +49,12 @@ public class SceneLoader
 
     public void Unload()
     {
-        SceneManager.UnloadScene(m_level.m_sceneName);
+        var handle = SceneManager.UnloadSceneAsync(m_level.m_sceneName);
+        handle.completed += OnSceneLoad;
         foreach(Subscene subscene in m_level.m_scene.m_subscenes)
         {
-            SceneManager.UnloadScene(subscene.m_scene);
+            handle = SceneManager.UnloadSceneAsync(subscene.m_scene);
+            handle.completed += OnSceneLoad;
         }
     }
 }
