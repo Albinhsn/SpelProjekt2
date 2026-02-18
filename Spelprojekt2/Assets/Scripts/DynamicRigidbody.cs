@@ -5,11 +5,13 @@ using System.Collections.Generic;
 public class DynamicRigidbody : MonoBehaviour
 {
     private Collider m_col;
+    private Rigidbody m_rb;
     // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
     [HideInInspector] public HashSet<GameObject> m_collidingWithSet;
 
     void Awake()
     {
+        m_rb = GetComponent<Rigidbody>();
         FilterManager manager = FindFirstObjectByType<FilterManager>();
         manager.m_filterChanged.AddListener(OnFilterChange);
         this.m_col = GetComponent<Collider>();
@@ -24,6 +26,8 @@ public class DynamicRigidbody : MonoBehaviour
         {
             DestroyOnCollision();
         }
+
+        m_rb.WakeUp();
     }
 
     public void DestroyOnCollision()
