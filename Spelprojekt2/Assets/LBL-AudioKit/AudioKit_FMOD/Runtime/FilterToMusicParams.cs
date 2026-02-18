@@ -4,8 +4,9 @@ using AudioKit.FMOD;
 public sealed class FilterToMusicParams : MonoBehaviour
 {
     [Header("Refs")]
-    [SerializeField] private FilterManager filterManager;
     [SerializeField] private AudioParameterDriver driver;
+
+    private FilterManager filterManager;
 
     [Header("AudioParamLibrary keys")]
     [SerializeField] private string redKey = "music_red";
@@ -32,7 +33,7 @@ public sealed class FilterToMusicParams : MonoBehaviour
 
     private void Awake()
     {
-        if (!filterManager) filterManager = FindFirstObjectByType<FilterManager>();
+        filterManager = FindFirstObjectByType<FilterManager>();
         if (!driver) driver = FindFirstObjectByType<AudioParameterDriver>();
         ResolveKindsFromGameData();
     }
