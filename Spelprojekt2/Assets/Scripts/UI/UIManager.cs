@@ -375,6 +375,7 @@ public class UIManager : MonoBehaviour
                 if(MenuBtn("Delete save", btn_index++))
                 {
                     PersistentDataManager.RemoveAllSerializedData();
+                    GlobalInkVariableManager.ClearAll();
                     FilterManager.m_filterUnlocked = false;
                 }
 
