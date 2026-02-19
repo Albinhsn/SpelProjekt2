@@ -38,14 +38,19 @@ public sealed class GlitchVolume : CustomPostProcessVolumeComponent, IPostProces
     public override void Render(CommandBuffer cmd, HDCamera camera, RTHandle source, RTHandle destination)
     {
         if (!IsActive2())
-            return;
+        {
+            HDUtils.BlitCameraTexture(cmd, source, destination);
+        }
+        else
+        {
+            m_Material.SetFloat("_ScanlineSpeed", m_scanlineSpeed.value * m_intensity.value);
+            m_Material.SetFloat("_ScanlineStrength", m_scanlineStrength.value * m_intensity.value);
+            m_Material.SetFloat("_GlitchSpeed", m_glitchSpeed.value * m_intensity.value);
+            m_Material.SetFloat("_GlitchStrength", m_glitchStrength.value * m_intensity.value);
+            m_Material.SetTexture("_MainTex", source);
+            HDUtils.DrawFullScreen(cmd, m_Material, destination, shaderPassId: 0);
+        }
 
-        m_Material.SetFloat("_ScanlineSpeed", m_scanlineSpeed.value * m_intensity.value);
-        m_Material.SetFloat("_ScanlineStrength", m_scanlineStrength.value * m_intensity.value);
-        m_Material.SetFloat("_GlitchSpeed", m_glitchSpeed.value * m_intensity.value);
-        m_Material.SetFloat("_GlitchStrength", m_glitchStrength.value * m_intensity.value);
-        m_Material.SetTexture("_MainTex", source);
-        HDUtils.DrawFullScreen(cmd, m_Material, destination, shaderPassId: 0);
     }
 
     public override void Cleanup()

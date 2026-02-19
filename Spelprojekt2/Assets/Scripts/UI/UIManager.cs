@@ -576,7 +576,6 @@ public class UIManager : MonoBehaviour
         {
             m_useSelected = true;
         }
-        
 
         if(m_state == UIState.None)
         {
