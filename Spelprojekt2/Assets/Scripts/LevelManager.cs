@@ -54,7 +54,7 @@ public sealed class LevelManager
         Instance.m_currentLevel = levelData;
     }
 
-    public static void TransitionToSceneAsync(LevelData levelData)
+    public static void TransitionToSceneAsync(LevelData levelData, float transition_time = 4.0f)
     {
         if(Instance.m_isTransitioning)
         {
@@ -79,7 +79,7 @@ public sealed class LevelManager
                 Debug.Log("Transition end is null?");
             }
             GlitchTransitionManager.m_onTransitionEnd.AddListener(SetGlitchBoolTrue);
-            if(!GlitchTransitionManager.StartTransition(4.0f, 0.0f))
+            if(!GlitchTransitionManager.StartTransition(transition_time, 0.0f))
             {
                 Debug.LogError("[LevelManager] A transition is already happening when we're trying to start a new one");
 

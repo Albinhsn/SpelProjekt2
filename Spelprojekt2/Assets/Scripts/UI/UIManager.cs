@@ -169,6 +169,11 @@ public class UIManager : MonoBehaviour
         EnterState(m_stateOnInitialization);
     }
 
+    void OnEnable()
+    {
+        m_buttonSignals = new();
+    }
+
     void Start()
     {
         m_audioSystem = FindFirstObjectByType<AudioSystem>();
@@ -331,6 +336,12 @@ public class UIManager : MonoBehaviour
         }
         EnterState(UIState.None);
         LevelManager.m_onTransitionEnd -= SetupScene;
+    }
+
+    void SetupMainMenu()
+    {
+        EnterState(UIState.MainMenu);
+        LevelManager.m_onTransitionEnd -= SetupMainMenu;
     }
 
     void OnGUI()
@@ -517,9 +528,11 @@ public class UIManager : MonoBehaviour
                     {
                         Debug.LogWarning("Tried to save without any player?");
                     }
-                    EnterState(UIState.MainMenu);
 
-                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0]);
+                    // HACK(ah): just want no ui shown here, don't want to enter state
+                    this.m_state  = UIState.None;
+                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
+                    LevelManager.m_onTransitionEnd += SetupMainMenu;
                 }
 
                 AreaEnd();
