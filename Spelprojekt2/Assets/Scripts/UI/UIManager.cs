@@ -83,18 +83,18 @@ public class UIManager : MonoBehaviour
     private int m_cursorUsages = 0;
     public void HideCursor()
     {
-        m_cursorUsages--;
-        if (m_cursorUsages <= 0)
-        {
-            m_cursorUsages = 0;
+        // m_cursorUsages--;
+        // if (m_cursorUsages <= 0)
+        // {
+        //     m_cursorUsages = 0;
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-        }
+        // }
     }
 
     public void ShowCursor()
     {
-        m_cursorUsages++;
+        // m_cursorUsages++;
         Cursor.visible   = true;
         Cursor.lockState = CursorLockMode.None;
     }
@@ -598,7 +598,7 @@ public class UIManager : MonoBehaviour
         {
             if(InputManager.Unpaused())
             {
-                EnterState(UIState.PauseMenu);
+                EnterState(m_statePriorToSettingsMenu);
             }
         }
         // InputManager.MoveCursor(Mouse.current.position.ReadValue());
