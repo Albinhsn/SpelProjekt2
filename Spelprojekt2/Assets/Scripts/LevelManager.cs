@@ -123,10 +123,10 @@ public sealed class LevelManager
 
         // ah: set the player inactive during transitions
         {
+            LevelCheckpointManager.m_allowChangeCheckpoint = true;
             if(Instance.m_player != null)
             {
                 // Instance.m_player.gameObject.SetActive(true);
-                LevelCheckpointManager.m_allowChangeCheckpoint = true;
                 LevelCheckpointManager.SetFirstSpawnPoint();
                 LevelCheckpointManager.Respawn();
                 Instance.m_player = null;
