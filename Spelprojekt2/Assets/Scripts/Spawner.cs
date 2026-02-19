@@ -19,6 +19,14 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        if(m_object != null)
+        {
+            Destroy(m_object);
+        }
+    }
+
     public bool CanSpawn()
     {
         bool result = true;

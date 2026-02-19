@@ -1,4 +1,5 @@
 using UnityEngine;
+using Interaction.Dialogue;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using AudioKit.FMOD;
