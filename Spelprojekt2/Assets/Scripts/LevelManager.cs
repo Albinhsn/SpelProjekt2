@@ -1,6 +1,8 @@
 using System;
 using AudioKit.FMOD;
 using UnityEngine;
+using FMOD.Studio;
+using FMODUnity;
 
 public sealed class LevelManager
 {
@@ -15,8 +17,17 @@ public sealed class LevelManager
             return _instance;
         } 
     }
+
+    LevelManager()
+    {
+        m_glitchAudio = Resources.Load<AudioCueSO>("Audio/AC_Glitch");
+    }
+
     private LevelData m_currentLevel;
     private LevelData m_nextLevel;
+
+    private AudioCueSO m_glitchAudio;
+    private EventInstance m_soundInstance;
 
     private Player m_player;
 
@@ -93,6 +104,17 @@ public sealed class LevelManager
                 Instance.m_player.gameObject.SetActive(false);
             }
         }
+
+        // ah: play transition sound effect
+        {
+            Instance.m_soundInstance = RuntimeManager.CreateInstance(Instance.m_glitchAudio.evt);
+            FMOD.RESULT ok = Instance.m_soundInstance.start();
+
+            if(ok != FMOD.RESULT.OK)
+            {
+                Debug.Log($"Failed to start glitch sound in transition because {ok}");
+            }
+        }
     }
 
     public static void FinishTransition()
@@ -130,6 +152,20 @@ public sealed class LevelManager
         if(sky != null)
         {
             sky.Apply();
+        }
+
+        // ah: stop play transition sound effect
+        {
+            FMOD.RESULT ok = Instance.m_soundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            if(ok != FMOD.RESULT.OK)
+            {
+                Debug.Log($"Failed to stop glitch sound in transition because {ok}");
+            }
+            ok = Instance.m_soundInstance.release();
+            if(ok != FMOD.RESULT.OK)
+            {
+                Debug.Log($"Failed to release glitch sound in transition because {ok}");
+            }
         }
     }
 

@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections;
+using FMODUnity;
+using FMOD.Studio;
 using AudioKit.FMOD;
 using static LinAlg.LinAlg;
 
@@ -10,8 +12,12 @@ using static LinAlg.LinAlg;
 public class MovementController : MonoBehaviour
 {
 
+    [Header("Sound")]
     [SerializeField]
     private AudioCueSO m_playerJumpSound;
+    [SerializeField]
+    private AudioCueSO m_footstepSound;
+    private FMOD.Studio.EventInstance m_footstepInstance;
 
     [Header("Movement")]
     [SerializeField, Tooltip("The movement speed of the player")]
@@ -32,6 +38,12 @@ public class MovementController : MonoBehaviour
     {
         m_rb = GetComponent<Rigidbody>();
         m_cameraTransform = Camera.main.transform;
+        m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
+    }
+
+    private void OnDestroy()
+    {
+        m_footstepInstance.release();
     }
 
     private void OnDisable()
@@ -81,10 +93,21 @@ public class MovementController : MonoBehaviour
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
             jumpCooldown = 0.5f;
+            m_footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         }
 
         m_rb.position += m_referenceVector * Time.deltaTime;
         jumpCooldown -= Time.deltaTime;
+    }
+
+    void PlayFootstepSound()
+    {
+        m_footstepInstance.getPlaybackState(out FMOD.Studio.PLAYBACK_STATE state);
+        if(state == FMOD.Studio.PLAYBACK_STATE.STOPPED)
+        {
+            FMOD.RESULT ok = m_footstepInstance.start();
+
+        }
     }
 
     void FixedUpdate()
@@ -99,6 +122,11 @@ public class MovementController : MonoBehaviour
         if(dir.sqrMagnitude > 0)
         {
             dir = dir.normalized;
+
+            if(!m_isJumping)
+            {
+                PlayFootstepSound();
+            }
         }
 
         // Apply movement
