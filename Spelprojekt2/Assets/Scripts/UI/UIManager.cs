@@ -519,7 +519,7 @@ public class UIManager : MonoBehaviour
                     }
                     EnterState(UIState.MainMenu);
 
-                    LevelManager.TransitionToScene(m_MainMenuLevelData.m_levels[0]);
+                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0]);
                 }
 
                 AreaEnd();

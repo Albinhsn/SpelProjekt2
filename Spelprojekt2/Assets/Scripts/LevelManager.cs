@@ -18,6 +18,8 @@ public sealed class LevelManager
     private LevelData m_currentLevel;
     private LevelData m_nextLevel;
 
+    private Player m_player;
+
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
     private bool m_scenesLoaded;
@@ -39,20 +41,6 @@ public sealed class LevelManager
     public static void SetCurrentLevel(LevelData levelData)
     {
         Instance.m_currentLevel = levelData;
-    }
-
-    public static void TransitionToScene(LevelData levelData)
-    {
-        if(Instance.m_isTransitioning)
-        {
-            Debug.LogWarning("Already transitioning to a new level, cannot transition to another one until the current transition is finished");
-            return;
-        }
-        Instance.m_nextLevel = levelData;
-        Instance.m_isTransitioning = true;
-        SceneLoader sceneLoader = new(levelData);
-        sceneLoader.Load();
-        FinishTransition();
     }
 
     public static void TransitionToSceneAsync(LevelData levelData)
@@ -96,16 +84,39 @@ public sealed class LevelManager
             sl.Unload();        
             Debug.Log($"Unloaded scene {Instance.m_currentLevel.m_sceneName}");
         }
+
+        // ah: set the player inactive during transitions
+        {
+            Instance.m_player = UnityEngine.Object.FindFirstObjectByType<Player>();
+            if(Instance.m_player != null)
+            {
+                Instance.m_player.gameObject.SetActive(false);
+            }
+        }
     }
 
     public static void FinishTransition()
     {
+
+        // NOTE(ah): This happens before because the respawn player is an event invoked
+        // in onTransitionEnd
+
+        // ah: set the player inactive during transitions
+        {
+            if(Instance.m_player != null)
+            {
+                Instance.m_player.gameObject.SetActive(true);
+                Instance.m_player = null;
+            }
+        }
+
         Debug.Log("Finishing transition");
         Instance.m_isGlitchingDone = false;
         Instance.m_scenesLoaded = false;
         Instance.m_currentLevel = Instance.m_nextLevel;
         Instance.m_isTransitioning = false;
         Instance.m_onTransitionEnd_?.Invoke();
+
 
         // ah: Change music
         AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
