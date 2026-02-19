@@ -101,7 +101,8 @@ public sealed class LevelManager
             Instance.m_player = UnityEngine.Object.FindFirstObjectByType<Player>();
             if(Instance.m_player != null)
             {
-                Instance.m_player.gameObject.SetActive(false);
+                LevelCheckpointManager.m_allowChangeCheckpoint = false;
+                // Instance.m_player.gameObject.SetActive(false);
             }
         }
 
@@ -120,14 +121,14 @@ public sealed class LevelManager
     public static void FinishTransition()
     {
 
-        // NOTE(ah): This happens before because the respawn player is an event invoked
-        // in onTransitionEnd
-
         // ah: set the player inactive during transitions
         {
+            LevelCheckpointManager.m_allowChangeCheckpoint = true;
             if(Instance.m_player != null)
             {
-                Instance.m_player.gameObject.SetActive(true);
+                // Instance.m_player.gameObject.SetActive(true);
+                LevelCheckpointManager.SetFirstSpawnPoint();
+                LevelCheckpointManager.Respawn();
                 Instance.m_player = null;
             }
         }
