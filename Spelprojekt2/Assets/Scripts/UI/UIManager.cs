@@ -556,8 +556,8 @@ public class UIManager : MonoBehaviour
 
                     // HACK(ah): just want no ui shown here, don't want to enter state
                     this.m_state  = UIState.None;
-                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
                     LevelManager.m_onTransitionEnd += SetupMainMenu;
+                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
                 }
 
                 AreaEnd();

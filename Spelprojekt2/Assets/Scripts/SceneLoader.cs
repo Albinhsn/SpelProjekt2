@@ -50,7 +50,7 @@ public class SceneLoader
         }
     }
 
-    public void Unload()
+    public void UnloadAsync()
     {
         var handle = SceneManager.UnloadSceneAsync(m_level.m_sceneName);
         handle.completed += OnSceneLoad;
