@@ -5,7 +5,7 @@ public class LevelCheckpoint : MonoBehaviour
 {
 
     [SerializeField]
-    private bool m_isFirstCheckpointOfLevel;
+    public bool m_isFirstCheckpointOfLevel;
 
     void Awake()
     {

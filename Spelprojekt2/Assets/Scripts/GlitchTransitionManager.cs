@@ -26,13 +26,11 @@ public class GlitchTransitionManager : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log("Trying to wake");
         if(I != null && I != this)
         {
             Destroy(this.gameObject);
             return;
         }
-        Debug.Log("Awoken");
 
         I = this;
         m_onTransitionEnd_ = new();
@@ -63,8 +61,16 @@ public class GlitchTransitionManager : MonoBehaviour
             I.m_transitionTime          = time;
             I.m_transitionTimeRemaining = time;
             I.m_startIntensity          = start_intensity;
-            I.StartCoroutine(UpdateTransition());
+
+            // ah: Take framebuffer snapshot
+            {
+                FramebufferSnapshotManager.Request();
+                FramebufferDisplaySnapshotPass.Activate();
+            }
+
             result = true;
+
+            I.StartCoroutine(UpdateTransition());
         }
         return result;
     }
@@ -74,6 +80,7 @@ public class GlitchTransitionManager : MonoBehaviour
         I.m_transitionTimeRemaining = 0;
         I.m_transitioning           = false;
         I.m_onTransitionEnd_?.Invoke();
+        FramebufferDisplaySnapshotPass.Deactivate();
     }
 
     static IEnumerator UpdateTransition()

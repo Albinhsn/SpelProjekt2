@@ -29,7 +29,7 @@ public sealed class LevelManager
     private AudioCueSO m_glitchAudio;
     private EventInstance m_soundInstance;
 
-    private Player m_player;
+    private SceneLoader m_sceneLoader;
 
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
@@ -61,12 +61,13 @@ public sealed class LevelManager
             Debug.LogWarning("Already transitioning to a new level, cannot transition to another one until the current transition is finished");
             return;
         }
+
+
         Instance.m_isGlitchingDone = false;
         Instance.m_scenesLoaded = false;
         Instance.m_nextLevel = levelData;
         Instance.m_isTransitioning = true;
-        SceneLoader sceneLoader = new(levelData);
-        sceneLoader.m_onAllScenesLoaded += SetScenesLoadedBoolTrue;
+
         var gtm = UnityEngine.Object.FindFirstObjectByType<GlitchTransitionManager>();
         if(gtm == null)
         {
@@ -74,34 +75,33 @@ public sealed class LevelManager
         }
         else
         {
-            if(GlitchTransitionManager.m_onTransitionEnd == null)
-            {
-                Debug.Log("Transition end is null?");
-            }
             GlitchTransitionManager.m_onTransitionEnd.AddListener(SetGlitchBoolTrue);
             if(!GlitchTransitionManager.StartTransition(transition_time, 0.0f))
             {
                 Debug.LogError("[LevelManager] A transition is already happening when we're trying to start a new one");
-
             }
         }
-        sceneLoader.LoadAsync();
 
         // ah: unload current scene async
         if(Instance.m_currentLevel.m_scene != null)
         {
-            SceneLoader sl = new(Instance.m_currentLevel);
-            sl.m_onAllScenesLoaded += SetScenesUnloadedBoolTrue;
-            sl.Unload();        
+            Instance.m_sceneLoader = new(Instance.m_currentLevel);
+            Instance.m_sceneLoader.m_onAllScenesLoaded += SetScenesUnloadedBoolTrue;
+            Instance.m_sceneLoader.UnloadAsync();        
             Debug.Log($"Unloaded scene {Instance.m_currentLevel.m_sceneName}");
         }
+        else
+        {
+            SetScenesUnloadedBoolTrue();
+        }
+
 
         // ah: set the player inactive during transitions
         {
-            Instance.m_player = UnityEngine.Object.FindFirstObjectByType<Player>();
-            if(Instance.m_player != null)
+            Player player = UnityEngine.Object.FindFirstObjectByType<Player>();
+            if(player != null)
             {
-                Instance.m_player.gameObject.SetActive(false);
+                LevelCheckpointManager.m_allowChangeCheckpoint = false;
             }
         }
 
@@ -120,15 +120,14 @@ public sealed class LevelManager
     public static void FinishTransition()
     {
 
-        // NOTE(ah): This happens before because the respawn player is an event invoked
-        // in onTransitionEnd
-
-        // ah: set the player inactive during transitions
+        // ah: set the player active again
         {
-            if(Instance.m_player != null)
+            LevelCheckpointManager.m_allowChangeCheckpoint = true;
+            Player player = UnityEngine.Object.FindFirstObjectByType<Player>();
+            if(player != null)
             {
-                Instance.m_player.gameObject.SetActive(true);
-                Instance.m_player = null;
+                LevelCheckpointManager.SetFirstSpawnPoint();
+                LevelCheckpointManager.Respawn();
             }
         }
 
@@ -138,7 +137,6 @@ public sealed class LevelManager
         Instance.m_currentLevel = Instance.m_nextLevel;
         Instance.m_isTransitioning = false;
         Instance.m_onTransitionEnd_?.Invoke();
-
 
         // ah: Change music
         AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
@@ -181,11 +179,10 @@ public sealed class LevelManager
 
     static void SetScenesUnloadedBoolTrue()
     {
+        Instance.m_sceneLoader    = new(Instance.m_nextLevel);
+        Instance.m_sceneLoader.m_onAllScenesLoaded += SetScenesLoadedBoolTrue;
+        Instance.m_sceneLoader.LoadAsync();
         Instance.m_scenesUnloaded = true;
-        if(Instance.m_isGlitchingDone && Instance.m_scenesLoaded)
-        {
-            FinishTransition();
-        }
     }
 
     static void SetScenesLoadedBoolTrue()

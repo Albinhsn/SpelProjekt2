@@ -1,4 +1,5 @@
 using UnityEngine;
+using Interaction.Dialogue;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using AudioKit.FMOD;
@@ -10,11 +11,12 @@ public enum UIState
     MainMenu,
     Settings,
     PauseMenu,
+    Dialogue,
 }
 
 public class UIManager : MonoBehaviour
 {
-    private static UIManager m_instance;
+    private static UIManager I;
 
     [SerializeField]
     private Font font;
@@ -79,82 +81,71 @@ public class UIManager : MonoBehaviour
     private int m_selectedIndex = 0;
     private bool m_useSelected;
 
-    private int m_cursorUsages = 0;
     public void HideCursor()
     {
-        m_cursorUsages--;
-        if (m_cursorUsages <= 0)
-        {
-            m_cursorUsages = 0;
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void ShowCursor()
     {
-        m_cursorUsages++;
         Cursor.visible   = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
-    private int m_pauseOverrideCount = 0;
-    public void AllowPause()
+    public static void EnterState(UIState state)
     {
-        --m_pauseOverrideCount;
-        if (m_pauseOverrideCount < 1)
+        if(!I)
         {
-            m_pauseOverrideCount = 0;
+            return;
         }
-    }
-    public void DisallowPause()
-    {
-        ++m_pauseOverrideCount;
-    }
-
-
-    private void EnterState(UIState state)
-    {
         switch(state)
         {
             case UIState.Settings:
             {
-                ShowCursor();
+                I.ShowCursor();
                 InputManager.DisablePlayerInput();
-                m_selectedButtonEnabled = false;
-                m_statePriorToSettingsMenu = m_state;
+                I.m_selectedButtonEnabled    = false;
+                I.m_statePriorToSettingsMenu = I.m_state;
                 break;
             }
             case UIState.None:
             {
-                HideCursor();
-                m_selectedButtonEnabled = false;
+                I.HideCursor();
+                I.m_selectedButtonEnabled = false;
                 InputManager.EnablePlayerInput();
                 break;
             }
             case UIState.MainMenu:
             {
-                ShowCursor();
-                m_selectedButtonEnabled = true;
+                I.ShowCursor();
+                I.m_selectedButtonEnabled = true;
                 InputManager.DisablePlayerInput();
                 break;
             }
             case UIState.PauseMenu:
             {
-                ShowCursor();
-                m_selectedButtonEnabled = true;
+                I.ShowCursor();
+                I.m_selectedButtonEnabled = true;
+                InputManager.DisablePlayerInput();
+                break;
+            }
+            case UIState.Dialogue:
+            {
+                I.ShowCursor();
+                I.m_selectedButtonEnabled = false;
                 InputManager.DisablePlayerInput();
                 break;
             }
         }
 
-        m_selectedIndex = 0;
-        this.m_state   = state;
+        I.m_selectedIndex = 0;
+        I.m_state   = state;
     }
 
     void Awake()
     {
-        if(m_instance != null && m_instance != this)
+        if(I != null && I != this)
         {
             Destroy(this.gameObject);
             return;
@@ -162,7 +153,7 @@ public class UIManager : MonoBehaviour
 
         LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
 
-        m_instance = this;
+        I = this;
         m_buttonSignals = new();
         DontDestroyOnLoad(this.gameObject);
 
@@ -180,6 +171,13 @@ public class UIManager : MonoBehaviour
     }
 
 
+    float GetScreenScaledSize(float width)
+    {
+        float expected = 1920.0f;
+        float actual   = Screen.width;
+        return (actual / expected) * width;
+    }
+
     bool MenuBtn(string text, int index)
     {
 
@@ -189,13 +187,14 @@ public class UIManager : MonoBehaviour
         GUILayout.FlexibleSpace();
 
         GUILayoutOption[] button_options = new GUILayoutOption[2];
-        button_options[0] = GUILayout.Width(m_btnWidth);
-        button_options[1] = GUILayout.Height(m_btnHeight);
+        button_options[0] = GUILayout.Width(GetScreenScaledSize(m_btnWidth));
+        button_options[1] = GUILayout.Height(GetScreenScaledSize(m_btnHeight));
 
         UI_Signal prev_signal = new();
         m_buttonSignals.TryGetValue(text, out prev_signal);
 
         GUIStyle btn_style = new GUIStyle(GUI.skin.button);
+        btn_style.fontSize = (int)(GetScreenScaledSize(m_btnHeight) * 0.75f);
         if(m_selectedButtonEnabled)
         {
             btn_style.normal.background = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
@@ -246,7 +245,7 @@ public class UIManager : MonoBehaviour
         options[0] = GUILayout.Width(m_sliderWidth);
 
         GUIStyle slider_style = new GUIStyle(GUI.skin.horizontalSlider);
-        slider_style.padding.top = -2;
+        slider_style.padding.top = (int)GetScreenScaledSize(-2);
 
         float result = GUILayout.HorizontalSlider(initial_value, 0, 1, slider_style, GUI.skin.horizontalScrollbarThumb, options);
 
@@ -259,6 +258,9 @@ public class UIManager : MonoBehaviour
     void
     AreaBegin(float w, float h)
     {
+        w = GetScreenScaledSize(w);
+        h = GetScreenScaledSize(h);
+
         GUIStyle window_style    = new GUIStyle(GUI.skin.window);
         window_style.padding.top = 0;
 
@@ -284,18 +286,21 @@ public class UIManager : MonoBehaviour
     }
 
     int 
-    MenuSelection(int prev_value, string label, string[] selections)
+    MenuSelection(int prev_value, string label, string[] selections, Color[] btn_colors)
     {
         GUIStyle style  = new(GUI.skin.button);
-        style.fontSize -= 10;
+        style.fontSize -= (int)GetScreenScaledSize(10);
         style.font      = font;
+        GUIStyle selected_style = new(style);
+        selected_style.hover  = selected_style.hover;
+        selected_style.normal = selected_style.active;
 
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
 
         GUIStyle label_style = new GUIStyle(GUI.skin.label);
         label_style.font = font;
-        label_style.fontSize = 15;
+        label_style.fontSize = (int)GetScreenScaledSize(15);
         GUILayout.Label(label, label_style);
 
         GUILayout.FlexibleSpace();
@@ -303,7 +308,25 @@ public class UIManager : MonoBehaviour
 
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        int new_value = GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
+
+        // Make the buttons actually the same size as well
+        // Show which buttons are selected
+
+        int new_value = prev_value;
+        for(int i = 0; i < selections.Length; i++)
+        {
+            GUIStyle current_style = prev_value == i ? selected_style : style;
+            current_style.normal.textColor = btn_colors[i];
+            current_style.hover.textColor  = btn_colors[i];
+            current_style.active.textColor = btn_colors[i];
+
+            if(GUILayout.Button(selections[i], current_style))
+            {
+                new_value = i;
+            }
+        }
+
+        // int new_value = GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
         
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -365,7 +388,7 @@ public class UIManager : MonoBehaviour
                     EnterState(UIState.None);
                 }
 
-                GUILayout.Space(25);
+                GUILayout.Space((int)GetScreenScaledSize(25));
                 if(MenuBtn("Settings", btn_index++))
                 {
                     EnterState(UIState.Settings);
@@ -375,9 +398,11 @@ public class UIManager : MonoBehaviour
                 if(MenuBtn("Delete save", btn_index++))
                 {
                     PersistentDataManager.RemoveAllSerializedData();
+                    GlobalInkVariableManager.ClearAll();
+                    FilterManager.m_filterUnlocked = false;
                 }
 
-                GUILayout.Space(25);
+                GUILayout.Space((int)GetScreenScaledSize(25));
                 if(MenuBtn("Quit", btn_index++))
                 {
                     PersistentDataManager.RemoveAllSerializedData();
@@ -442,7 +467,7 @@ public class UIManager : MonoBehaviour
                         }
 
                         bool change_filter = false;
-                        int new_primary = MenuSelection(prev_primary, "Primary", filter_color_strings);
+                        int new_primary = MenuSelection(prev_primary, "Primary", filter_color_strings, FilterManager.FilterColorColors);
                         if(prev_primary != new_primary)
                         {
                             if(new_primary == prev_secondary)
@@ -452,7 +477,7 @@ public class UIManager : MonoBehaviour
                             change_filter = true;
                         }
 
-                        int new_secondary = MenuSelection(prev_secondary, "Secondary", filter_color_strings);
+                        int new_secondary = MenuSelection(prev_secondary, "Secondary", filter_color_strings, FilterManager.FilterColorColors);
                         if(prev_secondary != new_secondary)
                         {
                             if(new_secondary == new_primary)
@@ -471,7 +496,7 @@ public class UIManager : MonoBehaviour
                     }
                 }
 
-                GUILayout.Space(15);
+                GUILayout.Space((int)GetScreenScaledSize(15));
 
                 if(MenuBtn("Back", btn_index++))
                 {
@@ -531,8 +556,8 @@ public class UIManager : MonoBehaviour
 
                     // HACK(ah): just want no ui shown here, don't want to enter state
                     this.m_state  = UIState.None;
-                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
                     LevelManager.m_onTransitionEnd += SetupMainMenu;
+                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
                 }
 
                 AreaEnd();
@@ -541,7 +566,6 @@ public class UIManager : MonoBehaviour
             default:{ break;}
         }
 
-        // HACK(ah): (:
         if(btn_index > 0 && m_selectedButtonEnabled)
         {
             if(InputManager.ReadUINavigationValue().y > 0.5f && m_menuScrollTimer <= 0f)
@@ -576,11 +600,10 @@ public class UIManager : MonoBehaviour
         {
             m_useSelected = true;
         }
-        
 
         if(m_state == UIState.None)
         {
-            if(InputManager.Paused() && m_pauseOverrideCount == 0)
+            if(InputManager.Paused())
             {
                 EnterState(UIState.PauseMenu);
             }
@@ -596,9 +619,8 @@ public class UIManager : MonoBehaviour
         {
             if(InputManager.Unpaused())
             {
-                EnterState(UIState.PauseMenu);
+                EnterState(m_statePriorToSettingsMenu);
             }
         }
-        // InputManager.MoveCursor(Mouse.current.position.ReadValue());
     }
 }

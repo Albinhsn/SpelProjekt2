@@ -25,7 +25,6 @@ namespace Interaction.Dialogue
         [SerializeField] private float m_altButtonOffset;
         private List<Button> m_altButtons;
 
-        private UIManager m_uiManager;
         
         //Per-interaction
         [CanBeNull] private Story m_activeStory;
@@ -41,7 +40,6 @@ namespace Interaction.Dialogue
 
         void Start()
         {
-            m_uiManager = FindAnyObjectByType<UIManager>();
             
             if (!m_subscribed && !m_initialSubscribed)
             {
@@ -88,8 +86,7 @@ namespace Interaction.Dialogue
 
         private void InitiateDialogue(Story story)
         {
-            m_uiManager.ShowCursor();
-            m_uiManager.DisallowPause();
+            UIManager.EnterState(UIState.Dialogue);
             
             m_speakerName = "";
             SetFont(0, m_textOut);
@@ -119,8 +116,7 @@ namespace Interaction.Dialogue
             m_speakerName = "";
             
             
-            m_uiManager.HideCursor();
-            m_uiManager.AllowPause();
+            UIManager.EnterState(UIState.None);
         }
         public void ContinueAction()
         {
