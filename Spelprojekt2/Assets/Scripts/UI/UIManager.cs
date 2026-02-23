@@ -81,7 +81,6 @@ public class UIManager : MonoBehaviour
     private int m_selectedIndex = 0;
     private bool m_useSelected;
 
-    private int m_cursorUsages = 0;
     public void HideCursor()
     {
         Cursor.visible = false;
@@ -172,6 +171,13 @@ public class UIManager : MonoBehaviour
     }
 
 
+    float GetScreenScaledSize(float width)
+    {
+        float expected = 1920.0f;
+        float actual   = Screen.width;
+        return (actual / expected) * width;
+    }
+
     bool MenuBtn(string text, int index)
     {
 
@@ -181,13 +187,14 @@ public class UIManager : MonoBehaviour
         GUILayout.FlexibleSpace();
 
         GUILayoutOption[] button_options = new GUILayoutOption[2];
-        button_options[0] = GUILayout.Width(m_btnWidth);
-        button_options[1] = GUILayout.Height(m_btnHeight);
+        button_options[0] = GUILayout.Width(GetScreenScaledSize(m_btnWidth));
+        button_options[1] = GUILayout.Height(GetScreenScaledSize(m_btnHeight));
 
         UI_Signal prev_signal = new();
         m_buttonSignals.TryGetValue(text, out prev_signal);
 
         GUIStyle btn_style = new GUIStyle(GUI.skin.button);
+        btn_style.fontSize = (int)(GetScreenScaledSize(m_btnHeight) * 0.75f);
         if(m_selectedButtonEnabled)
         {
             btn_style.normal.background = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
@@ -238,7 +245,7 @@ public class UIManager : MonoBehaviour
         options[0] = GUILayout.Width(m_sliderWidth);
 
         GUIStyle slider_style = new GUIStyle(GUI.skin.horizontalSlider);
-        slider_style.padding.top = -2;
+        slider_style.padding.top = (int)GetScreenScaledSize(-2);
 
         float result = GUILayout.HorizontalSlider(initial_value, 0, 1, slider_style, GUI.skin.horizontalScrollbarThumb, options);
 
@@ -251,6 +258,9 @@ public class UIManager : MonoBehaviour
     void
     AreaBegin(float w, float h)
     {
+        w = GetScreenScaledSize(w);
+        h = GetScreenScaledSize(h);
+
         GUIStyle window_style    = new GUIStyle(GUI.skin.window);
         window_style.padding.top = 0;
 
@@ -276,18 +286,21 @@ public class UIManager : MonoBehaviour
     }
 
     int 
-    MenuSelection(int prev_value, string label, string[] selections)
+    MenuSelection(int prev_value, string label, string[] selections, Color[] btn_colors)
     {
         GUIStyle style  = new(GUI.skin.button);
-        style.fontSize -= 10;
+        style.fontSize -= (int)GetScreenScaledSize(10);
         style.font      = font;
+        GUIStyle selected_style = new(style);
+        selected_style.hover  = selected_style.hover;
+        selected_style.normal = selected_style.active;
 
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
 
         GUIStyle label_style = new GUIStyle(GUI.skin.label);
         label_style.font = font;
-        label_style.fontSize = 15;
+        label_style.fontSize = (int)GetScreenScaledSize(15);
         GUILayout.Label(label, label_style);
 
         GUILayout.FlexibleSpace();
@@ -295,7 +308,25 @@ public class UIManager : MonoBehaviour
 
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        int new_value = GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
+
+        // Make the buttons actually the same size as well
+        // Show which buttons are selected
+
+        int new_value = prev_value;
+        for(int i = 0; i < selections.Length; i++)
+        {
+            GUIStyle current_style = prev_value == i ? selected_style : style;
+            current_style.normal.textColor = btn_colors[i];
+            current_style.hover.textColor  = btn_colors[i];
+            current_style.active.textColor = btn_colors[i];
+
+            if(GUILayout.Button(selections[i], current_style))
+            {
+                new_value = i;
+            }
+        }
+
+        // int new_value = GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
         
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -357,7 +388,7 @@ public class UIManager : MonoBehaviour
                     EnterState(UIState.None);
                 }
 
-                GUILayout.Space(25);
+                GUILayout.Space((int)GetScreenScaledSize(25));
                 if(MenuBtn("Settings", btn_index++))
                 {
                     EnterState(UIState.Settings);
@@ -371,7 +402,7 @@ public class UIManager : MonoBehaviour
                     FilterManager.m_filterUnlocked = false;
                 }
 
-                GUILayout.Space(25);
+                GUILayout.Space((int)GetScreenScaledSize(25));
                 if(MenuBtn("Quit", btn_index++))
                 {
                     PersistentDataManager.RemoveAllSerializedData();
@@ -436,7 +467,7 @@ public class UIManager : MonoBehaviour
                         }
 
                         bool change_filter = false;
-                        int new_primary = MenuSelection(prev_primary, "Primary", filter_color_strings);
+                        int new_primary = MenuSelection(prev_primary, "Primary", filter_color_strings, FilterManager.FilterColorColors);
                         if(prev_primary != new_primary)
                         {
                             if(new_primary == prev_secondary)
@@ -446,7 +477,7 @@ public class UIManager : MonoBehaviour
                             change_filter = true;
                         }
 
-                        int new_secondary = MenuSelection(prev_secondary, "Secondary", filter_color_strings);
+                        int new_secondary = MenuSelection(prev_secondary, "Secondary", filter_color_strings, FilterManager.FilterColorColors);
                         if(prev_secondary != new_secondary)
                         {
                             if(new_secondary == new_primary)
@@ -465,7 +496,7 @@ public class UIManager : MonoBehaviour
                     }
                 }
 
-                GUILayout.Space(15);
+                GUILayout.Space((int)GetScreenScaledSize(15));
 
                 if(MenuBtn("Back", btn_index++))
                 {
@@ -535,7 +566,6 @@ public class UIManager : MonoBehaviour
             default:{ break;}
         }
 
-        // HACK(ah): (:
         if(btn_index > 0 && m_selectedButtonEnabled)
         {
             if(InputManager.ReadUINavigationValue().y > 0.5f && m_menuScrollTimer <= 0f)
@@ -592,6 +622,5 @@ public class UIManager : MonoBehaviour
                 EnterState(m_statePriorToSettingsMenu);
             }
         }
-        // InputManager.MoveCursor(Mouse.current.position.ReadValue());
     }
 }

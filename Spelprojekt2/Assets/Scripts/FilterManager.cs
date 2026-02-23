@@ -7,6 +7,14 @@ using Unity.VisualScripting;
 
 public class FilterManager : MonoBehaviour
 {
+
+    public static Color[] FilterColorColors = {
+        Color.red,
+        Color.green,
+        Color.blue,
+        Color.yellow
+    };
+
     private int[] m_collidingWithCount;
 
     [SerializeField]
