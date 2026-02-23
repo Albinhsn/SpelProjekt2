@@ -94,17 +94,11 @@ public class FilterManager : MonoBehaviour
         m_collidingWithCount[(int)kind]--;
     }
 
+    // NOTE(ah): Assumes it's possible to actually change filters!
     public void ChangeFilter(FilterKind new_filter)
     {
-        // NOTE(ah): Assumes it's possible to actually change filters!
 
-        // ah: broadcast event
-        // HACK(ah): Currently player at least relies on this happening before 
-        // activating/deactivating objects. Because both rely on setting 
-        // _isKinematic_ to either true/false. So correct behaviour is 
-        // to set it to true (which activating does afterwards)
         bool activating       = m_activeFilter != new_filter;
-        this.m_filterChanged?.Invoke(new_filter, activating);
 
         // ah: Play filter change sound
         SfxDirector.PlayCue2(m_filterChangeCue, this.transform.position);
@@ -145,6 +139,9 @@ public class FilterManager : MonoBehaviour
         {
             m_activeFilter = FilterKind.None;
         }
+
+        // ah: broadcast event
+        this.m_filterChanged?.Invoke(new_filter, activating);
 
     }
 
