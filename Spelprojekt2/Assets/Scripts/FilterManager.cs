@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using AudioKit.FMOD;
 
 public class FilterManager : MonoBehaviour
 {
@@ -16,6 +16,7 @@ public class FilterManager : MonoBehaviour
     };
 
     private int[] m_collidingWithCount;
+    private AudioCueSO m_filterChangeCue;
 
     [SerializeField]
     public UnityEvent<FilterKind, bool> m_filterChanged;
@@ -41,6 +42,7 @@ public class FilterManager : MonoBehaviour
     {
         m_filterMaterialData = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
         m_filterColorData    = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
+        m_filterChangeCue    = Resources.Load("Audio/AC_FilterChange") as AudioCueSO;
         m_filterChanged = new();
 
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
@@ -94,7 +96,7 @@ public class FilterManager : MonoBehaviour
 
     public void ChangeFilter(FilterKind new_filter)
     {
-        // NOTE(ah): Assumes it's possible to do!
+        // NOTE(ah): Assumes it's possible to actually change filters!
 
         // ah: broadcast event
         // HACK(ah): Currently player at least relies on this happening before 
@@ -103,6 +105,9 @@ public class FilterManager : MonoBehaviour
         // to set it to true (which activating does afterwards)
         bool activating       = m_activeFilter != new_filter;
         this.m_filterChanged?.Invoke(new_filter, activating);
+
+        // ah: Play filter change sound
+        SfxDirector.PlayCue2(m_filterChangeCue, this.transform.position);
 
         // ah: activate objects
         FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
