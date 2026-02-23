@@ -8,6 +8,6 @@ public class PlaySound : MonoBehaviour
 
     public void Play()
     {
-        SfxDirector.PlayCue2(m_soundEvent, this.transform.position);
+        SfxDirector.PlayCue2(m_soundCue, this.transform.position);
     }
 }
