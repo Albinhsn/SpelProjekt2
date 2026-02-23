@@ -42,7 +42,7 @@ namespace Interaction.Dialogue
             
             if (!m_story.canContinue)
             {
-                interactor.CancelInteract();
+                interactor.FinishInteraction();
                 return;
             }
             m_activeInteractor = interactor;
@@ -98,7 +98,7 @@ namespace Interaction.Dialogue
             m_dlsRelay.ExitDialogue();
             SetActiveCamera(-1);
             m_interacting = false;
-            m_activeInteractor.CancelInteract();
+            m_activeInteractor.FinishInteraction();
             m_activeInteractor = null;
             m_story.ResetState();
         }

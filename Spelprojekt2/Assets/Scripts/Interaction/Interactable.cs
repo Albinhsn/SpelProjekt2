@@ -41,6 +41,11 @@ namespace Interaction
             m_onInteraction.Invoke(interactor);
         }
 
+        public virtual bool TryCancelInteract(Interactor interactor)
+        {
+            return false;
+        }
+
         public virtual void SetHighlighted(bool highlight) => m_toggleHighlighted.Invoke(highlight);
 
         public virtual void SetIsInteractable(bool active)

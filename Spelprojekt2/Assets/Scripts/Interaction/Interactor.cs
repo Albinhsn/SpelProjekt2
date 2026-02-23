@@ -17,14 +17,39 @@ namespace Interaction
         [SerializeField] private float m_coneFactor;
         
         [SerializeField] private InputActionReference m_interactAction;
+        [SerializeField] private InputActionReference m_interactionCancelAction;
         [SerializeField] private UnityEvent<bool> m_deactivateWhileInteracting;
+
+        [SerializeField] private LayerMask m_blockLineOfSight;
 
         [CanBeNull] private Interactable m_selected = null;
         private bool m_interacting = false;
 
+        public Vector3 aimDirection
+        {
+            get
+            {
+                return Vector3.forward;//TODO: replace with something more dynamic to enable camera locking
+            }
+        }
+
+        public Vector3 position => m_targetOrigin.position;
+
+        private void Awake()
+        {
+            //TODO: InputManager
+        }
+
         private void Update()
         {
-            if(m_interacting) return;
+            if (m_interacting)
+            {
+                if(m_interactionCancelAction.action.WasPressedThisFrame())
+                {
+                    CancelInteraction();
+                }
+                else return;
+            }
             SearchFrustum();
 
             if (m_selected is not null && m_interactAction.action.WasPressedThisFrame())
@@ -47,7 +72,18 @@ namespace Interaction
             interactable.Interact(this);
         }
 
-        public void CancelInteract()
+
+        private void CancelInteraction()
+        {
+            if (m_selected.TryCancelInteract(this))
+            {
+                //TODO: interaction cancel logic
+                m_selected = null;
+                m_interacting = false;
+            }
+        }
+
+        public void FinishInteraction()
         {
             Assert.IsTrue(m_interacting, "cancelInteract called on non-interacting interactor");
             m_interacting = false;
@@ -57,6 +93,7 @@ namespace Interaction
 
         private void SearchFrustum()
         {
+            
             Interactable sel = null;
             float sel_distance = float.MaxValue;
             
@@ -69,8 +106,9 @@ namespace Interaction
 
                 float obj_radial_distance = (obj_relative_position - transform.forward * obj_linear_distance).magnitude;
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
+                
 
-                if (obj_radial_distance < sel_distance)//May be subject to change, test if this, linear or combination feels better
+                if (obj_radial_distance < sel_distance && !Physics.Raycast(m_targetOrigin.position, obj_relative_position.normalized, obj_linear_distance, m_blockLineOfSight))
                 {
                     sel = obj;
                     sel_distance = obj_radial_distance;
