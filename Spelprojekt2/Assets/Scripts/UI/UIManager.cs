@@ -11,11 +11,12 @@ public enum UIState
     MainMenu,
     Settings,
     PauseMenu,
+    Dialogue,
 }
 
 public class UIManager : MonoBehaviour
 {
-    private static UIManager m_instance;
+    private static UIManager I;
 
     [SerializeField]
     private Font font;
@@ -83,79 +84,69 @@ public class UIManager : MonoBehaviour
     private int m_cursorUsages = 0;
     public void HideCursor()
     {
-        // m_cursorUsages--;
-        // if (m_cursorUsages <= 0)
-        // {
-        //     m_cursorUsages = 0;
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        // }
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void ShowCursor()
     {
-        // m_cursorUsages++;
         Cursor.visible   = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
-    private int m_pauseOverrideCount = 0;
-    public void AllowPause()
+    public static void EnterState(UIState state)
     {
-        --m_pauseOverrideCount;
-        if (m_pauseOverrideCount < 1)
+        if(!I)
         {
-            m_pauseOverrideCount = 0;
+            return;
         }
-    }
-    public void DisallowPause()
-    {
-        ++m_pauseOverrideCount;
-    }
-
-
-    private void EnterState(UIState state)
-    {
         switch(state)
         {
             case UIState.Settings:
             {
-                ShowCursor();
+                I.ShowCursor();
                 InputManager.DisablePlayerInput();
-                m_selectedButtonEnabled = false;
-                m_statePriorToSettingsMenu = m_state;
+                I.m_selectedButtonEnabled    = false;
+                I.m_statePriorToSettingsMenu = I.m_state;
                 break;
             }
             case UIState.None:
             {
-                HideCursor();
-                m_selectedButtonEnabled = false;
+                I.HideCursor();
+                I.m_selectedButtonEnabled = false;
                 InputManager.EnablePlayerInput();
                 break;
             }
             case UIState.MainMenu:
             {
-                ShowCursor();
-                m_selectedButtonEnabled = true;
+                I.ShowCursor();
+                I.m_selectedButtonEnabled = true;
                 InputManager.DisablePlayerInput();
                 break;
             }
             case UIState.PauseMenu:
             {
-                ShowCursor();
-                m_selectedButtonEnabled = true;
+                I.ShowCursor();
+                I.m_selectedButtonEnabled = true;
+                InputManager.DisablePlayerInput();
+                break;
+            }
+            case UIState.Dialogue:
+            {
+                I.ShowCursor();
+                I.m_selectedButtonEnabled = false;
                 InputManager.DisablePlayerInput();
                 break;
             }
         }
 
-        m_selectedIndex = 0;
-        this.m_state   = state;
+        I.m_selectedIndex = 0;
+        I.m_state   = state;
     }
 
     void Awake()
     {
-        if(m_instance != null && m_instance != this)
+        if(I != null && I != this)
         {
             Destroy(this.gameObject);
             return;
@@ -163,7 +154,7 @@ public class UIManager : MonoBehaviour
 
         LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
 
-        m_instance = this;
+        I = this;
         m_buttonSignals = new();
         DontDestroyOnLoad(this.gameObject);
 
@@ -582,7 +573,7 @@ public class UIManager : MonoBehaviour
 
         if(m_state == UIState.None)
         {
-            if(InputManager.Paused() && m_pauseOverrideCount == 0)
+            if(InputManager.Paused())
             {
                 EnterState(UIState.PauseMenu);
             }
