@@ -54,6 +54,13 @@ public class Spawner : MonoBehaviour
             {
                 rb.linearVelocity = m_initialVelocity;
             }
+
+            // ah: reset flipped gravity on respawn
+            GravityFlippedObject gravity_flip = this.m_object.GetComponent<GravityFlippedObject>();
+            if(gravity_flip != null)
+            {
+                gravity_flip.ResetGravity();
+            }
         }
     }
 
