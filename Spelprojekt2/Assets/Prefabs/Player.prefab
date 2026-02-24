@@ -75,13 +75,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d628259bd09e4e4b8d2edd3afb08e9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
+  m_interactableSets:
+  - {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
+  - {fileID: 11400000, guid: f6924d1f7265a9b49b1fa0fe6014aeed, type: 2}
   m_targetOrigin: {fileID: 84247538685420441}
   m_range: 7.44
   m_coneBaseRad: 1.32
   m_coneFactor: 0.52
-  m_interactAction: {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
-  m_interactionCancelAction: {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  m_interactActions:
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  m_interactionCancelActions:
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
   m_deactivateWhileInteracting:
   - {fileID: 695921995035222353}
   - {fileID: 2804696581348211148}

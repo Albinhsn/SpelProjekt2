@@ -10,20 +10,20 @@ namespace Interaction
 {
     public class Interactor : MonoBehaviour
     {
-        [SerializeField] private InstanceSet m_interactableSet;
+        [SerializeField] private InstanceSet[] m_interactableSets;
         [SerializeField] private Transform m_targetOrigin;
         [SerializeField] private float m_range;
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
         
-        [SerializeField] private InputActionReference m_interactAction;
-        [SerializeField] private InputActionReference m_interactionCancelAction;
+        [SerializeField] private InputActionReference[] m_interactActions;
+        [SerializeField] private InputActionReference[] m_interactionCancelActions;
         [SerializeField] private MonoBehaviour[] m_deactivateWhileInteracting;
 
         [SerializeField] private LayerMask m_blockLineOfSight;
 
-        [CanBeNull] private Interactable m_selected = null;
-        private bool m_interacting = false;
+        [ItemCanBeNull] private Interactable[] m_selected;
+        private int m_interacting = -1; //Interaction type. -1=not interacting
 
         public Vector3 aimDirection
         {
@@ -37,31 +37,40 @@ namespace Interaction
 
         private void Awake()
         {
+            m_selected = new Interactable?[m_interactableSets.Length];
+            for (int a = 0; a < m_interactableSets.Length; a++)
+            {
+                m_interactActions[a].action.Enable();
+                m_interactionCancelActions[a].action.Enable();
+            }
+
             //TODO: InputManager
         }
 
         private void Update()
         {
-            if (m_interacting)
+            if (m_interacting != -1)
             {
-                if(m_interactionCancelAction.action.WasPressedThisFrame()) CancelInteraction();
+                if(m_interactionCancelActions[m_interacting].action.WasPressedThisFrame()) CancelInteractions();
                 return;
             }
-            SearchFrustum();
 
-            if (m_selected is not null && m_interactAction.action.WasPressedThisFrame())
+            for (int a = 0; a < m_interactableSets.Length; a++)
             {
-                Interact(m_selected);
+                SearchFrustum(a);
+                if (m_selected[a] is not null && m_interactActions[a].action.WasPressedThisFrame())
+                {
+                    Interact(m_selected[a], a);
+                    break;
+                }
             }
         }
 
-        public void Interact(Interactable interactable)
+        public void Interact(Interactable interactable, int set_index)
         {
-            if(m_interacting) return;
-            
             if (interactable.requireUninteract)
             {
-                m_interacting = true;
+                m_interacting = set_index;
                 interactable.SetHighlighted(false);
             }
 
@@ -74,16 +83,16 @@ namespace Interaction
                 InputManager.DisablePlayerInput();
             }
 
-            m_selected = interactable;
+            m_selected[set_index] = interactable;
             interactable.Interact(this);
         }
 
 
-        public void CancelInteraction()//Cancel interaction input
+        public void CancelInteractions()//Cancel interaction input
         {
-            if(!m_interacting) return;
+            if(m_interacting == -1) return;
             
-            if (m_selected.TryCancelInteract(this))
+            if (m_selected[m_interacting].TryCancelInteract(this))
             {
                 foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
                 {
@@ -91,31 +100,31 @@ namespace Interaction
                 }
                 InputManager.EnablePlayerInput();
            
-                m_selected = null;
-                m_interacting = false;
+                m_selected[m_interacting] = null;
+                m_interacting = -1;
             }
         }
 
         public void FinishInteraction()//Interaction finished callback from interactable
         {
-            Assert.IsTrue(m_interacting, "FinishInteraction called on non-interacting interactor");
+            Assert.IsTrue(m_interacting != -1, "FinishInteraction called on non-interacting interactor");
             foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
             {
                 obj.enabled = true;
             }
             InputManager.EnablePlayerInput();
             
-            m_selected = null;
-            m_interacting = false;
+            m_selected[m_interacting] = null;
+            m_interacting = -1;
         }
 
-        private void SearchFrustum()
+        private void SearchFrustum(int set_index)
         {
             
             Interactable sel = null;
             float sel_distance = float.MaxValue;
             
-            foreach (Interactable obj in m_interactableSet.GetEnumerable())
+            foreach (Interactable obj in m_interactableSets[set_index].GetEnumerable())
             {
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
                 float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
@@ -133,12 +142,12 @@ namespace Interaction
                 }
             }
 
-            if (m_selected is not null && sel != m_selected)
+            if (m_selected[set_index] is not null && sel != m_selected[set_index])
             {
-                m_selected.SetHighlighted(false);
+                m_selected[set_index].SetHighlighted(false);
             }
-            m_selected = sel;
-            m_selected?.SetHighlighted(true);
+            m_selected[set_index] = sel;
+            m_selected[set_index]?.SetHighlighted(true);
         }
         
 
