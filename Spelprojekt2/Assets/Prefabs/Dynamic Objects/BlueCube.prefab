@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3350494049519190331}
   - component: {fileID: -1345212627984704744}
   - component: {fileID: 3785609980439772403}
+  - component: {fileID: -663604853255146023}
   m_Layer: 7
   m_Name: BlueCube
   m_TagString: Untagged
@@ -187,3 +188,34 @@ MonoBehaviour:
     snapshot: 
     snapshotEnable: 0
     fade: 0
+--- !u!114 &-663604853255146023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9063331542980127942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 841dabb42eca402981c82b8c3398e445, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_interactableSet: {fileID: 11400000, guid: f6924d1f7265a9b49b1fa0fe6014aeed, type: 2}
+  m_active: 1
+  m_requireUninteract: 1
+  m_canControlWhileInteracting: 1
+  m_cancelable: 1
+  m_onInteraction:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
+  m_toggleHighlighted:
+    m_PersistentCalls:
+      m_Calls: []
+  m_holdDistance: 2.25
+  m_linearMovementThreshold: 4
+  m_maxVelocity: 10
+  m_deceleration: 20
+  m_snapThreshold: 0.05
