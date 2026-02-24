@@ -32,6 +32,15 @@ public class GravityFlippedObject : MonoBehaviour
         Awake();
         ResetGravity();
     }
+#if UNITY_EDITOR
+    public void OnValidate()
+    {
+        if(m_ID == null)
+        {
+            m_ID = System.Guid.NewGuid();
+        }
+    }
+#endif
 
     public void SetGravity(bool use_gravity)
     {

@@ -21,6 +21,16 @@ public class Spawner : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
+    public void OnValidate()
+    {
+        if(m_ID == null)
+        {
+            m_ID = System.Guid.NewGuid();
+        }
+    }
+#endif
+
     void OnDestroy()
     {
         if(m_object != null)

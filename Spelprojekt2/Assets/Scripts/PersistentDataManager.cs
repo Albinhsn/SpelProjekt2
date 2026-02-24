@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using System;
 using System.Text;
+using System.Security.Cryptography;
 using System.Collections.Generic;
 using Interaction.Dialogue;
 using static Serialization;
@@ -478,6 +479,7 @@ public sealed class PersistentDataManager
             }
         }
 
+        Debug.Log($"Serializing with {size}");
         byte[] buffer = new byte[size];
         int offset = 0;
 
@@ -487,12 +489,15 @@ public sealed class PersistentDataManager
             if(game_state.m_play.m_exists)
             {
                 offset = game_state.m_play.Serialize(buffer, offset);
+                Debug.Log($"Serializing play {offset} expected {game_state.m_play.m_chunkSize}");
             }
 
             // ah: stry
             if(game_state.m_story.m_exists)
             {
+                int prev = offset;
                 offset = game_state.m_story.Serialize(buffer, offset);
+                Debug.Log($"Serializing stry {offset - prev} expected {game_state.m_story.m_chunkSize}");
             }
 
             // ah: lvls
@@ -911,6 +916,16 @@ public sealed class PersistentDataManager
         }
 
     }
+    public static Guid GuidFromStringHash(string str)
+    {
+        Guid result = new();
+        using (MD5 md5 = MD5.Create())
+        {
+            byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(str));
+            result = new Guid(hash);
+        }
+        return result;
+    }
 
     public static void SerializeLoadedScenes(bool save = true)
     {
@@ -927,7 +942,7 @@ public sealed class PersistentDataManager
         for(int i = 0; i < scene_count; i++)
         {
             Scene scene = SceneManager.GetSceneAt(i);
-            scene_chunks[new Guid(scene.path)] = new();
+            scene_chunks[GuidFromStringHash(scene.path)] = new();
         }
 
         // ah: map sgos
@@ -937,7 +952,7 @@ public sealed class PersistentDataManager
             {
                 SerializableObject obj = sgos[i];
 
-                Guid scene_guid = new Guid(obj.gameObject.scene.path);
+                Guid scene_guid = GuidFromStringHash(obj.gameObject.scene.path);
                 if(scene_chunks[scene_guid].m_sgos == null)
                 {
                     ChunkLVL chunk = scene_chunks[scene_guid];
@@ -972,7 +987,7 @@ public sealed class PersistentDataManager
 
                 GameObject child = spawner.m_object;
 
-                Guid scene_guid = new Guid(child.scene.path);
+                Guid scene_guid = GuidFromStringHash(child.scene.path);
                 if(scene_chunks[scene_guid].m_spawners == null)
                 {
                     ChunkLVL chunk = scene_chunks[scene_guid];
@@ -1004,7 +1019,7 @@ public sealed class PersistentDataManager
             for(int i = 0; i < flipped.Length; i++)
             {
                 GravityFlippedObject obj = flipped[i];
-                Guid scene_guid = new Guid(obj.gameObject.scene.path);
+                Guid scene_guid = GuidFromStringHash(obj.gameObject.scene.path);
                 if(scene_chunks[scene_guid].m_flipped == null)
                 {
                     ChunkLVL chunk  = scene_chunks[scene_guid];
