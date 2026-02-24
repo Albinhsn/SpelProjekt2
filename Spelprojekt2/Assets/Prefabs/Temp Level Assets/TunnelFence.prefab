@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 4683764393818525164}
   - component: {fileID: 8431552723965874175}
   - component: {fileID: 8764054514350362000}
+  - component: {fileID: 3204243773279177774}
+  - component: {fileID: 6774465802070359485}
   m_Layer: 0
   m_Name: pTorus98 (2)
   m_TagString: Untagged
@@ -86,6 +88,40 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &3204243773279177774
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1750919376973425684}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.3150682, y: 1.3715411, z: 0.10609059}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6774465802070359485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1750919376973425684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87994faf08af05f4cb2b4cde415da541, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_kind: 0
 --- !u!1 &5367533734081388761
 GameObject:
   m_ObjectHideFlags: 0
@@ -100,6 +136,8 @@ GameObject:
   - component: {fileID: 7556245233156533827}
   - component: {fileID: 4037190844947018360}
   - component: {fileID: 8805167482818260639}
+  - component: {fileID: 1595181497235158664}
+  - component: {fileID: 6986449311279530388}
   m_Layer: 0
   m_Name: PolyShape (1)
   m_TagString: Untagged
@@ -435,6 +473,40 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!65 &1595181497235158664
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5367533734081388761}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.9607115, y: 0.33001673, z: 4.398374}
+  m_Center: {x: 0.38332817, y: -0.16500777, z: 2.199186}
+--- !u!114 &6986449311279530388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5367533734081388761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87994faf08af05f4cb2b4cde415da541, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_kind: 0
 --- !u!1 &6722656071615779336
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,7 +516,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 89260475773296415}
-  - component: {fileID: 457177870888280648}
   m_Layer: 0
   m_Name: TunnelFence
   m_TagString: Untagged
@@ -470,27 +541,6 @@ Transform:
   - {fileID: 8761731617383376608}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &457177870888280648
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6722656071615779336}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.4200628, y: 1.8318174, z: 0.41169247}
-  m_Center: {x: 0.038402453, y: -0.0062551564, z: -0.024545534}
 --- !u!1 &8847291555506165019
 GameObject:
   m_ObjectHideFlags: 0
@@ -505,6 +555,8 @@ GameObject:
   - component: {fileID: 6507262332639645855}
   - component: {fileID: 3049741380778228354}
   - component: {fileID: 286890917423351244}
+  - component: {fileID: 8594100070399572234}
+  - component: {fileID: 2334851352067477437}
   m_Layer: 0
   m_Name: PolyShape
   m_TagString: Untagged
@@ -840,3 +892,37 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!65 &8594100070399572234
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8847291555506165019}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.9607111, y: 0.3300169, z: 4.398374}
+  m_Center: {x: 0.38332865, y: -0.16500646, z: 2.1991866}
+--- !u!114 &2334851352067477437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8847291555506165019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87994faf08af05f4cb2b4cde415da541, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_kind: 0
