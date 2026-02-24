@@ -188,7 +188,7 @@ public sealed class PersistentDataManager
         {
             get
             {
-                return sizeof(int) * 3 + MAX_INK_VARIABLE_SIZE * 2 * m_entries.Count;
+                return sizeof(int) * 3 + sizeof(int) + MAX_INK_VARIABLE_SIZE * 2 * m_entries.Count;
             }
         }
 
@@ -206,6 +206,8 @@ public sealed class PersistentDataManager
             }
 
             // ah: entries
+            int entry_count = m_entries != null ? m_entries.Count : 0;
+            offset = SerializeScalar<int>(ref buffer, entry_count, offset);
             if(m_entries != null)
             {
                 foreach(KeyValuePair<string, object> kv in m_entries)
