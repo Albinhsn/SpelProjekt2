@@ -1,9 +1,18 @@
 using UnityEngine;
 
 
+public enum GravityDirection
+{
+    Up,
+    Down,
+}
+
+
 [RequireComponent(typeof(Rigidbody))]
 public class GravityFlippedObject : MonoBehaviour
 {
+    [SerializeField]
+    private GravityDirection m_startingState;
 
     Vector3 m_flippedGravity = new Vector3(0, 9.8f, 0);
     Rigidbody m_rb;
@@ -13,10 +22,17 @@ public class GravityFlippedObject : MonoBehaviour
         m_rb = GetComponent<Rigidbody>();
     }
 
+    void OnEnable()
+    {
+        Awake();
+        ResetGravity();
+    }
+
     public void ResetGravity()
     {
-        m_rb.useGravity = true;
+        m_rb.useGravity = m_startingState == GravityDirection.Up;
     }
+
 
     public void Flip()
     {
