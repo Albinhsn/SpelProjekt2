@@ -9,7 +9,6 @@ namespace Interaction
     {
         [SerializeField] private float m_holdDistance;
         [SerializeField] private float m_linearMovementThreshold;
-        [SerializeField] private float m_acceleration;
         [SerializeField] private float m_maxVelocity;
         [SerializeField] private float m_deceleration;
         [SerializeField] private float m_snapThreshold;
@@ -19,8 +18,8 @@ namespace Interaction
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;
-        private float m_interactorDistance => Vector3.Distance(transform.position, m_activeInteractor.position);
-        private float m_outerDistance => m_interactorDistance - m_holdDistance;
+        private float m_distanceToInteractor => Vector3.Distance(transform.position, m_activeInteractor.position);
+        private float m_outerDistance => m_distanceToInteractor - m_holdDistance;
         private float m_decThreshold => MathF.Pow(m_currentVelocity, 2) / (2 * m_deceleration);
         private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - Vector3.Dot(m_interactorDirection, m_linearTargetDirection) * m_interactorDirection).normalized;
 
@@ -40,6 +39,7 @@ namespace Interaction
             m_rb.useGravity = false;
             m_activeInteractor = interactor;
             m_isHeld = true;
+            m_currentVelocity = 0;
         }
 
         public override bool TryCancelInteract(Interactor interactor)
@@ -50,19 +50,31 @@ namespace Interaction
             return true;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (m_isHeld)
             {
-                //Update velocity
-                m_currentVelocity = m_targetDistance > m_decThreshold ? MathF.Min(m_maxVelocity, m_currentVelocity + m_acceleration) : m_currentVelocity - m_deceleration;
+                if (m_targetDistance < m_maxVelocity * Time.fixedDeltaTime)
+                {
+                    m_currentVelocity = 0;
+                    m_rb.linearVelocity = Vector3.zero;
+                    m_rb.MovePosition(m_targetPosition);
+                    return;
+                }
                 
-                transform.position += (
+                //Update velocity
+                m_currentVelocity = m_targetDistance > m_decThreshold ? m_maxVelocity : MathF.Max(0, m_currentVelocity - m_deceleration * Time.fixedDeltaTime);
+                
+                m_rb.linearVelocity = (
                     Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Slerp input
-                        MathF.Max(1, MathF.Min(0, (m_interactorDistance - m_outerDistance) / m_linearMovementThreshold))) //Slerp t
-                    
-                    + MathF.Max(0, m_outerDistance) * -m_interactorDirection //Move out from hold range
-                    ) * (m_currentVelocity * Time.deltaTime); //Velocity scale
+                        MathF.Max(0, MathF.Min(1, m_outerDistance / m_linearMovementThreshold))) //Slerp t
+
+                    + (m_outerDistance > 0//Move out from hold range
+                        ? 0
+                        : (1 - m_distanceToInteractor / m_holdDistance) * m_maxVelocity)
+                    * -m_interactorDirection 
+                
+                    ) * m_currentVelocity; //Velocity scale
             }
         }
 
@@ -72,7 +84,7 @@ namespace Interaction
 
             
             Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(m_targetPosition, 0.1f); //Object target
+            Gizmos.DrawSphere(m_targetPosition, m_snapThreshold); //Object target
             
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(m_activeInteractor.position, m_holdDistance); //Min distance
@@ -85,8 +97,12 @@ namespace Interaction
             Gizmos.DrawLine(transform.position, transform.position + m_sphericalTargetDirection); //Spherical direction
 
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, transform.position + Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection,
-                MathF.Max(1, MathF.Min(0, (m_interactorDistance - m_outerDistance) / m_linearMovementThreshold)))); //Active direction
+            Gizmos.DrawLine(transform.position, transform.position + (
+                Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection,//Slerp input
+                    MathF.Max(0, MathF.Min(1, m_outerDistance / m_linearMovementThreshold))) //Slerp t
+                    
+                //+ MathF.Max(0, m_outerDistance) * -m_interactorDirection //Move out from hold range
+            )); //Active direction
         }
     }
 }
