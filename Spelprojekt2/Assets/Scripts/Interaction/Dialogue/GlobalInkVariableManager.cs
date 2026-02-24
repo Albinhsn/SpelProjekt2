@@ -18,14 +18,16 @@ namespace Interaction.Dialogue
             }
         }
 
-        private Dictionary<string, object> m_inkVariables = new Dictionary<string, object>();
+        private Dictionary<string, object> m_inkVariables_ = new Dictionary<string, object>();
+
+        public static Dictionary<string, object> m_inkVariables => m_instance.m_inkVariables_;
 
         public static void SyncUp(Story story) //Read from story into global
         {
             foreach (string obj in story.variablesState)
             {
-                if (m_instance.m_inkVariables.ContainsKey(obj)) m_instance.m_inkVariables[obj] = story.variablesState[obj];
-                else m_instance.m_inkVariables.Add(obj, story.variablesState[obj]);
+                if (m_inkVariables.ContainsKey(obj)) m_inkVariables[obj] = story.variablesState[obj];
+                else m_inkVariables.Add(obj, story.variablesState[obj]);
             }
         }
         
@@ -38,21 +40,28 @@ namespace Interaction.Dialogue
             }
             for (int a = 0; a < vars.Count; a++)
             {
-                if (m_instance.m_inkVariables.ContainsKey(vars[a])) story.variablesState[vars[a]] = m_instance.m_inkVariables[vars[a]]; //Update only included variables
+                if (m_inkVariables.ContainsKey(vars[a])) story.variablesState[vars[a]] = m_inkVariables[vars[a]]; //Update only included variables
             }
         }
 
         public static void ClearAll()
         {
-            m_instance.m_inkVariables.Clear();
+            m_inkVariables.Clear();
         }
+
 
         public static void ClearSelected(string[] selection)
         {
             for (int a = 0; a < selection.Length; a++)
             {
-                m_instance.m_inkVariables.Remove(selection[a]);
+                m_inkVariables.Remove(selection[a]);
             }
+        }
+
+        public static void SetVariables(Dictionary<string, object> variables)
+        {
+            ClearAll();
+            m_instance.m_inkVariables_ = variables;
         }
     }
 }

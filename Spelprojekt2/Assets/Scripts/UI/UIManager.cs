@@ -339,6 +339,7 @@ public class UIManager : MonoBehaviour
     {
         Player player = Instantiate(m_playerPrefab);
 
+        PersistentDataManager.DeserializeAll();
         // Deserialize player
         DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player);
         if(ok.found)
@@ -517,22 +518,12 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Save", btn_index++))
                 {
-                    PersistentDataManager.SerializeLoadedLevels();
-
-                    Player player = FindFirstObjectByType<Player>();
-                    if(player != null)
-                    {
-                        PersistentDataManager.SerializePlayer(player);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Tried to save without any player?");
-                    }
+                    PersistentDataManager.SerializeAll();
                 }
 
                 if(MenuBtn("Reset to checkpoint", btn_index++))
                 {
-                    LevelCheckpointManager.ResetToCheckpoint();
+                    LevelCheckpointManager.Respawn();
                 }
 
                 if(MenuBtn("Settings", btn_index++))
@@ -542,17 +533,9 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Main Menu", btn_index++))
                 {
-                    PersistentDataManager.SerializeLoadedLevels();
+                    PersistentDataManager.SerializeAll();
                     Player player = FindFirstObjectByType<Player>();
-                    if(player != null)
-                    {
-                        PersistentDataManager.SerializePlayer(player);
-                        Destroy(player.gameObject);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Tried to save without any player?");
-                    }
+                    Destroy(player.gameObject);
 
                     // HACK(ah): just want no ui shown here, don't want to enter state
                     this.m_state  = UIState.None;

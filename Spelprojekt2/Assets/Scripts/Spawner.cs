@@ -1,15 +1,17 @@
 using UnityEngine;
+using System;
 
 public class Spawner : MonoBehaviour
 {
+    public Guid m_ID;
+
     [SerializeField] private GameObject m_objectToSpawn;
     [SerializeField] private Vector3 m_initialVelocity;
 
     [SerializeField]
     private bool m_spawnOnActivation;
 
-    private GameObject m_object;
-    
+    public GameObject m_object;
     
     public void Awake()
     {

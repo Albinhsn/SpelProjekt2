@@ -42,12 +42,4 @@ public sealed class LevelCheckpointManager
             m_sceneBuildIndex           = scene_build_index;
         }
     }
-
-    public static void ResetToCheckpoint()
-    {
-        // Delete save file for current scene
-        PersistentDataManager.RemoveSceneData(m_sceneBuildIndex); 
-        Respawn();
-
-    }
 }
