@@ -29,7 +29,7 @@ namespace Interaction
         {
             get
             {
-                return Vector3.forward;//TODO: replace with something more dynamic to enable camera locking
+                return transform.forward;//TODO: replace with something more dynamic to enable camera locking
             }
         }
 
@@ -118,11 +118,11 @@ namespace Interaction
             foreach (Interactable obj in m_interactableSet.GetEnumerable())
             {
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
-                float obj_linear_distance = Vector3.Dot(obj_relative_position, transform.forward);
+                float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
                 
                 if(obj_linear_distance < 0 || obj_linear_distance > m_range) continue; //Out of range
 
-                float obj_radial_distance = (obj_relative_position - transform.forward * obj_linear_distance).magnitude;
+                float obj_radial_distance = (obj_relative_position - aimDirection * obj_linear_distance).magnitude;
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
                 
 
@@ -200,6 +200,8 @@ namespace Interaction
             }
             
             Gizmos.DrawLineList(cone_verts);
+            
+            Gizmos.DrawLine(position, position + aimDirection * m_range);
         }
     }
 }

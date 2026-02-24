@@ -16,13 +16,13 @@ namespace Interaction
         
         private float m_currentVelocity;
         private Vector3 m_targetPosition => m_activeInteractor.position + m_activeInteractor.aimDirection * m_holdDistance;
-        private Vector3 m_linearTargetDirection => (transform.position - m_targetPosition).normalized;
+        private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => transform.position - m_activeInteractor.position;
         private float m_interactorDistance => Vector3.Distance(transform.position, m_activeInteractor.position);
         private float m_outerDistance => m_interactorDistance - m_holdDistance;
         private float m_decThreshold => MathF.Pow(m_currentVelocity, 2) / (2 * m_deceleration);
-        private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - m_interactorDirection * Vector3.Dot(m_linearTargetDirection, m_interactorDirection)).normalized;
+        private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - m_interactorDirection * Vector3.Dot(m_linearTargetDirection, m_interactorDirection)).normalized;//TODO: fix
         
         
         
@@ -51,13 +51,39 @@ namespace Interaction
                 if (m_outerDistance > m_linearMovementThreshold) //Move straight towards target outside some range
                 {
                     transform.position += m_linearTargetDirection * (m_currentVelocity * Time.deltaTime);
+                    Debug.Log("using linear movement");
                 }
                 else //Spherical movement
                 {
                     transform.position += Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection,
                         MathF.Min(0, (m_interactorDistance - m_outerDistance) / m_linearMovementThreshold)) * (m_currentVelocity * Time.deltaTime);
+                    Debug.Log("using spherical movement");
                 }
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+            if(!m_isHeld) return;
+
+            
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(m_targetPosition, 0.1f); //Object target
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(m_activeInteractor.position, m_holdDistance); //Min distance
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(m_activeInteractor.position, m_linearMovementThreshold); //Linear movement threshold
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transform.position, transform.position + m_linearTargetDirection); //Linear direction
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + m_sphericalTargetDirection); //Spherical direction
+
+            /*Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, transform.position + Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection,
+                MathF.Max(1, MathF.Min(0, (m_interactorDistance - m_outerDistance) / m_linearMovementThreshold)))); //Active direction
+*/
         }
     }
 }
