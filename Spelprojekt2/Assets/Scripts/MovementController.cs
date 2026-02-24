@@ -29,7 +29,7 @@ public class MovementController : MonoBehaviour
     private float m_smoothAccelerationFactor = 0.1f;
     private Rigidbody m_rb;
     private bool m_isJumping;
-    private Transform m_cameraTransform;
+    private PlayerCamera m_playerCamera;
     private Vector3 m_referenceVector = Vector3.zero;
 
     private float jumpCooldown = 0;
@@ -37,7 +37,7 @@ public class MovementController : MonoBehaviour
     void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
-        m_cameraTransform = Camera.main.transform;
+        m_playerCamera = GetComponentInChildren<PlayerCamera>();
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
     }
 
@@ -113,8 +113,8 @@ public class MovementController : MonoBehaviour
     void FixedUpdate()
     {
         // Calculate movement direction
-        Vector3 forward = Rejection(m_cameraTransform.forward, new Vector3(0, 1, 0));
-        Vector3 right   = Rejection(m_cameraTransform.right, new Vector3(0, 1, 0));
+        Vector3 forward = Rejection(m_playerCamera.m_playerForward, new Vector3(0, 1, 0));
+        Vector3 right   = Rejection(m_playerCamera.m_playerRight, new Vector3(0, 1, 0));
         Vector2 input   = InputManager.ReadMovementValue();
         Vector3 dir     = forward * input.y + right * input.x;
 
