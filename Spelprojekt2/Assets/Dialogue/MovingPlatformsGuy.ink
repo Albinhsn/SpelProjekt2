@@ -10,6 +10,7 @@ VAR isFirstInteractionM = true
 {isFirstInteractionM: ->main.think | ->main.think2}
 
 = think
+~isFirstInteractionM = false
 Ey, you there lad or lassy. Can't tell. # speaker=Unknown
 I've been looking at those platforms ova' there and for the darndest long time I have not figured them out. # speaker=Platforms Guy
 They keep going out of sync, if I had a way to maybe stop one or two I coulda scuttled on over.
