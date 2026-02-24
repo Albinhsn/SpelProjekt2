@@ -397,7 +397,7 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Delete save", btn_index++))
                 {
-                    PersistentDataManager.RemoveAllSerializedData();
+                    PersistentDataManager.DeleteSave();
                     GlobalInkVariableManager.ClearAll();
                     FilterManager.m_filterUnlocked = false;
                 }
@@ -405,7 +405,7 @@ public class UIManager : MonoBehaviour
                 GUILayout.Space((int)GetScreenScaledSize(25));
                 if(MenuBtn("Quit", btn_index++))
                 {
-                    PersistentDataManager.RemoveAllSerializedData();
+                    PersistentDataManager.DeleteSave();
                 #if UNITY_EDITOR
                     UnityEditor.EditorApplication.isPlaying = false;
                 #endif
