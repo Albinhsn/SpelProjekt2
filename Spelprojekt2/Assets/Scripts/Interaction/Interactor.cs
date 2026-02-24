@@ -18,7 +18,7 @@ namespace Interaction
         
         [SerializeField] private InputActionReference m_interactAction;
         [SerializeField] private InputActionReference m_interactionCancelAction;
-        [SerializeField] private UnityEvent<bool> m_deactivateWhileInteracting;
+        [SerializeField] private MonoBehaviour[] m_deactivateWhileInteracting;
 
         [SerializeField] private LayerMask m_blockLineOfSight;
 
@@ -44,11 +44,8 @@ namespace Interaction
         {
             if (m_interacting)
             {
-                if(m_interactionCancelAction.action.WasPressedThisFrame())
-                {
-                    CancelInteraction();
-                }
-                else return;
+                if(m_interactionCancelAction.action.WasPressedThisFrame()) CancelInteraction();
+                return;
             }
             SearchFrustum();
 
@@ -65,30 +62,51 @@ namespace Interaction
             if (interactable.requireUninteract)
             {
                 m_interacting = true;
-                m_deactivateWhileInteracting.Invoke(false);
                 interactable.SetHighlighted(false);
+            }
+
+            if (!interactable.canControlWhileInteracting)
+            {
+                foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
+                {
+                    obj.enabled = false;
+                }
                 InputManager.DisablePlayerInput();
             }
+
+            m_selected = interactable;
             interactable.Interact(this);
         }
 
 
-        private void CancelInteraction()
+        public void CancelInteraction()//Cancel interaction input
         {
+            if(!m_interacting) return;
+            
             if (m_selected.TryCancelInteract(this))
             {
-                //TODO: interaction cancel logic
+                foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
+                {
+                    obj.enabled = true;
+                }
+                InputManager.EnablePlayerInput();
+           
                 m_selected = null;
                 m_interacting = false;
             }
         }
 
-        public void FinishInteraction()
+        public void FinishInteraction()//Interaction finished callback from interactable
         {
-            Assert.IsTrue(m_interacting, "cancelInteract called on non-interacting interactor");
-            m_interacting = false;
-            m_deactivateWhileInteracting.Invoke(true);
+            Assert.IsTrue(m_interacting, "FinishInteraction called on non-interacting interactor");
+            foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
+            {
+                obj.enabled = true;
+            }
             InputManager.EnablePlayerInput();
+            
+            m_selected = null;
+            m_interacting = false;
         }
 
         private void SearchFrustum()
@@ -124,7 +142,7 @@ namespace Interaction
         }
         
 
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
             const int CONE_VERT_COUNT = 16;
             Gizmos.color = Color.yellow;

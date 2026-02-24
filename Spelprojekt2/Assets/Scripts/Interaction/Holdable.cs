@@ -50,12 +50,12 @@ namespace Interaction
                 
                 if (m_outerDistance > m_linearMovementThreshold) //Move straight towards target outside some range
                 {
-                    transform.position += m_linearTargetDirection * m_currentVelocity;
+                    transform.position += m_linearTargetDirection * (m_currentVelocity * Time.deltaTime);
                 }
                 else //Spherical movement
                 {
-                    transform.position += m_currentVelocity * Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection,
-                        MathF.Min(0, (m_interactorDistance - m_outerDistance) / m_linearMovementThreshold));
+                    transform.position += Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection,
+                        MathF.Min(0, (m_interactorDistance - m_outerDistance) / m_linearMovementThreshold)) * (m_currentVelocity * Time.deltaTime);
                 }
             }
         }
