@@ -103,7 +103,7 @@ public sealed class PersistentDataManager
                 size += sizeof(float) * 4 * 2;
 
                 // spawnpoint build index
-                size  += sizeof(int);
+                size += sizeof(int);
 
                 return size;
             }
@@ -199,7 +199,7 @@ public sealed class PersistentDataManager
 
             // ah: header
             {
-                offset = SerializeScalar<int>(ref buffer, PLAY, offset);
+                offset = SerializeScalar<int>(ref buffer, STRY, offset);
                 int size = m_chunkSize;
                 offset = SerializeScalar<int>(ref buffer, size, offset);
                 offset = SerializeScalar<int>(ref buffer, version, offset);
@@ -263,9 +263,13 @@ public sealed class PersistentDataManager
                 // ah: header
                 int size = sizeof(int) * 3;
 
+                size += 16;
+
                 // guid, pos, rotation
                 int size_of_object_data = 16 + sizeof(float) * 3 + sizeof(float) * 4;
 
+                // the fucking size of the arrays
+                size += sizeof(int) * 3;
                 size += size_of_object_data * (m_sgos != null ? m_sgos.Count : 0);
                 size += size_of_object_data * (m_spawners != null ? m_spawners.Count : 0);
 
@@ -281,7 +285,7 @@ public sealed class PersistentDataManager
 
             // ah: header
             {
-                offset = SerializeScalar<int>(ref buffer, PLAY, offset);
+                offset = SerializeScalar<int>(ref buffer, LVLS, offset);
                 int size = m_chunkSize;
                 offset = SerializeScalar<int>(ref buffer, size, offset);
                 offset = SerializeScalar<int>(ref buffer, version, offset);
@@ -290,6 +294,7 @@ public sealed class PersistentDataManager
             // ah: id
             {
                 byte[] id = m_id.ToByteArray();
+                Debug.Log(id.Length);
                 offset = SerializeArray<byte>(ref buffer, id, offset, 1);
             }
 
@@ -395,32 +400,24 @@ public sealed class PersistentDataManager
                 {
                     for(int i = 0; i < m_levels.Count; i++)
                     {
-                        ChunkLVL lvl = m_levels[i];
-                        size += lvl.m_chunkSize;
+                        size += m_levels[i].m_chunkSize;
                     }
                 }
                 return size;
             }
         }
 
-        private const int version = 0;
-
         public int Serialize(byte[] buffer, int offset)
         {
 
-            // ah: header
-            {
-                offset = SerializeScalar<int>(ref buffer, PLAY, offset);
-                int size = m_chunkSize;
-                offset = SerializeScalar<int>(ref buffer, size, offset);
-                offset = SerializeScalar<int>(ref buffer, version, offset);
-            }
-
             if(m_levels != null)
             {
+                int prev = offset;
                 for(int i = 0; i < m_levels.Count; i++)
                 {
                     offset = m_levels[i].Serialize(buffer, offset);
+                    Debug.Log($"Serialized lvl {i}: expected:{m_levels[i].m_chunkSize}, got: {offset - prev}");
+                    prev = offset;
                 }
             }
 
