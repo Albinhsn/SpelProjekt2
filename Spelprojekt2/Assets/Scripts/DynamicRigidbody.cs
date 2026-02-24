@@ -30,14 +30,19 @@ public class DynamicRigidbody : MonoBehaviour
         m_rb.WakeUp();
     }
 
+    public void Destroy()
+    {
+        Material material = GetComponent<MeshRenderer>().material;
+        ParticleManager.PlayParticleEffect(transform.position, transform.rotation, Vector3.one, material);
+        Destroy(this.gameObject);
+    }
+
     public void DestroyOnCollision()
     {
         if(this.m_collidingWithSet == null) return;
         if(this.m_collidingWithSet.Count > 0)
         {
-            Material material = GetComponent<MeshRenderer>().material;
-            ParticleManager.PlayParticleEffect(transform.position, transform.rotation, Vector3.one, material);
-            Destroy(this.gameObject);
+            Destroy();
         }
         else
         {
