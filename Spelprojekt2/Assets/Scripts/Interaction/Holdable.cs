@@ -34,6 +34,18 @@ namespace Interaction
             m_rb = GetComponent<Rigidbody>();
         }
 
+        protected override void VirtOnDisable()
+        {
+            if (m_isHeld)
+            {
+                m_isHeld = false;
+                m_activeInteractor.FinishInteraction();
+                m_rb.useGravity = true;
+                m_activeInteractor = null;
+            }
+            base.VirtOnDisable();
+        }
+
         public override void Interact(Interactor interactor)
         {
             m_rb.useGravity = false;
