@@ -90,6 +90,11 @@ public sealed class InputManager
         }
     }
 
+    public static bool FlipGravity()
+    {
+        return Instance.m_inputActions.Player.FlipGravity.WasPressedThisFrame();
+    }
+
     public static bool Filter(FilterKind kind)
     {
         bool result = false;
