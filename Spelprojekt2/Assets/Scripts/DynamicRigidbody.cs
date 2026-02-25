@@ -10,14 +10,17 @@ public class DynamicRigidbody : MonoBehaviour
     // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
     [HideInInspector] public HashSet<GameObject> m_collidingWithSet;
 
+    void Awake()
+    {
+        this.m_rb = GetComponent<Rigidbody>();
+        this.m_col = GetComponent<Collider>();
+        this.m_collidingWithSet = new();
+    }
+
     void Start()
     {
-        m_rb = GetComponent<Rigidbody>();
         FilterManager manager = FindFirstObjectByType<FilterManager>();
         manager.m_filterChanged.AddListener(OnFilterChange);
-        this.m_col = GetComponent<Collider>();
-
-        this.m_collidingWithSet = new();
     }
 
 
@@ -141,7 +144,10 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        this.m_collidingWithSet.Remove(other.gameObject);
+        if(this.m_collidingWithSet != null)
+        {
+            this.m_collidingWithSet.Remove(other.gameObject);
+        }
     }
 
     void LateUpdate()
