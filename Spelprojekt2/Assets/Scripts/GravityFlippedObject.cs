@@ -12,7 +12,10 @@ public enum GravityDirection
 [RequireComponent(typeof(Rigidbody))]
 public class GravityFlippedObject : MonoBehaviour
 {
-    public Guid m_ID;
+    Guid guid = System.Guid.Empty;
+
+    public byte[] m_ID;
+
 
     [SerializeField]
     private GravityDirection m_startingState;
@@ -35,9 +38,10 @@ public class GravityFlippedObject : MonoBehaviour
 #if UNITY_EDITOR
     public void OnValidate()
     {
-        if(m_ID == null)
+        if(m_ID == null || m_ID.Length != 16)
         {
-            m_ID = System.Guid.NewGuid();
+            guid = System.Guid.NewGuid();
+            m_ID = guid.ToByteArray();
         }
     }
 #endif

@@ -339,8 +339,7 @@ public class UIManager : MonoBehaviour
     {
         Player player = Instantiate(m_playerPrefab);
 
-        PersistentDataManager.DeserializeAll();
-        // Deserialize player
+        PersistentDataManager.DeserializeLoadedScenes();
         DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player);
         if(ok.found)
         {

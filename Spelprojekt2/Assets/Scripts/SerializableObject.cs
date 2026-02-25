@@ -1,16 +1,24 @@
 using UnityEngine;
+using UnityEditor;
 using System;
 
 public class SerializableObject : MonoBehaviour
 {
-    public Guid m_ID;
+
+    [SerializeField]
+    public byte[] m_ID;
 
 #if UNITY_EDITOR
-    public void OnValidate()
+    void OnValidate()
     {
-        if(m_ID == null)
+        if(Application.isPlaying)
         {
-            m_ID = System.Guid.NewGuid();
+            var id = GlobalObjectId.GetGlobalObjectIdSlow(this.gameObject);
+            if(m_ID != null)
+            {
+                Debug.Log($"Validating {id} that has {new Guid(m_ID)}");
+            }
+            m_ID = GuidManager.Register(m_ID, this.gameObject);
         }
     }
 #endif

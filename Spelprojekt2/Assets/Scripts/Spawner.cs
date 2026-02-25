@@ -3,7 +3,10 @@ using System;
 
 public class Spawner : MonoBehaviour
 {
-    public Guid m_ID;
+    Guid guid = Guid.Empty;
+
+    [SerializeField]
+    public byte[] m_ID;
 
     [SerializeField] private GameObject m_objectToSpawn;
     [SerializeField] private Vector3 m_initialVelocity;
@@ -24,9 +27,10 @@ public class Spawner : MonoBehaviour
 #if UNITY_EDITOR
     public void OnValidate()
     {
-        if(m_ID == null)
+        if(m_ID == null || m_ID.Length != 16)
         {
-            m_ID = System.Guid.NewGuid();
+            guid = System.Guid.NewGuid();
+            m_ID = guid.ToByteArray();
         }
     }
 #endif

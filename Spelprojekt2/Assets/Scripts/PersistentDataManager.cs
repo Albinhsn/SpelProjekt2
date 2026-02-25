@@ -29,10 +29,10 @@ public sealed class PersistentDataManager
 
     private struct FlippedData
     {
-        public Guid id;
+        public byte[] id;
         public bool m_usesGravity;
 
-        public FlippedData(Guid id, int usesGravity)
+        public FlippedData(byte[] id, int usesGravity)
         {
             this.id       = id;
             this.m_usesGravity = usesGravity == 1;
@@ -41,11 +41,11 @@ public sealed class PersistentDataManager
 
     private struct ObjectData
     {
-        public Guid id;
+        public byte[] id;
         public Vector3 position;
         public Quaternion rotation;
 
-        public ObjectData(Guid id, float[] position, float[] rotation)
+        public ObjectData(byte[] id, float[] position, float[] rotation)
         {
             this.id       = id;
             this.position = new Vector3(position[0], position[1], position[2]);
@@ -251,7 +251,7 @@ public sealed class PersistentDataManager
 
     private struct ChunkLVL
     {
-        public Guid m_id;
+        public byte[] m_id;
         public List<ObjectData> m_sgos;
         public List<ObjectData> m_spawners;
         public List<FlippedData> m_flipped;
@@ -295,8 +295,7 @@ public sealed class PersistentDataManager
 
             // ah: id
             {
-                byte[] id = m_id.ToByteArray();
-                Debug.Log(id.Length);
+                byte[] id = m_id;
                 offset = SerializeArray<byte>(ref buffer, id, offset, 1);
             }
 
@@ -310,7 +309,8 @@ public sealed class PersistentDataManager
                     {
                         ObjectData obj = m_sgos[i];
 
-                        byte[] id = obj.id.ToByteArray();
+                        byte[] id = obj.id;
+                        Debug.Log($"Serializing sgo with {new Guid(id)}");
                         offset = SerializeArray<byte>(ref buffer, id, offset, 1);
 
                         float[] p = new float[3]
@@ -343,7 +343,7 @@ public sealed class PersistentDataManager
                     {
                         ObjectData obj = m_spawners[i];
 
-                        byte[] id = obj.id.ToByteArray();
+                        byte[] id = obj.id;
                         offset = SerializeArray<byte>(ref buffer, id, offset, 1);
 
                         float[] p = new float[3]
@@ -376,7 +376,7 @@ public sealed class PersistentDataManager
                     {
                         FlippedData obj = m_flipped[i];
 
-                        byte[] id = obj.id.ToByteArray();
+                        byte[] id = obj.id;
                         offset = SerializeArray<byte>(ref buffer, id, offset, 1);
                         offset = SerializeScalar<int>(ref buffer, obj.m_usesGravity ? 1 : 0, offset);
                     }
@@ -556,6 +556,9 @@ public sealed class PersistentDataManager
                     case LVLS:
                     {
                         ChunkLVL lvl = new();
+                        byte[] level_id_bytes = new byte[16];
+                        offset = DeserializeArray<byte>(ref level_id_bytes, buffer, offset, 1);
+                        lvl.m_id = level_id_bytes;
 
                         // ah: SerializedGameObject
                         {
@@ -569,7 +572,6 @@ public sealed class PersistentDataManager
                                 {
                                     byte[] id = new byte[16];
                                     offset = DeserializeArray<byte>(ref id, buffer, offset, 1);
-                                    Guid guid = new(id);
                                     
                                     float[] position = new float[3];
                                     offset = DeserializeArray<float>(ref position, buffer, offset);
@@ -578,7 +580,7 @@ public sealed class PersistentDataManager
                                     float[] rotation = new float[4];
                                     offset = DeserializeArray<float>(ref rotation, buffer, offset);
 
-                                    objs.Add(new(guid, position, rotation));
+                                    objs.Add(new(id, position, rotation));
                                 }
                                 lvl.m_sgos = objs;
                             }
@@ -596,7 +598,6 @@ public sealed class PersistentDataManager
                                 {
                                     byte[] id = new byte[16];
                                     offset = DeserializeArray<byte>(ref id, buffer, offset, 1);
-                                    Guid guid = new(id);
 
                                     float[] position = new float[3];
                                     offset = DeserializeArray<float>(ref position, buffer, offset);
@@ -604,7 +605,7 @@ public sealed class PersistentDataManager
                                     float[] rotation = new float[4];
                                     offset = DeserializeArray<float>(ref rotation, buffer, offset);
 
-                                    objs.Add(new(guid, position, rotation));
+                                    objs.Add(new(id, position, rotation));
                                 }
                                 lvl.m_spawners = objs;
                             }
@@ -623,12 +624,11 @@ public sealed class PersistentDataManager
                                 {
                                     byte[] id = new byte[16];
                                     offset = DeserializeArray<byte>(ref id, buffer, offset, 1);
-                                    Guid guid = new(id);
 
                                     int direction = 0;
                                     offset = DeserializeScalar<int>(ref direction, buffer, offset);
 
-                                    objs[i] = new(guid, direction);
+                                    objs[i] = new(id, direction);
                                 }
                                 lvl.m_flipped = objs;
                             }
@@ -821,6 +821,11 @@ public sealed class PersistentDataManager
                 result.active_filter = play.m_filter;
                 result.m_unlockedFilter = play.m_unlockedFilter;
                 result.m_unlockedFlipped = play.m_unlockedFlipped;
+
+                player.transform.position = play.m_playerP;
+                player.transform.rotation = play.m_playerR;
+
+                LevelCheckpointManager.SetNewSpawnPoint(play.m_spawnP, play.m_spawnR, play.m_sceneIndex);
             }
         }
 
@@ -850,19 +855,19 @@ public sealed class PersistentDataManager
                 for(int j = 0; lvl.m_sgos != null && j < lvl.m_sgos.Count; j++)
                 {
                     ObjectData obj = lvl.m_sgos[j];
-                    sgos[obj.id] = obj;
+                    sgos[new Guid(obj.id)] = obj;
                 }
 
                 for(int j = 0; lvl.m_spawners != null && j < lvl.m_spawners.Count; j++)
                 {
                     ObjectData obj = lvl.m_spawners[j];
-                    spawners[obj.id] = obj;
+                    spawners[new Guid(obj.id)] = obj;
                 }
 
                 for(int j = 0; lvl.m_flipped != null && j < lvl.m_flipped.Count; j++)
                 {
                     FlippedData obj = lvl.m_flipped[j];
-                    flipped[obj.id] = obj;
+                    flipped[new Guid(obj.id)] = obj;
                 }
             }
 
@@ -872,9 +877,10 @@ public sealed class PersistentDataManager
                 for(int i = 0; i < objs.Length; i++)
                 {
                     SerializableObject obj = objs[i];
-                    if(sgos.ContainsKey(obj.m_ID))
+                    var guid = new Guid(obj.m_ID);
+                    if(sgos.ContainsKey(guid))
                     {
-                        ObjectData data = sgos[obj.m_ID];
+                        ObjectData data = sgos[guid];
                         obj.transform.position = data.position;
                         obj.transform.rotation = data.rotation;
                     }
@@ -887,9 +893,10 @@ public sealed class PersistentDataManager
                 for(int i = 0; i < objs.Length; i++)
                 {
                     Spawner obj = objs[i];
-                    if(spawners.ContainsKey(obj.m_ID))
+                    var guid = new Guid(obj.m_ID);
+                    if(spawners.ContainsKey(guid))
                     {
-                        ObjectData data = spawners[obj.m_ID];
+                        ObjectData data = spawners[guid];
                         obj.Spawn();
                         obj.m_object.transform.position = data.position;
                         obj.m_object.transform.rotation = data.rotation;
@@ -903,9 +910,10 @@ public sealed class PersistentDataManager
                 for(int i = 0; i < objs.Length; i++)
                 {
                     GravityFlippedObject obj = objs[i];
-                    if(flipped.ContainsKey(obj.m_ID))
+                    var guid = new Guid(obj.m_ID);
+                    if(flipped.ContainsKey(guid))
                     {
-                        FlippedData data = flipped[obj.m_ID];
+                        FlippedData data = flipped[guid];
                         obj.SetGravity(data.m_usesGravity);
                     }
                 }
@@ -928,20 +936,17 @@ public sealed class PersistentDataManager
 
     public static void SerializeLoadedScenes(bool save = true)
     {
-        // ah: init gamestate if it doesn't exist
-        if(!m_gameState.m_isValid)
-        {
-            DeserializeAll();
-        }
-
 
         // ah: Create a dictionary that maps scenes to a ChunkLVL
         Dictionary<Guid, ChunkLVL> scene_chunks = new();
         int scene_count = SceneManager.loadedSceneCount;
         for(int i = 0; i < scene_count; i++)
         {
-            Scene scene = SceneManager.GetSceneAt(i);
-            scene_chunks[GuidFromStringHash(scene.path)] = new();
+            Scene scene      = SceneManager.GetSceneAt(i);
+            var id           = GuidFromStringHash(scene.path);
+            ChunkLVL lvl     = new();
+            lvl.m_id         = id.ToByteArray();
+            scene_chunks[id] = lvl;
         }
 
         // ah: map sgos
@@ -973,7 +978,9 @@ public sealed class PersistentDataManager
                     obj.transform.rotation.z,
                     obj.transform.rotation.w,
                 };
-                scene_chunks[scene_guid].m_sgos.Add(new(obj.m_ID, p, r));
+                ObjectData data = new(obj.m_ID, p, r);
+                Debug.Log($"Created sgo with {new Guid(obj.m_ID)}");
+                scene_chunks[scene_guid].m_sgos.Add(data);
             }
         }
 
@@ -987,6 +994,10 @@ public sealed class PersistentDataManager
                 GameObject child = spawner.m_object;
 
                 Guid scene_guid = GuidFromStringHash(child.scene.path);
+                {
+                    var lvl = scene_chunks[scene_guid];
+                    lvl.m_id  = scene_guid.ToByteArray();
+                }
                 if(scene_chunks[scene_guid].m_spawners == null)
                 {
                     ChunkLVL chunk = scene_chunks[scene_guid];
