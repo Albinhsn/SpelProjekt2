@@ -20,7 +20,6 @@ public struct DeserializedPlayerResult
 
 public sealed class PersistentDataManager
 {
-
     private static PersistentDataManager _instance;
     private static PersistentDataManager m_instance {
         get
@@ -214,17 +213,13 @@ public sealed class PersistentDataManager
             }
         }
 
-
         public int Serialize(byte[] buffer, int offset)
         {
-
             // ah: header
-            {
-                offset = SerializeScalar<int>(ref buffer, STRY, offset);
-                int size = m_chunkSize;
-                offset = SerializeScalar<int>(ref buffer, size, offset);
-                offset = SerializeScalar<int>(ref buffer, version, offset);
-            }
+            offset = SerializeScalar<int>(ref buffer, STRY, offset);
+            int size = m_chunkSize;
+            offset = SerializeScalar<int>(ref buffer, size, offset);
+            offset = SerializeScalar<int>(ref buffer, version, offset);
 
             // ah: entries
             int entry_count = m_entries != null ? m_entries.Count : 0;
@@ -300,12 +295,10 @@ public sealed class PersistentDataManager
         {
 
             // ah: header
-            {
-                offset = SerializeScalar<int>(ref buffer, LVLS, offset);
-                int size = m_chunkSize;
-                offset = SerializeScalar<int>(ref buffer, size, offset);
-                offset = SerializeScalar<int>(ref buffer, version, offset);
-            }
+            offset = SerializeScalar<int>(ref buffer, LVLS, offset);
+            int size = m_chunkSize;
+            offset = SerializeScalar<int>(ref buffer, size, offset);
+            offset = SerializeScalar<int>(ref buffer, version, offset);
 
             // ah: id
             byte[] id = m_id;
@@ -394,11 +387,9 @@ public sealed class PersistentDataManager
     {
         int size = 0;
         // ah: calculate total size of the buffer required
-        {
-            size += game_state.m_play.m_exists ? game_state.m_play.m_chunkSize : 0;
-            size += game_state.m_story.m_exists ? game_state.m_story.m_chunkSize : 0;
-            size += game_state.m_levels.m_exists ? game_state.m_levels.m_chunkSize : 0;
-        }
+        size += game_state.m_play.m_exists ? game_state.m_play.m_chunkSize : 0;
+        size += game_state.m_story.m_exists ? game_state.m_story.m_chunkSize : 0;
+        size += game_state.m_levels.m_exists ? game_state.m_levels.m_chunkSize : 0;
 
         byte[] buffer = new byte[size];
         int offset = 0;
@@ -423,11 +414,9 @@ public sealed class PersistentDataManager
             offset = game_state.m_levels.Serialize(buffer, offset);
         }
 
-
         // ah: write the file to temporary
         var path = m_dataPath;
         File.WriteAllBytes(path + ".temp", buffer);
-
 
         // ah: move/replace the file over
         if(File.Exists(path))
@@ -599,7 +588,6 @@ public sealed class PersistentDataManager
                 // ah: Find the target scene path
                 string target_scene = SceneUtility.GetScenePathByBuildIndex(play.m_sceneIndex);
 
-
                 // ah: See if the target scene path exists within levels 
                 for(int i = 0; i < levels.m_levels.Length; i++)
                 {
@@ -681,7 +669,7 @@ public sealed class PersistentDataManager
         ChunkSTRY stry = m_gameState.m_story;
         if(stry.m_exists)
         {
-            GlobalInkVariableManager.SetVariables(m_gameState.m_story.m_entries);
+            GlobalInkVariableManager.SetVariables(stry.m_entries);
         }
 
         ChunkLVLS lvls = m_gameState.m_levels;
@@ -915,5 +903,4 @@ public sealed class PersistentDataManager
         SerializeLoadedScenes(false);
         Serialize(m_gameState);
     }
-
 }
