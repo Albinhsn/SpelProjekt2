@@ -255,6 +255,22 @@ public class UIManager : MonoBehaviour
         return result;
     }
 
+    float VolumeSlider(string title, float initial_value)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+
+        GUIStyle label_style = new GUIStyle(GUI.skin.label);
+        label_style.font     = font;
+        label_style.fontSize = (int)GetScreenScaledSize(15);
+        GUILayout.Label(title, label_style);
+
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        return Slider(initial_value);
+    }
+
     void
     AreaBegin(float w, float h)
     {
@@ -417,7 +433,7 @@ public class UIManager : MonoBehaviour
             }
             case UIState.Settings:
             {
-                AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 1.25f);
+                AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 2.5f);
 
                 // Volume slider
                 {
@@ -428,14 +444,44 @@ public class UIManager : MonoBehaviour
 
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
-
-                    if(m_audioSystem != null)
+                    
+                    // ah: master
                     {
                         float audio_volume = m_audioSystem.GetMasterVolume();
-                        float new_volume   = Slider(audio_volume);
+                        float new_volume   = VolumeSlider("Master", audio_volume);
                         if(new_volume != audio_volume)
                         {
                             m_audioSystem.SetMasterVolume(new_volume);
+                        }
+                    }
+
+                    // ah: music
+                    {
+                        float audio_volume = m_audioSystem.GetMusicVolume();
+                        float new_volume   = VolumeSlider("Music", audio_volume);
+                        if(new_volume != audio_volume)
+                        {
+                            m_audioSystem.SetMusicVolume(new_volume);
+                        }
+                    }
+
+                    // ah: sfx
+                    {
+                        float audio_volume = m_audioSystem.GetSfxVolume();
+                        float new_volume   = VolumeSlider("Sfx", audio_volume);
+                        if(new_volume != audio_volume)
+                        {
+                            m_audioSystem.SetSfxVolume(new_volume);
+                        }
+                    }
+
+                    // ah: UI
+                    {
+                        float audio_volume = m_audioSystem.GetUiVolume();
+                        float new_volume   = VolumeSlider("UI", audio_volume);
+                        if(new_volume != audio_volume)
+                        {
+                            m_audioSystem.SetUiVolume(new_volume);
                         }
                     }
                 }
