@@ -687,7 +687,7 @@ public sealed class PersistentDataManager
                                     int has_been_activated = 0;
                                     offset = DeserializeScalar<int>(ref has_been_activated, buffer, offset);
 
-                                    objs[i] = new(id, has_been_activated);
+                                    objs.Add(new(id, has_been_activated));
                                 }
                                 lvl.m_triggers = objs;
                             }

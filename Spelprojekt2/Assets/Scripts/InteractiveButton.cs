@@ -20,7 +20,7 @@ public class InteractiveButton : MonoBehaviour
     private List<GameObject> m_collidingObjects;
 
 
-    void Awake()
+    void Start()
     {
         m_collidingObjects = new();
         FilterManager fm = FindFirstObjectByType<FilterManager>();

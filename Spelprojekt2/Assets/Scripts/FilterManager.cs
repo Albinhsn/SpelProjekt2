@@ -123,25 +123,19 @@ public class FilterManager : MonoBehaviour
         // ah: Change active index
         if(activating)
         {
-            if(m_activeFilter != FilterKind.None)
+            for(int j = 0; j < objects.Length; j++)
             {
-                for(int j = 0; j < objects.Length; j++)
+                if(objects[j].m_kind == m_activeFilter)
                 {
-                    if(objects[j].m_kind == m_activeFilter)
-                    {
-                        objects[j].Deactivate();
-                    }
+                    objects[j].Deactivate();
                 }
             }
-            m_activeFilter = new_filter;
-        }
-        else
-        {
-            m_activeFilter = FilterKind.None;
         }
 
         // ah: broadcast event
         this.m_filterChanged?.Invoke(new_filter, activating);
+
+        m_activeFilter = activating ? new_filter : FilterKind.None;
 
     }
 
