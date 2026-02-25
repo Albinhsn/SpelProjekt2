@@ -195,6 +195,7 @@ public sealed class PersistentDataManager
             // ah: spawn
             offset = SerializeVector3(ref buffer, m_spawnP, offset);
             offset = SerializeQuaternion(ref buffer, m_spawnR, offset);
+            offset = SerializeScalar<int>(ref buffer, m_sceneIndex, offset);
 
             return offset;
         }
