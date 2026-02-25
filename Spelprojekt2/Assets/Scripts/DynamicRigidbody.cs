@@ -6,10 +6,11 @@ public class DynamicRigidbody : MonoBehaviour
 {
     private Collider m_col;
     private Rigidbody m_rb;
+    private bool m_shouldDestroy;
     // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
     [HideInInspector] public HashSet<GameObject> m_collidingWithSet;
 
-    void Awake()
+    void Start()
     {
         m_rb = GetComponent<Rigidbody>();
         FilterManager manager = FindFirstObjectByType<FilterManager>();
@@ -22,12 +23,45 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnFilterChange(FilterKind kind, bool active)
     {
-        if(kind != FilterManager.m_activeFilter || !active)
+        if(this.m_collidingWithSet != null && this.m_collidingWithSet.Count > 0)
         {
-            DestroyOnCollision();
+            if(!active)
+            {
+                m_shouldDestroy = true;
+                Debug.Log("Setting to should destroy");
+            }
+            else
+            {
+                // Shouldn't destroy if you're the newly active filter (assuming it's not none)
+                FilterObject filter = GetComponent<FilterObject>();
+                bool is_newly_filtered = filter != null && kind == filter.m_kind;
+
+                if(!is_newly_filtered)
+                {
+                    m_shouldDestroy = !(this.m_collidingWithSet == null || this.m_collidingWithSet.Count == 0);
+                }
+
+                if(m_shouldDestroy)
+                {
+
+                    foreach(GameObject obj in m_collidingWithSet)
+                    {
+                        FilterObject filter_obj = obj.GetComponent<FilterObject>();
+                        if(filter_obj != null)
+                        {
+                            m_shouldDestroy = filter_obj.m_kind != kind;
+                        }
+
+                        if(m_shouldDestroy)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            m_rb.WakeUp();
         }
 
-        m_rb.WakeUp();
     }
 
     public void Destroy()
@@ -108,5 +142,13 @@ public class DynamicRigidbody : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         this.m_collidingWithSet.Remove(other.gameObject);
+    }
+
+    void LateUpdate()
+    {
+        if(m_shouldDestroy)
+        {
+            Destroy();
+        }
     }
 }
