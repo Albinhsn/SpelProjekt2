@@ -20,6 +20,7 @@ public class MovingPlatformController : MonoBehaviour
 	private Vector3 m_movementDirection;
 	
 	public bool moving => m_currentPosition != m_currentTarget;
+    private FilterObject m_filter;
 	
 	private void OnValidate()
 	{
@@ -87,12 +88,19 @@ public class MovingPlatformController : MonoBehaviour
 		m_platform.transform.position = m_targets[m_startIndex].transform.position;
 		m_currentPosition = m_startIndex;
 		m_currentTarget = m_startIndex;
+
+        m_filter = GetComponentInChildren<FilterObject>();
 	}
+
+    private bool IsFiltered()
+    {
+        return m_filter != null && m_filter.m_kind == FilterManager.m_activeFilter;
+    }
 
 	private void Update()
 	{
 		//Yes, it is unoptimized
-		if (moving)
+		if (moving && !IsFiltered())
 		{
 			if ((m_targets[m_currentTarget].position - m_platform.transform.position).magnitude < m_speed * Time.deltaTime)//Destination reached within next update;
 			{
