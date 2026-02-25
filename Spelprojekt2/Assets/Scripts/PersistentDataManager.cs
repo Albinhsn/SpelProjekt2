@@ -5,6 +5,7 @@ using System;
 using System.Text;
 using System.Security.Cryptography;
 using System.Collections.Generic;
+using Interaction;
 using Interaction.Dialogue;
 using static Serialization;
 
@@ -25,6 +26,18 @@ public sealed class PersistentDataManager
         public ChunkPLAY m_play;
         public ChunkSTRY m_story;
         public ChunkLVLS m_levels;
+    }
+
+    private struct ForceInteractorTriggerData
+    {
+        public byte[] id;
+        public bool m_hasBeenActivated;
+
+        public ForceInteractorTriggerData(byte[] id, int activated)
+        {
+            this.id       = id;
+            this.m_hasBeenActivated = activated == 1;
+        }
     }
 
     private struct FlippedData
@@ -255,6 +268,7 @@ public sealed class PersistentDataManager
         public List<ObjectData> m_sgos;
         public List<ObjectData> m_spawners;
         public List<FlippedData> m_flipped;
+        public List<ForceInteractorTriggerData> m_triggers;
 
         private const int version = 0;
 
@@ -271,12 +285,15 @@ public sealed class PersistentDataManager
                 int size_of_object_data = 16 + sizeof(float) * 3 + sizeof(float) * 4;
 
                 // the fucking size of the arrays
-                size += sizeof(int) * 3;
+                size += sizeof(int) * 4;
                 size += size_of_object_data * (m_sgos != null ? m_sgos.Count : 0);
                 size += size_of_object_data * (m_spawners != null ? m_spawners.Count : 0);
 
                 int size_of_flipped_data = 16 + sizeof(int);
                 size += size_of_flipped_data * (m_flipped != null ? m_flipped.Count : 0);
+
+                int size_of_trigger_data = 16 + sizeof(int);
+                size += size_of_trigger_data * (m_triggers != null ? m_triggers.Count : 0);
 
                 return size;
             }
@@ -310,7 +327,6 @@ public sealed class PersistentDataManager
                         ObjectData obj = m_sgos[i];
 
                         byte[] id = obj.id;
-                        Debug.Log($"Serializing sgo with {new Guid(id)}");
                         offset = SerializeArray<byte>(ref buffer, id, offset, 1);
 
                         float[] p = new float[3]
@@ -384,6 +400,24 @@ public sealed class PersistentDataManager
 
             }
 
+            // ah: triggered
+            {
+                int count = m_triggers == null ? 0 : m_triggers.Count;
+                offset = SerializeScalar<int>(ref buffer, count, offset);
+                if(count > 0)
+                {
+                    for(int i = 0; i < count; i++)
+                    {
+                        ForceInteractorTriggerData obj = m_triggers[i];
+
+                        byte[] id = obj.id;
+                        offset = SerializeArray<byte>(ref buffer, id, offset, 1);
+                        offset = SerializeScalar<int>(ref buffer, obj.m_hasBeenActivated ? 1 : 0, offset);
+                    }
+                }
+
+            }
+
             return offset;
         }
     }
@@ -418,7 +452,6 @@ public sealed class PersistentDataManager
                 for(int i = 0; i < m_levels.Count; i++)
                 {
                     offset = m_levels[i].Serialize(buffer, offset);
-                    Debug.Log($"Serialized lvl {i}: expected:{m_levels[i].m_chunkSize}, got: {offset - prev}");
                     prev = offset;
                 }
             }
@@ -478,7 +511,6 @@ public sealed class PersistentDataManager
             }
         }
 
-        Debug.Log($"Serializing with {size}");
         byte[] buffer = new byte[size];
         int offset = 0;
 
@@ -488,7 +520,6 @@ public sealed class PersistentDataManager
             if(game_state.m_play.m_exists)
             {
                 offset = game_state.m_play.Serialize(buffer, offset);
-                Debug.Log($"Serializing play {offset} expected {game_state.m_play.m_chunkSize}");
             }
 
             // ah: stry
@@ -496,7 +527,6 @@ public sealed class PersistentDataManager
             {
                 int prev = offset;
                 offset = game_state.m_story.Serialize(buffer, offset);
-                Debug.Log($"Serializing stry {offset - prev} expected {game_state.m_story.m_chunkSize}");
             }
 
             // ah: lvls
@@ -505,8 +535,6 @@ public sealed class PersistentDataManager
                 offset = game_state.m_levels.Serialize(buffer, offset);
             }
         }
-
-        Debug.Log($"Serialized game state, expected: {size}, got: {offset}");
 
 
         // ah: write the file to temporary
@@ -632,6 +660,29 @@ public sealed class PersistentDataManager
                                 }
                                 lvl.m_flipped = objs;
                             }
+                        }
+
+                        // ah: Triggers
+                        {
+                            int count   = 0;
+                            offset      = DeserializeScalar<int>(ref count, buffer, offset);
+
+                            if(count > 0)
+                            {
+                                List<ForceInteractorTriggerData> objs = new(count);
+                                for(int i = 0; i < count; i++)
+                                {
+                                    byte[] id = new byte[16];
+                                    offset = DeserializeArray<byte>(ref id, buffer, offset, 1);
+
+                                    int has_been_activated = 0;
+                                    offset = DeserializeScalar<int>(ref has_been_activated, buffer, offset);
+
+                                    objs[i] = new(id, has_been_activated);
+                                }
+                                lvl.m_triggers = objs;
+                            }
+
                         }
 
                         // ah: Add the lvl
@@ -840,6 +891,12 @@ public sealed class PersistentDataManager
             DeserializeAll();
         }
 
+        ChunkSTRY stry = m_gameState.m_story;
+        if(stry.m_exists)
+        {
+            GlobalInkVariableManager.SetVariables(m_gameState.m_story.m_entries);
+        }
+
         ChunkLVLS lvls = m_gameState.m_levels;
         if(lvls.m_exists)
         {
@@ -847,6 +904,7 @@ public sealed class PersistentDataManager
             Dictionary<Guid, ObjectData> sgos     = new();
             Dictionary<Guid, ObjectData> spawners = new();
             Dictionary<Guid, FlippedData> flipped = new();
+            Dictionary<Guid, ForceInteractorTriggerData> triggers = new();
 
             // ah: map lvl chunks based on id
             for(int i = 0; i < lvls.m_levels.Count; i++)
@@ -869,6 +927,12 @@ public sealed class PersistentDataManager
                     FlippedData obj = lvl.m_flipped[j];
                     flipped[new Guid(obj.id)] = obj;
                 }
+
+                for(int j = 0; lvl.m_triggers != null && j < lvl.m_triggers.Count; j++)
+                {
+                    ForceInteractorTriggerData obj = lvl.m_triggers[j];
+                    triggers[new Guid(obj.id)] = obj;
+                }
             }
 
             // ah: Query for objects and check if serialized data exists
@@ -877,51 +941,66 @@ public sealed class PersistentDataManager
                 for(int i = 0; i < objs.Length; i++)
                 {
                     SerializableObject obj = objs[i];
-                    var guid = new Guid(obj.m_ID);
-                    if(sgos.ContainsKey(guid))
+                    var guid = new Guid(obj.m_id);
+
+                    // ah: check if to serialize position and rotation
                     {
-                        ObjectData data = sgos[guid];
-                        obj.transform.position = data.position;
-                        obj.transform.rotation = data.rotation;
+                        if(obj.m_serializePositionAndRotation)
+                        {
+                            if(sgos.ContainsKey(guid))
+                            {
+                                ObjectData data = sgos[guid];
+                                obj.transform.position = data.position;
+                                obj.transform.rotation = data.rotation;
+                            }
+                        }
                     }
+
+                    // ah: check if spawner
+                    {
+                        Spawner spawner = obj.GetComponent<Spawner>();
+                        if(spawner != null)
+                        {
+                            if(spawners.ContainsKey(guid))
+                            {
+                                ObjectData data = spawners[guid];
+                                spawner.Spawn();
+                                spawner.m_object.transform.position = data.position;
+                                spawner.m_object.transform.rotation = data.rotation;
+                            }
+                        }
+
+                    }
+
+                    // ah: check if gravityflipped
+                    {
+                        GravityFlippedObject flip = obj.GetComponent<GravityFlippedObject>();
+                        if(flip != null)
+                        {
+                            if(flipped.ContainsKey(guid))
+                            {
+                                FlippedData data = flipped[guid];
+                                flip.SetGravity(data.m_usesGravity);
+                            }
+                        }
+                    }
+
+                    // ah: check if trigger
+                    {
+                        ForceInteractorTrigger trigger = obj.GetComponent<ForceInteractorTrigger>();
+                        if(trigger != null)
+                        {
+                            if(triggers.ContainsKey(guid))
+                            {
+                                ForceInteractorTriggerData data = triggers[guid];
+                                trigger.SetActive(!data.m_hasBeenActivated);
+                            }
+                        }
+                    }
+
                 }
             }
-
-            // ah: spawners
-            {
-                Spawner[] objs = UnityEngine.Object.FindObjectsByType<Spawner>(FindObjectsSortMode.None);
-                for(int i = 0; i < objs.Length; i++)
-                {
-                    Spawner obj = objs[i];
-                    var guid = new Guid(obj.m_ID);
-                    if(spawners.ContainsKey(guid))
-                    {
-                        ObjectData data = spawners[guid];
-                        obj.Spawn();
-                        obj.m_object.transform.position = data.position;
-                        obj.m_object.transform.rotation = data.rotation;
-                    }
-                }
-            }
-
-            // ah: flipped
-            {
-                GravityFlippedObject[] objs = UnityEngine.Object.FindObjectsByType<GravityFlippedObject>(FindObjectsSortMode.None);
-                for(int i = 0; i < objs.Length; i++)
-                {
-                    GravityFlippedObject obj = objs[i];
-                    var guid = new Guid(obj.m_ID);
-                    if(flipped.ContainsKey(guid))
-                    {
-                        FlippedData data = flipped[guid];
-                        obj.SetGravity(data.m_usesGravity);
-                    }
-                }
-
-            }
-
         }
-
     }
     public static Guid GuidFromStringHash(string str)
     {
@@ -949,97 +1028,95 @@ public sealed class PersistentDataManager
             scene_chunks[id] = lvl;
         }
 
-        // ah: map sgos
+        // ah: map objects 
         {
             SerializableObject[] sgos = UnityEngine.Object.FindObjectsByType<SerializableObject>(FindObjectsSortMode.None);
             for(int i = 0; i < sgos.Length; i++)
             {
                 SerializableObject obj = sgos[i];
-
                 Guid scene_guid = GuidFromStringHash(obj.gameObject.scene.path);
                 if(scene_chunks[scene_guid].m_sgos == null)
                 {
                     ChunkLVL chunk = scene_chunks[scene_guid];
-                    chunk.m_sgos   = new();
+                    chunk.m_sgos     = new();
+                    chunk.m_triggers = new();
+                    chunk.m_spawners = new();
+                    chunk.m_flipped  = new();
                     scene_chunks[scene_guid] = chunk;
                 }
 
-                float[] p = new float[3]
+                // ah: sgos
                 {
-                    obj.transform.position.x,
-                    obj.transform.position.y,
-                    obj.transform.position.z,
-                };
+                    if(obj.m_serializePositionAndRotation)
+                    {
+                        float[] p = new float[3]
+                        {
+                            obj.transform.position.x,
+                            obj.transform.position.y,
+                            obj.transform.position.z,
+                        };
 
-                float[] r = new float[4]
-                {
-                    obj.transform.rotation.x,
-                    obj.transform.rotation.y,
-                    obj.transform.rotation.z,
-                    obj.transform.rotation.w,
-                };
-                ObjectData data = new(obj.m_ID, p, r);
-                Debug.Log($"Created sgo with {new Guid(obj.m_ID)}");
-                scene_chunks[scene_guid].m_sgos.Add(data);
-            }
-        }
-
-        // ah: map spawners
-        {
-            Spawner[] spawners = UnityEngine.Object.FindObjectsByType<Spawner>(FindObjectsSortMode.None);
-            for(int i = 0; i < spawners.Length; i++)
-            {
-                Spawner spawner = spawners[i];
-
-                GameObject child = spawner.m_object;
-
-                Guid scene_guid = GuidFromStringHash(child.scene.path);
-                {
-                    var lvl = scene_chunks[scene_guid];
-                    lvl.m_id  = scene_guid.ToByteArray();
-                }
-                if(scene_chunks[scene_guid].m_spawners == null)
-                {
-                    ChunkLVL chunk = scene_chunks[scene_guid];
-                    chunk.m_spawners   = new();
-                    scene_chunks[scene_guid] = chunk;
+                        float[] r = new float[4]
+                        {
+                            obj.transform.rotation.x,
+                            obj.transform.rotation.y,
+                            obj.transform.rotation.z,
+                            obj.transform.rotation.w,
+                        };
+                        ObjectData data = new(obj.m_id, p, r);
+                        scene_chunks[scene_guid].m_sgos.Add(data);
+                    }
                 }
 
-                float[] p = new float[3]
+                // ah:spawners
                 {
-                    child.transform.position.x,
-                    child.transform.position.y,
-                    child.transform.position.z,
-                };
+                    Spawner spawner = obj.GetComponent<Spawner>();
+                    if(spawner != null)
+                    {
+                        GameObject child = spawner.m_object;
+                        if(scene_chunks[scene_guid].m_spawners == null)
+                        {
+                            ChunkLVL chunk = scene_chunks[scene_guid];
+                            chunk.m_spawners   = new();
+                            scene_chunks[scene_guid] = chunk;
+                        }
+                        float[] p = new float[3]
+                        {
+                            child.transform.position.x,
+                            child.transform.position.y,
+                            child.transform.position.z,
+                        };
 
-                float[] r = new float[4]
-                {
-                    child.transform.rotation.x,
-                    child.transform.rotation.y,
-                    child.transform.rotation.z,
-                    child.transform.rotation.w,
-                };
-                scene_chunks[scene_guid].m_spawners.Add(new(spawner.m_ID, p, r));
-            }
-        }
-
-        // ah: map gravity flipped
-        {
-            GravityFlippedObject[] flipped = UnityEngine.Object.FindObjectsByType<GravityFlippedObject>(FindObjectsSortMode.None);
-            for(int i = 0; i < flipped.Length; i++)
-            {
-                GravityFlippedObject obj = flipped[i];
-                Guid scene_guid = GuidFromStringHash(obj.gameObject.scene.path);
-                if(scene_chunks[scene_guid].m_flipped == null)
-                {
-                    ChunkLVL chunk  = scene_chunks[scene_guid];
-                    chunk.m_flipped = new();
-                    scene_chunks[scene_guid] = chunk;
+                        float[] r = new float[4]
+                        {
+                            child.transform.rotation.x,
+                            child.transform.rotation.y,
+                            child.transform.rotation.z,
+                            child.transform.rotation.w,
+                        };
+                        scene_chunks[scene_guid].m_spawners.Add(new(obj.m_id, p, r));
+                    }
                 }
 
-                scene_chunks[scene_guid].m_flipped.Add(new(obj.m_ID, obj.m_useGravity ? 1 : 0));
-            }
+                // ah: gravity flipped
+                {
+                    GravityFlippedObject flip = obj.GetComponent<GravityFlippedObject>();
+                    if(flip != null)
+                    {
+                        scene_chunks[scene_guid].m_flipped.Add(new(obj.m_id, flip.m_useGravity ? 1 : 0));
+                    }
+                }
 
+                // ah: Force InteractorTrigger
+                {
+                    ForceInteractorTrigger trigger = obj.GetComponent<ForceInteractorTrigger>();
+                    if(trigger != null)
+                    {
+                        scene_chunks[scene_guid].m_triggers.Add(new(obj.m_id, trigger.m_hasBeenActivated ? 1 : 0));
+                    }
+
+                }
+            }
         }
 
         // ah: write new level state
@@ -1101,7 +1178,12 @@ public sealed class PersistentDataManager
         // ah: serialize STRY to GameState
         {
             m_gameState.m_story.m_exists  = true;
-            m_gameState.m_story.m_entries = GlobalInkVariableManager.m_inkVariables;
+            m_gameState.m_story.m_entries = new();
+            foreach(KeyValuePair<string, object> kv in GlobalInkVariableManager.m_inkVariables)
+            {
+                m_gameState.m_story.m_entries[kv.Key] = kv.Value;
+            }
+            Debug.Log($"Serializing {m_gameState.m_story.m_entries.Count} ink entries");
         }
 
         SerializeLoadedScenes(false);

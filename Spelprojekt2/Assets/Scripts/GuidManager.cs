@@ -6,40 +6,39 @@ public class GuidManager
 {
     private static GuidManager I;
     private Dictionary<Guid, GameObject> m_objs;
-    private Dictionary<GameObject, Guid> m_ids;
 
     public GuidManager()
     {
-        m_ids  = new();
         m_objs = new();
     }
 
-    public static byte[] Register(byte[] id, GameObject obj)
+    public static bool Register(SerializableObject obj)
     {
         if(I == null)
         {
             I = new();
         }
 
-        byte[] result = null;
+        Guid id = obj.Guid;
 
-        if(I.m_ids.ContainsKey(obj))
+        bool found  = !I.m_objs.ContainsKey(id);
+        bool result = found;
+        if(found)
         {
-            result = I.m_ids[obj].ToByteArray();
-            Debug.Log($"Already found {obj.name} with {I.m_ids[obj]}");
+            I.m_objs[id] = obj.gameObject;
         }
-        else
+
+        if(!found)
         {
-            for(;result == null;)
+            GameObject go = I.m_objs[id];
+            if(go != null && obj.gameObject != go)
             {
-                Guid guid = System.Guid.NewGuid();
-                if(!I.m_objs.ContainsKey(guid))
-                {
-                    I.m_objs[guid] = obj;
-                    I.m_ids[obj] = guid;
-                    result = guid.ToByteArray();
-                    Debug.Log($"Registered {obj.name} with {I.m_ids[obj]}");
-                }
+                result = false;
+            }
+            else
+            {
+                result = true;
+                I.m_objs[id] = obj.gameObject;
             }
         }
 

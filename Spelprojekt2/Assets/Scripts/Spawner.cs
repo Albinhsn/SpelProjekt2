@@ -1,12 +1,9 @@
 using UnityEngine;
 using System;
 
+[RequireComponent(typeof(SerializableObject))]
 public class Spawner : MonoBehaviour
 {
-    Guid guid = Guid.Empty;
-
-    [SerializeField]
-    public byte[] m_ID;
 
     [SerializeField] private GameObject m_objectToSpawn;
     [SerializeField] private Vector3 m_initialVelocity;
@@ -23,17 +20,6 @@ public class Spawner : MonoBehaviour
             Spawn();
         }
     }
-
-#if UNITY_EDITOR
-    public void OnValidate()
-    {
-        if(m_ID == null || m_ID.Length != 16)
-        {
-            guid = System.Guid.NewGuid();
-            m_ID = guid.ToByteArray();
-        }
-    }
-#endif
 
     void OnDestroy()
     {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Ink.Runtime;
 using JetBrains.Annotations;
 using Object = UnityEngine.Object;
+using UnityEngine;
 
 namespace Interaction.Dialogue
 {
@@ -26,6 +27,7 @@ namespace Interaction.Dialogue
         {
             foreach (string obj in story.variablesState)
             {
+                Debug.Log($"Syncing {obj}");
                 if (m_inkVariables.ContainsKey(obj)) m_inkVariables[obj] = story.variablesState[obj];
                 else m_inkVariables.Add(obj, story.variablesState[obj]);
             }
@@ -61,7 +63,10 @@ namespace Interaction.Dialogue
         public static void SetVariables(Dictionary<string, object> variables)
         {
             ClearAll();
-            m_instance.m_inkVariables_ = variables;
+            foreach(KeyValuePair<string, object> kv in variables)
+            {
+                m_instance.m_inkVariables_[kv.Key] = kv.Value;
+            }
         }
     }
 }
