@@ -3,6 +3,18 @@ using UnityEngine;
 public class GravityFlippedManager : MonoBehaviour
 {
 
+    public static bool m_unlocked = true;
+
+    void Awake()
+    {
+#if UNITY_EDITOR
+            GravityFlippedManager.m_unlocked = true;
+#else
+            GravityFlippedManager.m_unlocked = false;
+#endif
+
+    }
+
     void Update()
     {
         if(InputManager.FlipGravity())

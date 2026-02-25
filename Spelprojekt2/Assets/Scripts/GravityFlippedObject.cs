@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 
 public enum GravityDirection
@@ -8,14 +9,18 @@ public enum GravityDirection
 }
 
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(SerializableObject))]
 public class GravityFlippedObject : MonoBehaviour
 {
+    Guid guid = System.Guid.Empty;
+
     [SerializeField]
     private GravityDirection m_startingState;
 
     Vector3 m_flippedGravity = new Vector3(0, 9.8f, 0);
     Rigidbody m_rb;
+
+    public bool m_useGravity => m_rb.useGravity;
 
     void Awake()
     {
@@ -26,6 +31,11 @@ public class GravityFlippedObject : MonoBehaviour
     {
         Awake();
         ResetGravity();
+    }
+
+    public void SetGravity(bool use_gravity)
+    {
+        m_rb.useGravity = use_gravity;
     }
 
     public void ResetGravity()

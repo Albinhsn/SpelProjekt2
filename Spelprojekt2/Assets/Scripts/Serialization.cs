@@ -33,6 +33,7 @@ public static class Serialization
     return buffer;
   }
 
+
   public static int memcpy(ref byte[] dest, byte[] src, int offset)
   {
     for (int i = 0; i < src.Length; i++)
@@ -40,6 +41,19 @@ public static class Serialization
       dest[i + offset] = src[i];
     }
     return offset + src.Length;
+  }
+
+  public static byte[] SerializeArray<T>(T[] src, int tSize)
+  {
+    byte[] dest = new byte[src.Length * tSize];
+    Buffer.BlockCopy(src, 0, dest, 0, dest.Length);
+    return dest;
+  }
+
+  public static int SerializeArray<T>(ref byte[] dest, T[] src, int offset, int tSize = 4)
+  {
+      byte[] src_bytes = SerializeArray<T>(src, tSize);
+      return memcpy(ref dest, src_bytes, offset);
   }
 
   public static int SerializeScalar<T>(ref byte[] dest, T src, int offset, int tSize = 4)
