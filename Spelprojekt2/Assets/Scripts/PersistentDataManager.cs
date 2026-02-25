@@ -243,7 +243,16 @@ public sealed class PersistentDataManager
 
                     // ah: value
                     {
-                        string value = (string)kv.Value;
+                        string value;
+                        if(kv.Value is bool)
+                        {
+                            value = (bool)kv.Value ? "true" : "false";
+                        }
+                        else
+                        {
+                            Debug.LogError("Unable to serialize ink variable of this type");
+                            value = "";
+                        }
 
                         if(value.Length > MAX_INK_VARIABLE_SIZE)
                         {

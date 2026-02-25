@@ -27,7 +27,6 @@ namespace Interaction.Dialogue
         {
             foreach (string obj in story.variablesState)
             {
-                Debug.Log($"Syncing {obj}");
                 if (m_inkVariables.ContainsKey(obj)) m_inkVariables[obj] = story.variablesState[obj];
                 else m_inkVariables.Add(obj, story.variablesState[obj]);
             }
