@@ -192,6 +192,11 @@ namespace AudioKit.FMOD
             PlayerPrefs.SetFloat(PrefMusic, baseMusic);
         }
 
+        public float GetMusicVolume()
+        {
+            return baseMusic;
+        }
+
         public void SetSfxVolume(float v)
         {
             baseSfx = Mathf.Clamp01(v);
@@ -199,11 +204,21 @@ namespace AudioKit.FMOD
             PlayerPrefs.SetFloat(PrefSfx, baseSfx);
         }
 
+        public float GetSfxVolume()
+        {
+            return baseSfx;
+        }
+
         public void SetUiVolume(float v)
         {
             baseUi = Mathf.Clamp01(v);
             ApplyUi();
             PlayerPrefs.SetFloat(PrefUi, baseUi);
+        }
+
+        public float GetUiVolume()
+        {
+            return baseUi;
         }
 
         // Ducking: sätt en runtime-multiplikator (0..1) som multipliceras med basvolymen.
