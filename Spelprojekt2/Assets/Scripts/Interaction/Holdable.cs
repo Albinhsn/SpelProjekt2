@@ -21,13 +21,13 @@ namespace Interaction
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;
-        private Vector3 m_localPosition => transform.position - m_activeInteractor.position;
+        private Vector3 m_closestLocalPoint => m_rb.ClosestPointOnBounds(m_activeInteractor.position) - m_activeInteractor.position;
 
-        private float m_distanceToInteractor => -m_capsuleHeight < m_localPosition.y && m_localPosition.y < 0
-            ? new Vector2(m_localPosition.x, m_localPosition.z).magnitude
-            : m_localPosition.magnitude; 
+        private float m_distanceToInteractor => -m_capsuleHeight < m_closestLocalPoint.y && m_closestLocalPoint.y < 0
+            ? new Vector2(m_closestLocalPoint.x, m_closestLocalPoint.z).magnitude
+            : MathF.Min(m_closestLocalPoint.magnitude, (m_closestLocalPoint + new Vector3(0, -m_capsuleHeight, 0)).magnitude); 
         private float m_outerDistance => m_distanceToInteractor - m_holdDistance;
-        private float m_decThreshold => MathF.Pow(m_currentVelocity, 2) / (2 * m_deceleration);
+        private float m_decThreshold => MathF.Pow(m_rb.linearVelocity.magnitude, 2) / (2 * m_deceleration);
         private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - Vector3.Dot(m_interactorDirection, m_linearTargetDirection) * m_interactorDirection).normalized;
         private float m_forwardAngleCorrespondence => Vector3.Dot(m_activeInteractor.aimDirection, (transform.position - m_activeInteractor.position).normalized);
 
@@ -100,12 +100,12 @@ namespace Interaction
 
                     + (m_outerDistance > 0//Move out from hold range
                         ? 0
-                        : (1 - m_distanceToInteractor / m_holdDistance) * m_maxVelocity)
+                        : m_holdDistance - m_distanceToInteractor)
                     * -m_interactorDirection 
                 
                     ) * m_currentVelocity; //Velocity scale
                 
-                
+                Debug.Log($"{m_distanceToInteractor}, {1 - m_distanceToInteractor / m_holdDistance}");
                 //Wall clip prevention (unnecessary, now using continuous collision detection while held
                 /*RaycastHit[] hit = Physics.RaycastAll(transform.position, m_rb.linearVelocity.normalized,
                     m_currentVelocity * Time.deltaTime, srUtils.Unity.Utils.GetPhysicsLayerMask(gameObject.layer));
