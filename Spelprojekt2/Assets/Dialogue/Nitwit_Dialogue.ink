@@ -10,7 +10,7 @@ VAR PickItUp = false
 
 = Surprise
 ~FirstIneractionN = true
-OH JEEZ! UH... HELLO? #speaker=Unknown
+OH JEEZ! UH... HELLO? #speaker=Unknown #camera=0
     * [Hello?]
         WOAH, you talk like us! That's cool. I mean. #speaker=Unknown 
         Who are you stranger? What are you doing here in the localites sacred land? #speaker=Unknown
@@ -41,6 +41,6 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
     -> DONE
 
 = Calm
-    If you haven't picked up the thingy yet, you should. #speaker=Nitwit #camera=0
+    If you haven't picked up the thingy yet, you should. #speaker=Nitwit #camera=1
     I'm kinda blind right now so I can't tell if you did. #speaker=Nitwit
     -> DONE
