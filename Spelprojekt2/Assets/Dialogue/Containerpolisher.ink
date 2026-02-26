@@ -1,5 +1,7 @@
 // Iteration upon Catwalk Polisher, Early Container Polisher
 
+# font=0
+
 VAR isFirstInteractionC = true
 
 -> main

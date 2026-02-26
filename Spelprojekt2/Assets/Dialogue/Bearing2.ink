@@ -1,3 +1,7 @@
+// User Bearing interaction 2
+
+# font=0
+
 User. # speaker=Alea
 … # speaker=USER
 Tell me, in what world do you reside? # speaker=Alea

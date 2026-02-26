@@ -1,3 +1,7 @@
+// First time at the Bearing
+
+# font=0
+
 Alea.  # speaker=USER # camera=0
 USER. # speaker=Alea
 You have done a good job getting here. Finally, we can get this over with. # speaker=USER
