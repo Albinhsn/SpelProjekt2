@@ -6,6 +6,7 @@ namespace srUtils.Unity
     {
 	    public static LayerMask GetPhysicsLayerMask(int layer)
 	    {
+		    //TODO: caching
 		    int output = 0;
 		    for (int a = 0; a < 32; a++)
 		    {
