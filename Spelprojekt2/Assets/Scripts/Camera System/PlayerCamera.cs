@@ -9,6 +9,7 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float m_rotationSmoothTime = 0.05f;
     [Header("Third Person")]
     [SerializeField] private float m_thirdPersonCameraHeight = .5f;
+    [SerializeField] private float m_decolliderSphereRadius = 1f;
     [Header("First Person")]
     [SerializeField] private float m_firstPersonCameraHeight = .75f;
 
@@ -36,6 +37,8 @@ public class PlayerCamera : MonoBehaviour
     private Transform m_parent;
     private float m_savedPitch;
     private float m_savedYaw;
+    private float m_decolliderDistanceChange;
+    private Vector3 m_basePosition;
     [HideInInspector] public Vector3 m_playerForward, m_playerRight;
 
     private void Start()
@@ -80,17 +83,31 @@ public class PlayerCamera : MonoBehaviour
         HandleRotation();
         HandleZoom();
         HandleShoulderSwitch();
+        
         UpdateCamera();
     }
     void FirstPersonCamera()
     {
         HandleRotation();
 
-        Vector3 fpPosition = m_parent.position + Vector3.up * m_firstPersonCameraHeight;
+        Vector3 fpPosition = m_parent.position + (Vector3.up * m_firstPersonCameraHeight);
         transform.position = fpPosition;
 
         Quaternion fpRotation = Quaternion.Euler(m_currentPitch, m_currentYaw, 0);
         transform.rotation = fpRotation;
+    }
+    void Decollider()
+    {
+        m_decolliderDistanceChange = 0f;
+        RaycastHit hit;
+        Vector3 dir = (m_basePosition - m_parent.position).normalized;
+        if(Physics.Raycast(m_parent.position, dir, out hit, m_maxZoomDistance))
+        {
+            if(hit.collider.gameObject != m_parent.gameObject)
+            {
+                m_decolliderDistanceChange = Mathf.Clamp(m_maxZoomDistance - (m_maxZoomDistance - m_targetDistance) - ((hit.point - m_parent.position).magnitude - m_decolliderSphereRadius),0, m_maxZoomDistance);
+            }
+        }
     }
 
     void HandleRotation()
@@ -122,8 +139,9 @@ public class PlayerCamera : MonoBehaviour
         m_targetDistance += zoomInput * m_zoomSpeed * Time.deltaTime;
         
         m_targetDistance = Mathf.Clamp(m_targetDistance, m_minZoomDistance, m_maxZoomDistance);
-
-        m_currentDistance = Mathf.Lerp(m_currentDistance, m_targetDistance, m_zoomSmoothSpeed * Time.deltaTime);
+        Decollider();
+        float targetDecollide = Mathf.Clamp(m_targetDistance - m_decolliderDistanceChange, 0, m_maxZoomDistance);
+        m_currentDistance = Mathf.Lerp(m_currentDistance, targetDecollide, m_zoomSmoothSpeed * Time.deltaTime);
     }
 
     void HandleShoulderSwitch()
@@ -138,13 +156,17 @@ public class PlayerCamera : MonoBehaviour
     {
         Quaternion rotation = Quaternion.Euler(m_currentPitch, m_currentYaw, 0);
 
-        Vector3 basePosition = m_parent.position + (m_thirdPersonCameraHeight * Vector3.up) + rotation * Vector3.back * m_currentDistance;
+        m_basePosition = m_parent.position + (m_thirdPersonCameraHeight * Vector3.up) + rotation * Vector3.back * m_currentDistance;
 
         float zoomT = 0f;
 
         if (m_currentDistance <= m_shoulderDisplacementStartDistance)
         {
             zoomT = 1f - Mathf.InverseLerp(m_minZoomDistance, m_shoulderDisplacementStartDistance, m_currentDistance);
+        }
+        if(m_currentDistance <= m_minZoomDistance)
+        {
+            zoomT = 1f - Mathf.InverseLerp(m_minZoomDistance, 0, m_currentDistance);
         }
 
         float targetShoulder = m_shoulderOffset * zoomT * (m_isRightShoulder ? 1f : -1f);
@@ -153,7 +175,7 @@ public class PlayerCamera : MonoBehaviour
 
         Vector3 shoulderOffset = rotation * Vector3.right * m_currentShoulderOffset;
 
-        transform.position = basePosition + shoulderOffset;
+        transform.position = m_basePosition + shoulderOffset;
 
         transform.rotation = rotation;
     }
