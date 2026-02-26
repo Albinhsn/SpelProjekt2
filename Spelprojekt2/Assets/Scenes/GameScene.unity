@@ -292,9 +292,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 358372983514085806, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
+      propertyPath: m_gameName
+      value: Shifted Colours
+      objectReference: {fileID: 0}
+    - target: {fileID: 358372983514085806, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
       propertyPath: m_levelData
       value: 
       objectReference: {fileID: 11400000, guid: 7d2c949e06f714be6a248de8c1ef8ecb, type: 2}
+    - target: {fileID: 358372983514085806, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
+      propertyPath: m_titleFontHeight
+      value: 125
+      objectReference: {fileID: 0}
     - target: {fileID: 358372983514085806, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
       propertyPath: m_onButtonHoverCue
       value: 
@@ -588,6 +596,11 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -706,11 +719,6 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
 --- !u!1 &1117760896
 GameObject:
   m_ObjectHideFlags: 0

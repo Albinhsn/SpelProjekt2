@@ -19,6 +19,9 @@ public class UIManager : MonoBehaviour
     private static UIManager I;
 
     [SerializeField]
+    private string m_gameName;
+
+    [SerializeField]
     private Font font;
 
     [SerializeField]
@@ -47,6 +50,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private float m_sliderWidth;
+
+    [SerializeField]
+    private int m_titleFontHeight;
 
     [SerializeField]
     private Texture2D m_btnTexture;
@@ -391,6 +397,36 @@ public class UIManager : MonoBehaviour
 
             case UIState.MainMenu:
             {
+                // ah: title
+                {
+
+                    GUIContent content = new GUIContent(m_gameName);
+
+                    GUIStyle title_style  = new(GUI.skin.label);
+                    title_style.alignment = TextAnchor.MiddleCenter;
+                    title_style.fontSize  = (int)GetScreenScaledSize((float)m_titleFontHeight);
+                    title_style.font = font;
+
+                    title_style.active = title_style.normal;
+                    title_style.normal.textColor = new Color(
+                            245.0f / 255.0f,
+                            40.0f / 255.0f, 
+                            145.0f / 255.0f,
+                            0.8f);
+                    title_style.active = title_style.normal;
+                    title_style.hover  = title_style.normal;
+
+                    var size  = title_style.CalcSize(content);
+
+                    size.x *= 1.5f;
+                    float x = (Screen.width - size.x) * 0.5f;
+                    float y = (Screen.height - size.y) * 0.2f;
+
+
+                    Rect rect = new(x,y,size.x,size.y);
+                    GUI.Label(rect, content, title_style);
+                }
+
                 AreaBegin(m_areaWidth, m_areaHeight);
 
                 if(MenuBtn("Play", btn_index++))
