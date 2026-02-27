@@ -50,10 +50,5 @@ public class PlayerTransformHandler : MonoBehaviour
         }
 
         m_meshRenderer.material.color = new Color(m_originalColor.r, m_originalColor.g, m_originalColor.b, alphaResult);
-        // }
-        //  else
-        // {
-        //     m_meshRenderer.material.color = new Color(m_originalColor.r, m_originalColor.g, m_originalColor.b, m_originalColor.a);
-        // }
     }
 }
