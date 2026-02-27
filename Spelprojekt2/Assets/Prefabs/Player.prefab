@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 84247538685420441}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Interaction targeting origin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8104142644778496576}
   - component: {fileID: 1106452026531506608}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Interactor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ MonoBehaviour:
   - {fileID: 5851279457604178779}
   m_blockLineOfSight:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
 --- !u!1 &1148831608214899303
 GameObject:
   m_ObjectHideFlags: 0
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 5475449872554946380}
   - component: {fileID: 4659944351768730764}
   - component: {fileID: 1549385372320832026}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FilterDistanceSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -203,7 +203,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5743394868718873319}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -243,7 +243,7 @@ GameObject:
   - component: {fileID: 1162450360667965049}
   - component: {fileID: 3424783072077675338}
   - component: {fileID: 4624679888893434033}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -483,6 +483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22ce483c0c3f2ef4a9300302ef7e33a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_emissiveIntensity: 1
 --- !u!1 &7802460504755190333
 GameObject:
   m_ObjectHideFlags: 0
@@ -499,7 +500,7 @@ GameObject:
   - component: {fileID: 5851279457604178779}
   - component: {fileID: 13585459665569523}
   - component: {fileID: 3924071857013570324}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FreeLook Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}

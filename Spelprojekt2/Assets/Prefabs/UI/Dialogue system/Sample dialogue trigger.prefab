@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6281125445952770457}
   - component: {fileID: 4744178648027739420}
   - component: {fileID: 3844175859547909368}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Dialogue trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,6 +126,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -141,6 +143,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -183,7 +188,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6109835060219811870}
   - component: {fileID: 5692167333085530553}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Camera 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -259,7 +264,7 @@ GameObject:
   - component: {fileID: 8581536919769360342}
   - component: {fileID: 7293867385628007459}
   - component: {fileID: 6126484030925789093}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Indicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -343,7 +348,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3176023773755229823}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sample dialogue trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +383,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9000824873845308480}
   - component: {fileID: 8862058946110933786}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DefaultCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
