@@ -1,5 +1,33 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6207206724971848482
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 790eb070b632d484ebd163e4d3450263, type: 3}
+  m_Name: GlitchVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  m_scanlineSpeed:
+    m_OverrideState: 1
+    m_Value: 0.292
+  m_scanlineStrength:
+    m_OverrideState: 1
+    m_Value: 0.354
+  m_glitchSpeed:
+    m_OverrideState: 1
+    m_Value: 22.4
+  m_glitchStrength:
+    m_OverrideState: 1
+    m_Value: 28.1
+  m_intensity:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13,7 +41,7 @@ MonoBehaviour:
   m_Name: PostProcessVolume Profile
   m_EditorClassIdentifier: 
   components:
-  - {fileID: 1086305119895345934}
+  - {fileID: -6207206724971848482}
 --- !u!114 &1086305119895345934
 MonoBehaviour:
   m_ObjectHideFlags: 3

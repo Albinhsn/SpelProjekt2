@@ -3,9 +3,16 @@ using UnityEngine;
 
 namespace Interaction
 {
-	[RequireComponent(typeof(Collider))]
+	[RequireComponent(typeof(Collider), typeof(SerializableObject))]
     public class ForceInteractorTrigger : Interactable
     {
+        public bool m_hasBeenActivated => !base.m_active;
+
+        public void SetActive(bool active)
+        {
+            base.m_active = active;
+        }
+
 	    [SerializeField] private bool m_oneShot = true;
 	    private void OnTriggerEnter(Collider other)
 	    {
