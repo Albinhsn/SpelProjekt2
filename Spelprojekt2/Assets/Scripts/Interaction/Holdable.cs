@@ -93,11 +93,9 @@ namespace Interaction
                 if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc && m_targetDistance < m_distanceToInteractor)
                 {
                     m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                    Debug.Log("using forward cone");
                 }
                 else
                 {
-                    Debug.Log("using normal movement");
                     m_rb.linearVelocity = (
                         Vector3.Slerp(
                             Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
