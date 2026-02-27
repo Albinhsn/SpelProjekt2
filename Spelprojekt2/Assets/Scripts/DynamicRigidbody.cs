@@ -7,6 +7,7 @@ public class DynamicRigidbody : MonoBehaviour
     private Collider m_col;
     private Rigidbody m_rb;
     private bool m_shouldDestroy;
+    private Mesh m_mesh;
     // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
     [HideInInspector] public HashSet<GameObject> m_collidingWithSet;
 
@@ -15,6 +16,7 @@ public class DynamicRigidbody : MonoBehaviour
         this.m_rb = GetComponent<Rigidbody>();
         this.m_col = GetComponent<Collider>();
         this.m_collidingWithSet = new();
+        this.m_mesh = GetComponent<Mesh>();
     }
 
     void Start()
@@ -70,7 +72,7 @@ public class DynamicRigidbody : MonoBehaviour
     public void Destroy()
     {
         Material material = GetComponent<MeshRenderer>().material;
-        ParticleManager.PlayParticleEffect(transform.position, transform.rotation, Vector3.one, material);
+        ParticleManager.PlayParticleEffect(transform.position, transform.rotation, m_mesh, material, transform.localScale);
         Destroy(this.gameObject);
     }
 
