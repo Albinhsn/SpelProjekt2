@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2621977161136988798}
   - component: {fileID: 436402026329760229}
   - component: {fileID: 8869797399019136371}
+  - component: {fileID: -4032853803544454131}
   m_Layer: 7
   m_Name: Sphere
   m_TagString: Untagged
@@ -149,3 +150,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ddbdbdee6fa5a149a6d285a5d3ac280, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-4032853803544454131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6276364791671496551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 841dabb42eca402981c82b8c3398e445, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_interactableSet: {fileID: 11400000, guid: f6924d1f7265a9b49b1fa0fe6014aeed, type: 2}
+  m_active: 1
+  m_requireUninteract: 1
+  m_canControlWhileInteracting: 1
+  m_cancelable: 1
+  m_onInteraction:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
+  m_toggleHighlighted:
+    m_PersistentCalls:
+      m_Calls: []
+  m_holdDistance: 2.25
+  m_linearMovementThreshold: 4
+  m_maxVelocity: 10
+  m_acceleration: 30
+  m_deceleration: 20
+  m_snapThreshold: 0.05
+  m_capsuleHeight: 1.5

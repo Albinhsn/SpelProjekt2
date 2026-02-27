@@ -20,7 +20,8 @@ namespace Interaction
 		    Interactor? interactor = other.GetComponentInChildren<Interactor>();
 		    if (interactor is not null)
 		    {
-			    interactor.Interact(this);
+			    interactor.CancelInteractions();
+			    interactor.Interact(this, 0);
 		    }
 	    }
 
