@@ -14,6 +14,7 @@ namespace Interaction
         [SerializeField] private float m_deceleration = 20;
         [SerializeField] private float m_snapThreshold = 0.05f;
         [SerializeField] private float m_capsuleHeight = 1.5f;
+        [SerializeField] private float m_holdRangeCorrectionStrength = 3;
         private float m_forwardLinearArc = 0.1f;
         
         private float m_currentVelocity;
@@ -21,7 +22,7 @@ namespace Interaction
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;
-        private Vector3 m_closestLocalPoint => m_rb.ClosestPointOnBounds(m_activeInteractor.position) - m_activeInteractor.position;
+        private Vector3 m_closestLocalPoint => transform.position - m_activeInteractor.position; //m_rb.ClosestPointOnBounds(m_activeInteractor.position) - m_activeInteractor.position;
 
         private float m_distanceToInteractor => -m_capsuleHeight < m_closestLocalPoint.y && m_closestLocalPoint.y < 0
             ? new Vector2(m_closestLocalPoint.x, m_closestLocalPoint.z).magnitude
@@ -88,24 +89,29 @@ namespace Interaction
                     return;
                 }
                 
-                if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc)
+                
+                if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc && m_targetDistance < m_distanceToInteractor)
                 {
                     m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                    return;
+                    Debug.Log("using forward cone");
+                }
+                else
+                {
+                    Debug.Log("using normal movement");
+                    m_rb.linearVelocity = (
+                        Vector3.Slerp(
+                            Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
+                                MathF.Min(1, //Spherical v linear movement T
+                                  MathF.Max((m_forwardAngleCorrespondence - (1 - m_forwardLinearArc)) / m_forwardLinearArc, //Linear movement cone 
+                                  MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
+                                  )))),
+                        -m_interactorDirection, //Hold range correction
+                        MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)))//Hold range correction T
+                    ).normalized; 
+
+                    m_rb.linearVelocity *= m_currentVelocity;//Velocity scale
                 }
                 
-                m_rb.linearVelocity = (
-                    Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Slerp input
-                        MathF.Max(0, MathF.Min(1, m_outerDistance / m_linearMovementThreshold))) //Slerp t
-
-                    + (m_outerDistance > 0//Move out from hold range
-                        ? 0
-                        : m_holdDistance - m_distanceToInteractor)
-                    * -m_interactorDirection 
-                
-                    ) * m_currentVelocity; //Velocity scale
-                
-                Debug.Log($"{m_distanceToInteractor}, {1 - m_distanceToInteractor / m_holdDistance}");
                 //Wall clip prevention (unnecessary, now using continuous collision detection while held
                 /*RaycastHit[] hit = Physics.RaycastAll(transform.position, m_rb.linearVelocity.normalized,
                     m_currentVelocity * Time.deltaTime, srUtils.Unity.Utils.GetPhysicsLayerMask(gameObject.layer));
@@ -156,14 +162,15 @@ namespace Interaction
             
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, transform.position + (
-                Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Slerp input
-                    MathF.Max(0, MathF.Min(1, m_outerDistance / m_linearMovementThreshold))) //Slerp t
-
-                + (m_outerDistance > 0//Move out from hold range
-                    ? 0
-                    : (1 - m_distanceToInteractor / m_holdDistance) * m_maxVelocity)
-                * -m_interactorDirection
-            )); //Active direction
+                Vector3.Slerp(
+                    Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
+                        MathF.Min(1, //Spherical v linear movement T
+                            MathF.Max(m_forwardAngleCorrespondence / (1 - m_forwardLinearArc), //Linear movement cone 
+                                MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
+                                )))),
+                    -m_interactorDirection, //Hold range correction
+                    MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)))//Hold range correction T
+            ).normalized);  //Active direction
         }
 
         private void OnDrawGizmosSelected()
