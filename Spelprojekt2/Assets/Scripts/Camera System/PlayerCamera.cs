@@ -105,15 +105,29 @@ public class PlayerCamera : MonoBehaviour
     }
     void Decollider()
     {
-        m_decolliderDistanceChange = 0f;
+        Vector3 camDir = (transform.position - m_parent.position).normalized;
         RaycastHit hit;
+
+        if(Physics.Raycast(m_parent.position, camDir, out hit, m_currentDistance))
+        {
+            m_rotationSmoothTime = 0;
+            m_zoomSmoothSpeed = 100;
+            m_shoulderSmoothSpeed = 100;
+        }
+        else
+        {
+            m_rotationSmoothTime = m_startRotationSmoothTime;
+            m_zoomSmoothSpeed = m_startZoomSmoothSpeed;
+            m_shoulderSmoothSpeed = m_startShoulderSmoothSpeed;
+        }
+
+        m_decolliderDistanceChange = 0f;
         Vector3 dir = (m_basePosition - m_parent.position).normalized;
         if(Physics.Raycast(m_parent.position, dir, out hit, m_maxZoomDistance))
         {
             m_decolliderDistanceChange = Mathf.Clamp(m_maxZoomDistance - (m_maxZoomDistance - m_targetDistance) - ((hit.point - m_parent.position).magnitude - m_decolliderSphereRadius),0, m_maxZoomDistance);
         }
 
-        Vector3 camDir = (transform.position - m_parent.position).normalized;
         if(Physics.Raycast(m_parent.position, camDir, out hit, m_targetDistance+1))
         {            
             m_shoulderOffsetThisFrame -= .05f;
@@ -129,20 +143,6 @@ public class PlayerCamera : MonoBehaviour
         }
         
         m_shoulderOffsetThisFrame = Mathf.Clamp(m_shoulderOffsetThisFrame,0,m_shoulderOffset);
-
-
-        // if(Physics.Raycast(m_parent.position, camDir, out hit, m_currentDistance))
-        // {
-        //     m_rotationSmoothTime = 0;
-        //     m_zoomSmoothSpeed = 100;
-        //     m_shoulderSmoothSpeed = 100;
-        // }
-        // else
-        // {
-        //     m_rotationSmoothTime = m_startRotationSmoothTime;
-        //     m_zoomSmoothSpeed = m_startZoomSmoothSpeed;
-        //     m_shoulderSmoothSpeed = m_startShoulderSmoothSpeed;
-        // }
     }
 
     void HandleRotation()
