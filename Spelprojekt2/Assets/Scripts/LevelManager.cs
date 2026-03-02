@@ -31,6 +31,8 @@ public sealed class LevelManager
 
     private SceneLoader m_sceneLoader;
 
+    private Player m_player;
+
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
     private bool m_scenesLoaded;
@@ -98,8 +100,8 @@ public sealed class LevelManager
 
         // ah: set the player inactive during transitions
         {
-            Player player = UnityEngine.Object.FindFirstObjectByType<Player>();
-            if(player != null)
+            Instance.m_player = UnityEngine.Object.FindFirstObjectByType<Player>();
+            if(Instance.m_player != null)
             {
                 LevelCheckpointManager.m_allowChangeCheckpoint = false;
             }
@@ -123,15 +125,14 @@ public sealed class LevelManager
         // ah: set the player active again
         {
             LevelCheckpointManager.m_allowChangeCheckpoint = true;
-            Player player = UnityEngine.Object.FindFirstObjectByType<Player>();
-            if(player != null)
+            if(Instance.m_player != null)
             {
                 LevelCheckpointManager.SetFirstSpawnPoint();
-                LevelCheckpointManager.Respawn();
+                LevelCheckpointManager.Respawn(Instance.m_player);
+                Instance.m_player.gameObject.SetActive(true);
             }
         }
 
-        Debug.Log("Finishing transition");
         Instance.m_isGlitchingDone = false;
         Instance.m_scenesLoaded = false;
         Instance.m_currentLevel = Instance.m_nextLevel;
@@ -179,6 +180,10 @@ public sealed class LevelManager
 
     static void SetScenesUnloadedBoolTrue()
     {
+        if(Instance.m_player != null)
+        {
+            Instance.m_player.gameObject.SetActive(false);
+        }
         Instance.m_sceneLoader    = new(Instance.m_nextLevel);
         Instance.m_sceneLoader.m_onAllScenesLoaded += SetScenesLoadedBoolTrue;
         Instance.m_sceneLoader.LoadAsync();
