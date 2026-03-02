@@ -38,6 +38,7 @@ public class PlayerCamera : MonoBehaviour
     private Transform m_parent;
     private float m_savedPitch;
     private float m_savedYaw;
+    private Vector3 m_basePosition;
     [HideInInspector] public Vector3 m_playerForward, m_playerRight;
 
     private void Start()
@@ -102,11 +103,19 @@ public class PlayerCamera : MonoBehaviour
     }
     void Decollider()
     {
+        Vector3 dir = (m_basePosition - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
         Vector3 camDir = (transform.position - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
         RaycastHit hit;
         // Ray hit;
 
-        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance, Int32.MaxValue, QueryTriggerInteraction.Ignore))
+        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), dir, out hit, m_targetDistance, Int32.MaxValue, QueryTriggerInteraction.Ignore))
+        {
+
+            transform.position = hit.point - (camDir * m_decolliderSphereRadius);
+            m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
+        }
+
+        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance + 1, Int32.MaxValue, QueryTriggerInteraction.Ignore))
         {
 
             transform.position = hit.point - (camDir * m_decolliderSphereRadius);
@@ -159,7 +168,7 @@ public class PlayerCamera : MonoBehaviour
     {
         Quaternion rotation = Quaternion.Euler(m_currentPitch, m_currentYaw, 0);
 
-        Vector3 m_basePosition = m_parent.position + (m_thirdPersonCameraHeight * Vector3.up) + rotation * Vector3.back * m_currentDistance;
+        m_basePosition = m_parent.position + (m_thirdPersonCameraHeight * Vector3.up) + rotation * Vector3.back * m_currentDistance;
 
         float zoomT = 0f;
 
