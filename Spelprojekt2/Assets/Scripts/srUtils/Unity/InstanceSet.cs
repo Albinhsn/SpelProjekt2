@@ -33,7 +33,7 @@ namespace srUtils.Unity
 
         public void Remove(Object obj)
         {
-            objectList.Remove(obj);
+            if(!objectList.Remove(obj)) return;
             OnUpdated?.Invoke();
             if(countOutput is not null) countOutput.value = count;
         }

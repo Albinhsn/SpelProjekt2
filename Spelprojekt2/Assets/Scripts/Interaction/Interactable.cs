@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using srUtils.Unity;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,6 +21,8 @@ namespace Interaction
 
         public bool requireUninteract => m_requireUninteract;
         public bool canControlWhileInteracting => m_canControlWhileInteracting;
+
+        [CanBeNull] protected Interactor m_activeInteractor = null;
 
 
         private void Start()
@@ -45,20 +48,35 @@ namespace Interaction
         }
         protected virtual void VirtOnDisable()
         {
-            if (m_active) m_interactableSet.Remove(this);
+            m_interactableSet.Remove(this);
         }
 
 
         public virtual void Interact(Interactor interactor)
         { 
             m_onInteraction.Invoke(interactor);
+            m_activeInteractor = interactor;
             Debug.Log($"interacting with {gameObject.name}");
         }
 
-        public virtual bool TryCancelInteract(Interactor interactor)
+        public virtual bool TryCancelInteraction()
         {
-            m_onInteractionCancelled.Invoke(interactor);
-            return m_cancelable;
+            if (!m_cancelable) return false;
+            if (m_activeInteractor is not null)
+            {
+                m_onInteractionCancelled.Invoke(m_activeInteractor);
+            }
+            m_activeInteractor = null;
+            return true;
+        }
+        public virtual void ForceCancelInteraction()//May break external components that don't support interaction cancel
+        {
+            if (m_activeInteractor is not null)
+            {
+                m_onInteractionCancelled.Invoke(m_activeInteractor);
+                m_activeInteractor.FinishInteraction();
+            }
+            m_activeInteractor = null;
         }
 
         public virtual void SetHighlighted(bool highlight) => m_toggleHighlighted.Invoke(highlight);

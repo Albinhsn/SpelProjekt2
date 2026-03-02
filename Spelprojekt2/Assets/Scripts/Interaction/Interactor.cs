@@ -79,7 +79,7 @@ namespace Interaction
         {
             if(m_interacting == -1) return;
             
-            if (m_selected[m_interacting].TryCancelInteract(this))
+            if (m_selected[m_interacting].TryCancelInteraction())
             {
                 InputManager.EnablePlayerInput();
            

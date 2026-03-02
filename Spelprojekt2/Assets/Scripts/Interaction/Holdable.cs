@@ -39,8 +39,6 @@ namespace Interaction
 
 
         private Rigidbody m_rb;
-        
-        private Interactor m_activeInteractor;
         private bool m_isHeld;
 
         private void Awake()
@@ -63,21 +61,28 @@ namespace Interaction
         private CollisionDetectionMode m_savedCollissionDetectionMode;
         public override void Interact(Interactor interactor)
         {
+            base.Interact(interactor);
             m_savedCollissionDetectionMode = m_rb.collisionDetectionMode;
             m_rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-            m_activeInteractor = interactor;
             m_isHeld = true;
             m_currentVelocity = 0;
             
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
         }
 
-        public override bool TryCancelInteract(Interactor interactor)
+        public override bool TryCancelInteraction()
         {
             m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
             m_activeInteractor = null;
             m_isHeld = false;
+            base.TryCancelInteraction();
             return true;
+        }
+
+        public override void ForceCancelInteraction()
+        {
+            TryCancelInteraction();
+            base.ForceCancelInteraction();
         }
 
         private void FixedUpdate()

@@ -158,5 +158,6 @@ public class FilterObject : MonoBehaviour
         }
         
         m_interactableComponent?.SetIsInteractable(false);
+        m_interactableComponent?.ForceCancelInteraction();
     }
 }
