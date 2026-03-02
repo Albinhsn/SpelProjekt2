@@ -113,6 +113,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "FlipGravity",
+                    "type": "Button",
+                    "id": "8f6c7a83-610d-4e14-92ad-2b6f2908100f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -476,6 +485,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "CameraFirstPerson",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ae272d78-0e1d-4621-8015-54cff053d5cc",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "FlipGravity",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

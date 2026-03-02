@@ -199,6 +199,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FlipGravity"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f6c7a83-610d-4e14-92ad-2b6f2908100f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -562,6 +571,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""CameraFirstPerson"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ae272d78-0e1d-4621-8015-54cff053d5cc"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""FlipGravity"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1025,6 +1045,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_CameraZoom = m_Player.FindAction("CameraZoom", throwIfNotFound: true);
         m_Player_CameraFreeLookToggle = m_Player.FindAction("CameraFreeLookToggle", throwIfNotFound: true);
         m_Player_CameraFirstPerson = m_Player.FindAction("CameraFirstPerson", throwIfNotFound: true);
+        m_Player_FlipGravity = m_Player.FindAction("FlipGravity", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1132,6 +1153,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_CameraZoom;
     private readonly InputAction m_Player_CameraFreeLookToggle;
     private readonly InputAction m_Player_CameraFirstPerson;
+    private readonly InputAction m_Player_FlipGravity;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1191,6 +1213,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/CameraFirstPerson".
         /// </summary>
         public InputAction @CameraFirstPerson => m_Wrapper.m_Player_CameraFirstPerson;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/FlipGravity".
+        /// </summary>
+        public InputAction @FlipGravity => m_Wrapper.m_Player_FlipGravity;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1253,6 +1279,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @CameraFirstPerson.started += instance.OnCameraFirstPerson;
             @CameraFirstPerson.performed += instance.OnCameraFirstPerson;
             @CameraFirstPerson.canceled += instance.OnCameraFirstPerson;
+            @FlipGravity.started += instance.OnFlipGravity;
+            @FlipGravity.performed += instance.OnFlipGravity;
+            @FlipGravity.canceled += instance.OnFlipGravity;
         }
 
         /// <summary>
@@ -1300,6 +1329,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @CameraFirstPerson.started -= instance.OnCameraFirstPerson;
             @CameraFirstPerson.performed -= instance.OnCameraFirstPerson;
             @CameraFirstPerson.canceled -= instance.OnCameraFirstPerson;
+            @FlipGravity.started -= instance.OnFlipGravity;
+            @FlipGravity.performed -= instance.OnFlipGravity;
+            @FlipGravity.canceled -= instance.OnFlipGravity;
         }
 
         /// <summary>
@@ -1706,6 +1738,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnCameraFirstPerson(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FlipGravity" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFlipGravity(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

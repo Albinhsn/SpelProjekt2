@@ -66,7 +66,11 @@ public sealed class InputManager
 
     public static bool PickedUpItem()
     {
-        return Instance.m_inputActions.Player.Interact.WasPressedThisFrame();
+        return Instance.m_inputActions.Player.Pickup.WasPressedThisFrame();
+    }
+    public static bool Interact()
+    {
+        return Instance.m_inputActions.Player.Interact.WasPerformedThisFrame();
     }
     public static bool Paused()
     {
