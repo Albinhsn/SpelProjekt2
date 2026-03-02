@@ -1,3 +1,4 @@
+using System;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -103,9 +104,11 @@ public class PlayerCamera : MonoBehaviour
     {
         Vector3 camDir = (transform.position - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
         RaycastHit hit;
+        // Ray hit;
 
-        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance))
+        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance, Int32.MaxValue, QueryTriggerInteraction.Ignore))
         {
+
             transform.position = hit.point - (camDir * m_decolliderSphereRadius);
             m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
         }
