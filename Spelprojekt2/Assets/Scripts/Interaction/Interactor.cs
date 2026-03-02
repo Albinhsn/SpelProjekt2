@@ -15,54 +15,45 @@ namespace Interaction
         [SerializeField] private float m_range;
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
-        
-        [SerializeField] private InputActionReference[] m_interactActions;
-        [SerializeField] private InputActionReference[] m_interactionCancelActions;
-        [SerializeField] private MonoBehaviour[] m_deactivateWhileInteracting;
 
         [SerializeField] private LayerMask m_blockLineOfSight;
 
         [ItemCanBeNull] private Interactable[] m_selected;
         private int m_interacting = -1; //Interaction type. -1=not interacting
 
-        public Vector3 aimDirection
-        {
-            get
-            {
-                return transform.forward;//TODO: replace with something more dynamic to enable camera locking
-            }
-        }
+        public Vector3 aimDirection => InputManager.GetForwardAimDir();
 
         public Vector3 position => m_targetOrigin.position;
 
         private void Awake()
         {
             m_selected = new Interactable?[m_interactableSets.Length];
-            for (int a = 0; a < m_interactableSets.Length; a++)
-            {
-                m_interactActions[a].action.Enable();
-                m_interactionCancelActions[a].action.Enable();
-            }
-
-            //TODO: InputManager
         }
 
         private void Update()
         {
-            if (m_interacting != -1)
+            switch (m_interacting)
             {
-                if(m_interactionCancelActions[m_interacting].action.WasPressedThisFrame()) CancelInteractions();
-                return;
-            }
-
-            for (int a = 0; a < m_interactableSets.Length; a++)
-            {
-                SearchFrustum(a);
-                if (m_selected[a] is not null && m_interactActions[a].action.WasPressedThisFrame())
-                {
-                    Interact(m_selected[a], a);
+                case 0:
+                    if(InputManager.Interact()) CancelInteractions();
                     break;
-                }
+                case 1:
+                    if(InputManager.PickedUpItem()) CancelInteractions();
+                    break;
+                default:
+                    for (int a = 0; a < m_interactableSets.Length; a++)
+                    {
+                        SearchFrustum(a);
+                    }
+                    if (m_selected[0] is not null && InputManager.Interact())
+                    {
+                        Interact(m_selected[0], 0);
+                    }
+                    else if (m_selected[1] is not null && InputManager.PickedUpItem())
+                    {
+                        Interact(m_selected[1], 1);
+                    }
+                    break;
             }
         }
 
@@ -76,10 +67,6 @@ namespace Interaction
 
             if (!interactable.canControlWhileInteracting)
             {
-                foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
-                {
-                    obj.enabled = false;
-                }
                 InputManager.DisablePlayerInput();
             }
 
@@ -94,10 +81,6 @@ namespace Interaction
             
             if (m_selected[m_interacting].TryCancelInteract(this))
             {
-                foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
-                {
-                    obj.enabled = true;
-                }
                 InputManager.EnablePlayerInput();
            
                 m_selected[m_interacting] = null;
@@ -108,10 +91,6 @@ namespace Interaction
         public void FinishInteraction()//Interaction finished callback from interactable
         {
             Assert.IsTrue(m_interacting != -1, "FinishInteraction called on non-interacting interactor");
-            foreach (MonoBehaviour obj in m_deactivateWhileInteracting)
-            {
-                obj.enabled = true;
-            }
             InputManager.EnablePlayerInput();
             
             m_selected[m_interacting] = null;
@@ -135,7 +114,7 @@ namespace Interaction
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
                 
 
-                if (obj_radial_distance < sel_distance && !Physics.Raycast(m_targetOrigin.position, obj_relative_position.normalized, obj_linear_distance, m_blockLineOfSight))
+                if (obj_radial_distance < sel_distance && !Physics.Raycast(m_targetOrigin.position, obj_relative_position.normalized, obj_linear_distance, m_blockLineOfSight, QueryTriggerInteraction.Ignore))
                 {
                     sel = obj;
                     sel_distance = obj_radial_distance;
