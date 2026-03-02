@@ -1,4 +1,5 @@
 using System;
+using AudioKit.FMOD;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace Interaction
     [RequireComponent(typeof(DynamicRigidbody))]
     public class Holdable : Interactable
     {
+        [SerializeField] private AudioCueSO m_pickupCue;
+        
         [SerializeField] private float m_holdDistance = 2.25f;
         [SerializeField] private float m_linearMovementThreshold = 4;
         [SerializeField] private float m_maxVelocity = 10;
@@ -60,17 +63,17 @@ namespace Interaction
         private CollisionDetectionMode m_savedCollissionDetectionMode;
         public override void Interact(Interactor interactor)
         {
-            //m_rb.useGravity = false;
             m_savedCollissionDetectionMode = m_rb.collisionDetectionMode;
             m_rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             m_activeInteractor = interactor;
             m_isHeld = true;
             m_currentVelocity = 0;
+            
+            SfxDirector.PlayCue2(m_pickupCue, transform.position);
         }
 
         public override bool TryCancelInteract(Interactor interactor)
         {
-            //m_rb.useGravity = true;
             m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
             m_activeInteractor = null;
             m_isHeld = false;
