@@ -47,17 +47,9 @@ public class PlayerCamera : MonoBehaviour
         m_targetPitch = m_currentPitch = angles.x;
         m_targetDistance = m_currentDistance = m_maxZoomDistance;
     }
-
-    private void Update()
+    void Update()
     {
-        if(InputManager.CameraFirstPerson())
-        {
-            FirstPersonCamera();
-        }
-        else
-        {
-            ThirdPersonCamera();
-        }
+        HandleShoulderSwitch();
 
         if(InputManager.CameraFreeLookToggleRealesed())
         {
@@ -70,16 +62,29 @@ public class PlayerCamera : MonoBehaviour
             m_savedPitch = m_targetPitch;
             m_savedYaw = m_targetYaw;
         }
+
         m_playerForward = Quaternion.Euler(m_savedPitch, m_savedYaw, 0) * Vector3.forward;
         m_playerRight = Quaternion.Euler(m_savedPitch, m_savedYaw, 0) * Vector3.right;
-        
+
         InputManager.SetAimDirection(m_playerForward,m_playerRight);
+    }
+
+    private void FixedUpdate()
+    {
+        if(InputManager.CameraFirstPerson())
+        {
+            FirstPersonCamera();
+        }
+        else
+        {
+            ThirdPersonCamera();
+        }
+        
     }
     void ThirdPersonCamera()
     {
         HandleRotation();
         HandleZoom();
-        HandleShoulderSwitch();
         
         UpdateCamera();
         Decollider();
@@ -96,7 +101,6 @@ public class PlayerCamera : MonoBehaviour
     }
     void Decollider()
     {
-
         Vector3 camDir = (transform.position - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
         RaycastHit hit;
 
