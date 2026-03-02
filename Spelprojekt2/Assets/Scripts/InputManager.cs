@@ -1,4 +1,5 @@
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -28,6 +29,23 @@ public sealed class InputManager
     }
     
     private InputSystem_Actions m_inputActions;
+    private Vector3 m_aimDirectionForward = Vector3.zero;
+    private Vector3 m_aimDirectionRight = Vector3.zero;
+
+    public static void SetAimDirection(Vector3 forward, Vector3 Right)
+    {
+        Instance.m_aimDirectionForward = forward;
+        Instance.m_aimDirectionRight = Right;
+    }
+    public static Vector3 GetForwardAimDir()
+    {
+        return Instance.m_aimDirectionForward;
+    }
+
+    public static Vector3 GetRightAimDir()
+    {
+        return Instance.m_aimDirectionRight;
+    }
 
     public static Vector2 ReadMovementValue()
     {
