@@ -15,6 +15,8 @@ public class Fan : MonoBehaviour
     [SerializeField] float m_bobAmplitude = 0.5f;
     [SerializeField] float m_bobSpeed = 2f;
 
+    [SerializeField] private ParticleSystem m_particleSystem;
+
     [Header("Start active")]
     [SerializeField]
     private bool m_isActive;
@@ -27,6 +29,10 @@ public class Fan : MonoBehaviour
     {
         m_isActive = false;
         StopSound();
+        if(m_particleSystem != null)
+        {
+            m_particleSystem.Stop();
+        }
     }
 
     public void TurnOn()
@@ -37,6 +43,10 @@ public class Fan : MonoBehaviour
         if(filter != null)
         {
             should_play_sound = filter.m_kind != FilterManager.m_activeFilter;
+        }
+        if(m_particleSystem != null)
+        {
+            m_particleSystem.Play();
         }
 
         if(should_play_sound)
