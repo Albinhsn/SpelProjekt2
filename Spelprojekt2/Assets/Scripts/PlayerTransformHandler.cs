@@ -24,8 +24,8 @@ public class PlayerTransformHandler : MonoBehaviour
     } 
     void FixedUpdate() 
     { 
-        Vector3 forward = Rejection(m_camera.m_playerForward, new Vector3(0, 1, 0)); 
-        Vector3 right = Rejection(m_camera.m_playerRight, new Vector3(0, 1, 0)); 
+        Vector3 forward = Rejection(InputManager.GetForwardAimDir(), new Vector3(0, 1, 0)); 
+        Vector3 right = Rejection(InputManager.GetRightAimDir(), new Vector3(0, 1, 0)); 
         Vector2 input = InputManager.ReadMovementValue(); 
         Vector3 dir = forward * input.y + right * input.x; 
         if(m_parentRb.linearVelocity.magnitude > 0.1f && input != Vector2.zero) 

@@ -83,7 +83,7 @@ public class PlayerCamera : MonoBehaviour
         m_playerForward = Quaternion.Euler(m_savedPitch, m_savedYaw, 0) * Vector3.forward;
         m_playerRight = Quaternion.Euler(m_savedPitch, m_savedYaw, 0) * Vector3.right;
         
-        
+        InputManager.SetAimDirection(m_playerForward,m_playerRight);
     }
     void ThirdPersonCamera()
     {
