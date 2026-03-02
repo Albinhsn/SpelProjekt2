@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 84247538685420441}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Interaction targeting origin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8104142644778496576}
   - component: {fileID: 1106452026531506608}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Interactor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,52 +75,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d628259bd09e4e4b8d2edd3afb08e9fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
+  m_interactableSets:
+  - {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
+  - {fileID: 11400000, guid: f6924d1f7265a9b49b1fa0fe6014aeed, type: 2}
   m_targetOrigin: {fileID: 84247538685420441}
   m_range: 7.44
   m_coneBaseRad: 1.32
   m_coneFactor: 0.52
-  m_interactAction: {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  m_interactActions:
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  m_interactionCancelActions:
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
+  - {fileID: 1781555164194001046, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
   m_deactivateWhileInteracting:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 695921995035222353}
-        m_TargetAssemblyTypeName: Player, Assembly-CSharp
-        m_MethodName: set_enabled
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2804696581348211148}
-        m_TargetAssemblyTypeName: MovementController, Assembly-CSharp
-        m_MethodName: set_enabled
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 5851279457604178779}
-        m_TargetAssemblyTypeName: Unity.Cinemachine.CinemachineInputAxisController,
-          Unity.Cinemachine
-        m_MethodName: set_enabled
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+  - {fileID: 695921995035222353}
+  - {fileID: 2804696581348211148}
+  - {fileID: 5851279457604178779}
+  m_blockLineOfSight:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!1 &1148831608214899303
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,7 +107,7 @@ GameObject:
   - component: {fileID: 5475449872554946380}
   - component: {fileID: 4659944351768730764}
   - component: {fileID: 1549385372320832026}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FilterDistanceSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -229,7 +203,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5743394868718873319}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -268,7 +242,8 @@ GameObject:
   - component: {fileID: 780126874217328345}
   - component: {fileID: 1162450360667965049}
   - component: {fileID: 3424783072077675338}
-  m_Layer: 0
+  - component: {fileID: 4624679888893434033}
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -325,7 +300,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5561349426305759274, guid: 48068877d53ee8c42a765c8bbacececb, type: 3}
+  - {fileID: 2100000, guid: 12de8ce1f931c0649a4c27d8ed243201, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -496,6 +471,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 0.1, z: 0.5}
   m_Center: {x: 0, y: -0.85, z: 0}
+--- !u!114 &4624679888893434033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6733362284341771832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22ce483c0c3f2ef4a9300302ef7e33a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_emissiveIntensity: 1
 --- !u!1 &7802460504755190333
 GameObject:
   m_ObjectHideFlags: 0
@@ -512,7 +500,7 @@ GameObject:
   - component: {fileID: 5851279457604178779}
   - component: {fileID: 13585459665569523}
   - component: {fileID: 3924071857013570324}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FreeLook Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}

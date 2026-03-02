@@ -61,14 +61,16 @@ public class GlitchTransitionManager : MonoBehaviour
             I.m_transitionTime          = time;
             I.m_transitionTimeRemaining = time;
             I.m_startIntensity          = start_intensity;
-            I.StartCoroutine(UpdateTransition());
-            result = true;
 
             // ah: Take framebuffer snapshot
             {
                 FramebufferSnapshotManager.Request();
                 FramebufferDisplaySnapshotPass.Activate();
             }
+
+            result = true;
+
+            I.StartCoroutine(UpdateTransition());
         }
         return result;
     }

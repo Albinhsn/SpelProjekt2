@@ -1,15 +1,17 @@
 using UnityEngine;
+using System;
 
+[RequireComponent(typeof(SerializableObject))]
 public class Spawner : MonoBehaviour
 {
+
     [SerializeField] private GameObject m_objectToSpawn;
     [SerializeField] private Vector3 m_initialVelocity;
 
     [SerializeField]
     private bool m_spawnOnActivation;
 
-    private GameObject m_object;
-    
+    public GameObject m_object;
     
     public void Awake()
     {
@@ -53,6 +55,13 @@ public class Spawner : MonoBehaviour
             if(rb != null)
             {
                 rb.linearVelocity = m_initialVelocity;
+            }
+
+            // ah: reset flipped gravity on respawn
+            GravityFlippedObject gravity_flip = this.m_object.GetComponent<GravityFlippedObject>();
+            if(gravity_flip != null)
+            {
+                gravity_flip.ResetGravity();
             }
         }
     }

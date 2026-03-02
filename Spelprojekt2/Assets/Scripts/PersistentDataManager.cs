@@ -2,45 +2,24 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System;
+using System.Text;
+using System.Security.Cryptography;
 using System.Collections.Generic;
+using Interaction;
+using Interaction.Dialogue;
 using static Serialization;
 
-/*
- v0 format for scene:
-  Magic (SCEN) (32bit)
-  Version (32bit)
-  Count of objects (32bit)
-  ID, Position, Rotation
-
- v0 format for player:
-  Magic (PLAY) (32bit)
-  Version (32bit)
-  Filter active (32bit)
-  Position, Rotation,
-  Latest spawn position
-
- */
 
 public struct DeserializedPlayerResult
 {
     public bool found;
     public FilterKind active_filter;
+    public bool m_unlockedFilter;
+    public bool m_unlockedFlipped;
 }
 
 public sealed class PersistentDataManager
 {
-
-    private struct ObjectData
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-
-        public ObjectData(float[] position, float[] rotation)
-        {
-            this.position = new Vector3(position[0], position[1], position[2]);
-            this.rotation = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
-        }
-    }
 
     private static PersistentDataManager _instance;
     private static PersistentDataManager m_instance {
@@ -54,370 +33,888 @@ public sealed class PersistentDataManager
         }
 
     }
-
-    public PersistentDataManager()
+    private struct GameState
     {
+        public bool m_isValid;
+        public ChunkPLAY m_play;
+        public ChunkSTRY m_story;
+        public ChunkLVLS m_levels;
     }
 
-    public static void RemoveSceneData(int scene_build_index)
+    private static GameState m_gameState;
+    private static string m_dataPath => Path.Combine(Application.persistentDataPath, "game.bin");
+
+    private struct ForceInteractorTriggerData
     {
-        Scene scene = SceneManager.GetSceneByBuildIndex(scene_build_index);
-        var path = Path.Combine(Application.persistentDataPath, $"{scene.name}.bin");
+        public byte[] id;
+        public bool m_hasBeenActivated;
+
+        public ForceInteractorTriggerData(byte[] id, int activated)
+        {
+            this.id       = id;
+            this.m_hasBeenActivated = activated == 1;
+        }
+        public int Serialize(ref byte[] buffer, int offset)
+        {
+            offset = SerializeArray<byte>(ref buffer, id, offset, 1);
+            offset = SerializeScalar<int>(ref buffer, m_hasBeenActivated ? 1 : 0, offset);
+            return offset;
+        }
+
+        public static ForceInteractorTriggerData Deserialize(byte[] buffer, ref int offset)
+        {
+            byte[] id = new byte[16];
+            offset = DeserializeArray<byte>(ref id, buffer, offset, 1);
+
+            int has_been_activated = 0;
+            offset = DeserializeScalar<int>(ref has_been_activated, buffer, offset);
+
+            return new(id, has_been_activated);
+        }
+    }
+
+    private struct FlippedData
+    {
+        public byte[] id;
+        public bool m_usesGravity;
+
+        public FlippedData(byte[] id, int usesGravity)
+        {
+            this.id       = id;
+            this.m_usesGravity = usesGravity == 1;
+        }
+
+        public int Serialize(ref byte[] buffer, int offset)
+        {
+            offset = SerializeArray<byte>(ref buffer, id, offset, 1);
+            offset = SerializeScalar<int>(ref buffer, m_usesGravity ? 1 : 0, offset);
+            return offset;
+        }
+        public static FlippedData Deserialize(byte[] buffer, ref int offset)
+        {
+            FlippedData data = new();
+            data.id = new byte[16];
+            offset = DeserializeArray<byte>(ref data.id, buffer, offset, 1);
+            int uses_gravity = 0;
+            offset = DeserializeScalar<int>(ref uses_gravity, buffer, offset);
+            data.m_usesGravity = uses_gravity == 1 ? true : false;
+            return data;
+        }
+        
+    }
+
+    private struct ObjectData
+    {
+        public byte[] id;
+        public Vector3 position;
+        public Quaternion rotation;
+
+        public ObjectData(byte[] id, Vector3 p, Quaternion r)
+        {
+            this.id       = id;
+            this.position = p;
+            this.rotation = r;
+        }
+
+        public int Serialize(ref byte[] buffer, int offset)
+        {
+            offset = SerializeArray<byte>(ref buffer, this.id, offset, 1);
+            offset = SerializeVector3(ref buffer, this.position, offset);
+            offset = SerializeQuaternion(ref buffer, this.rotation, offset);
+            return offset;
+        }
+
+        public static ObjectData Deserialize(byte[] buffer, ref int offset)
+        {
+            ObjectData data = new();
+            data.id = new byte[16];
+            offset = DeserializeArray<byte>(ref data.id, buffer, offset, 1);
+            offset = DeserializeVector3(ref data.position, buffer, offset);
+            offset = DeserializeQuaternion(ref data.rotation, buffer, offset);
+            return data;
+        }
+    }
+
+    private struct ChunkPLAY 
+    {
+        const int version = 0;
+
+        public bool m_exists;
+        public FilterKind m_filter;
+        public bool m_unlockedFilter;
+        public bool m_unlockedFlipped;
+        public Vector3 m_playerP;
+        public Quaternion m_playerR;
+        public Vector3 m_spawnP;
+        public Quaternion m_spawnR;
+        public int m_sceneIndex;
+
+        public int m_chunkSize
+        {
+            get
+            {
+                int size = 0;
+                // ah: header
+                size += sizeof(int) * 3;
+
+                // active filter, unlocked filter, unlocked flipped
+                size  += sizeof(int) * 3;
+
+                // play pos + spawn pos
+                size += sizeof(float) * 3 * 2;
+
+                // play rot + spawn rot
+                size += sizeof(float) * 4 * 2;
+
+                // spawnpoint build index
+                size += sizeof(int);
+
+                return size;
+            }
+        }
+
+        public int Serialize(byte[] buffer, int offset)
+        {
+
+            // ah: header
+            offset = SerializeScalar<int>(ref buffer, PLAY, offset);
+            offset = SerializeScalar<int>(ref buffer, m_chunkSize, offset);
+            offset = SerializeScalar<int>(ref buffer, version, offset);
+
+            // ah: filter
+            offset = SerializeScalar<int>(ref buffer, (int)m_filter, offset);
+            offset = SerializeScalar<int>(ref buffer, m_unlockedFilter ? 1 : 0, offset);
+
+            // ah: flipped
+            offset = SerializeScalar<int>(ref buffer, m_unlockedFlipped ? 1 : 0, offset);
+
+            // ah: player 
+            offset = SerializeVector3(ref buffer, m_playerP, offset);
+            offset = SerializeQuaternion(ref buffer, m_playerR, offset);
+
+            // ah: spawn
+            offset = SerializeVector3(ref buffer, m_spawnP, offset);
+            offset = SerializeQuaternion(ref buffer, m_spawnR, offset);
+            offset = SerializeScalar<int>(ref buffer, m_sceneIndex, offset);
+
+            return offset;
+        }
+    }
+
+    private struct ChunkSTRY
+    {
+        private const int version = 0;
+        public bool m_exists;
+        public Dictionary<string, object> m_entries;
+
+        public int m_chunkSize
+        {
+            get
+            {
+                return sizeof(int) * 3 + sizeof(int) + MAX_INK_VARIABLE_SIZE * 2 * m_entries.Count;
+            }
+        }
+
+
+        public int Serialize(byte[] buffer, int offset)
+        {
+
+            // ah: header
+            {
+                offset = SerializeScalar<int>(ref buffer, STRY, offset);
+                int size = m_chunkSize;
+                offset = SerializeScalar<int>(ref buffer, size, offset);
+                offset = SerializeScalar<int>(ref buffer, version, offset);
+            }
+
+            // ah: entries
+            int entry_count = m_entries != null ? m_entries.Count : 0;
+            offset = SerializeScalar<int>(ref buffer, entry_count, offset);
+            if(m_entries != null)
+            {
+                foreach(KeyValuePair<string, object> kv in m_entries)
+                {
+                    // ah: key
+                    offset = SerializeString(kv.Key, buffer, offset, MAX_INK_VARIABLE_SIZE);
+
+                    // ah: value
+                    string value;
+                    if(kv.Value is bool)
+                    {
+                        value = (bool)kv.Value ? "true" : "false";
+                    }
+                    else
+                    {
+                        Debug.LogError($"Unable to serialize ink variable of this type {kv.Value.GetType().ToString()}");
+                        value = "";
+                    }
+                    offset = SerializeString(value, buffer, offset, MAX_INK_VARIABLE_SIZE);
+                }
+            }
+            return offset;
+        }
+    }
+
+    private struct ChunkLVL
+    {
+        public byte[] m_id;
+        public List<ObjectData> m_sgos;
+        public List<ObjectData> m_spawners;
+        public List<FlippedData> m_flipped;
+        public List<ForceInteractorTriggerData> m_triggers;
+
+        private const int version = 0;
+
+        public int m_chunkSize
+        {
+            get
+            {
+                // ah: header
+                int size = sizeof(int) * 3;
+
+                // ah: lvl id
+                size += 16;
+
+                // ah: size of ObjectData guid, pos, rotation
+                int size_of_object_data = 16 + sizeof(float) * 3 + sizeof(float) * 4;
+
+                // ah: the fucking size of the arrays (spent some time debuggin this :) )
+                size += sizeof(int) * 4;
+
+                // ah: sgo and spawners
+                size += size_of_object_data * (m_sgos != null ? m_sgos.Count : 0);
+                size += size_of_object_data * (m_spawners != null ? m_spawners.Count : 0);
+
+                // ah: gravity flipped objects
+                int size_of_flipped_data = 16 + sizeof(int);
+                size += size_of_flipped_data * (m_flipped != null ? m_flipped.Count : 0);
+
+                // ah: force interaction trigger data
+                int size_of_trigger_data = 16 + sizeof(int);
+                size += size_of_trigger_data * (m_triggers != null ? m_triggers.Count : 0);
+
+                return size;
+            }
+        }
+
+        public int Serialize(byte[] buffer, int offset)
+        {
+
+            // ah: header
+            {
+                offset = SerializeScalar<int>(ref buffer, LVLS, offset);
+                int size = m_chunkSize;
+                offset = SerializeScalar<int>(ref buffer, size, offset);
+                offset = SerializeScalar<int>(ref buffer, version, offset);
+            }
+
+            // ah: id
+            byte[] id = m_id;
+            offset = SerializeArray<byte>(ref buffer, id, offset, 1);
+
+            // ah: sgos
+            int count = m_sgos == null ? 0 : m_sgos.Count;
+            offset = SerializeScalar<int>(ref buffer, count, offset);
+            for(int i = 0; i < count; i++)
+            {
+                offset = m_sgos[i].Serialize(ref buffer, offset);
+            }
+
+            // ah: spawner
+            count = m_spawners == null ? 0 : m_spawners.Count;
+            offset = SerializeScalar<int>(ref buffer, count, offset);
+            for(int i = 0; i < count; i++)
+            {
+                offset = m_spawners[i].Serialize(ref buffer, offset);
+            }
+
+            // ah: flipped
+            count = m_flipped == null ? 0 : m_flipped.Count;
+            offset = SerializeScalar<int>(ref buffer, count, offset);
+            for(int i = 0; i < count; i++)
+            {
+                offset = m_flipped[i].Serialize(ref buffer, offset);
+            }
+
+            // ah: triggered
+            count = m_triggers == null ? 0 : m_triggers.Count;
+            offset = SerializeScalar<int>(ref buffer, count, offset);
+            for(int i = 0; i < count; i++)
+            {
+                offset = m_triggers[i].Serialize(ref buffer, offset);
+            }
+
+            return offset;
+        }
+    }
+
+    private struct ChunkLVLS
+    {
+        public bool m_exists;
+        public List<ChunkLVL> m_levels;
+
+        public int m_chunkSize 
+        {
+            get
+            {
+                int size = 0;
+                for(int i = 0; m_levels != null && i < m_levels.Count; i++)
+                {
+                    size += m_levels[i].m_chunkSize;
+                }
+                return size;
+            }
+        }
+
+        public int Serialize(byte[] buffer, int offset)
+        {
+            for(int i = 0; m_levels != null && i < m_levels.Count; i++)
+            {
+                offset = m_levels[i].Serialize(buffer, offset);
+            }
+            return offset;
+        }
+    }
+
+
+
+    public static void DeleteSave()
+    {
+        if(File.Exists(m_dataPath))
+        {
+            File.Delete(m_dataPath);
+        }
+    }
+
+    private const int LVLS = (((int)'l') << 24) | (((int)'v') << 16) | (((int)'l') << 8) | (((int)'s') << 0);
+    private const int STRY = (((int)'s') << 24) | (((int)'t') << 16) | (((int)'r') << 8) | (((int)'y') << 0);
+    private const int PLAY = (((int)'p') << 24) | (((int)'l') << 16) | (((int)'a') << 8) | (((int)'y') << 0);
+    private const int MAX_INK_VARIABLE_SIZE = 64;
+
+    private static void Serialize(GameState game_state)
+    {
+        int size = 0;
+        // ah: calculate total size of the buffer required
+        {
+            size += game_state.m_play.m_exists ? game_state.m_play.m_chunkSize : 0;
+            size += game_state.m_story.m_exists ? game_state.m_story.m_chunkSize : 0;
+            size += game_state.m_levels.m_exists ? game_state.m_levels.m_chunkSize : 0;
+        }
+
+        byte[] buffer = new byte[size];
+        int offset = 0;
+
+        // ah: serialize game state
+        // ah: play
+        if(game_state.m_play.m_exists)
+        {
+            offset = game_state.m_play.Serialize(buffer, offset);
+        }
+
+        // ah: stry
+        if(game_state.m_story.m_exists)
+        {
+            int prev = offset;
+            offset = game_state.m_story.Serialize(buffer, offset);
+        }
+
+        // ah: lvls
+        if(game_state.m_levels.m_exists)
+        {
+            offset = game_state.m_levels.Serialize(buffer, offset);
+        }
+
+
+        // ah: write the file to temporary
+        var path = m_dataPath;
+        File.WriteAllBytes(path + ".temp", buffer);
+
+
+        // ah: move/replace the file over
         if(File.Exists(path))
         {
-            File.Delete(path);
+            File.Replace(m_dataPath + ".temp", m_dataPath, null);
         }
+        else
+        {
+            File.Move(m_dataPath + ".temp", m_dataPath);
+        }
+
     }
 
-    public static void RemoveAllSerializedData()
+    private static GameState Deserialize()
     {
-        for(int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-        {
-            Scene scene = SceneManager.GetSceneByBuildIndex(i);
-            var path = Path.Combine(Application.persistentDataPath, $"{scene.name}.bin");
-            if(File.Exists(path))
-            {
-                File.Delete(path);
-            }
-        }
+        GameState result = new();
 
+        // ah: read the file
+        var path = m_dataPath;
+        if(File.Exists(path))
         {
-            var path = Path.Combine(Application.persistentDataPath, $"player.bin");
-            if(File.Exists(path))
-            {
-                File.Delete(path);
-            }
-        }
-    }
+            var buffer = File.ReadAllBytes(path);
+            int offset = 0;
 
+            result.m_isValid = true;
 
-    public static void SerializeLoadedLevels()
-    {
-        for(int i = 0; i < SceneManager.loadedSceneCount; i++)
-        {
-            Scene scene = SceneManager.GetSceneAt(i);
-            if(scene.isLoaded)
+            for(; offset < buffer.Length;)
             {
-                List<SerializableObject> objs = new();
-                foreach(var root in scene.GetRootGameObjects())
+                // ah: read header
+                int magic = 0;
+                offset = DeserializeScalar<int>(ref magic, buffer, offset);
+
+                int size = 0;
+                offset = DeserializeScalar<int>(ref size, buffer, offset);
+
+                int version = 0;
+                offset = DeserializeScalar<int>(ref version, buffer, offset);
+
+                switch(magic)
                 {
-                    objs.AddRange(root.GetComponentsInChildren<SerializableObject>(true));
+                    case LVLS:
+                    {
+                        ChunkLVL lvl = new();
+                        lvl.m_id = new byte[16];
+                        offset = DeserializeArray<byte>(ref lvl.m_id, buffer, offset, 1);
+
+                        // ah: SerializedGameObject
+                        int count   = 0;
+                        offset      = DeserializeScalar<int>(ref count, buffer, offset);
+                        lvl.m_sgos = new(count);
+                        for(int i = 0; i < count; i++)
+                        {
+                            lvl.m_sgos.Add(ObjectData.Deserialize(buffer, ref offset));
+                        }
+
+                        // ah: Spawners
+                        offset      = DeserializeScalar<int>(ref count, buffer, offset);
+                        lvl.m_spawners = new(count);
+                        for(int i = 0; i < count; i++)
+                        {
+                            lvl.m_spawners.Add(ObjectData.Deserialize(buffer, ref offset));
+                        }
+
+                        // ah: Flipped
+                        offset      = DeserializeScalar<int>(ref count, buffer, offset);
+                        lvl.m_flipped = new(count);
+                        for(int i = 0; i < count; i++)
+                        {
+                            lvl.m_flipped.Add(FlippedData.Deserialize(buffer, ref offset));
+                        }
+
+                        // ah: Triggers
+                        offset      = DeserializeScalar<int>(ref count, buffer, offset);
+                        lvl.m_triggers = new(count);
+                        for(int i = 0; i < count; i++)
+                        {
+                            lvl.m_triggers.Add(ForceInteractorTriggerData.Deserialize(buffer, ref offset));
+                        }
+
+                        // ah: Add the lvl
+                        result.m_levels.m_exists = true;
+                        if(result.m_levels.m_levels == null)
+                        {
+                            result.m_levels.m_levels = new();
+                        }
+                        result.m_levels.m_levels.Add(lvl);
+                        break;
+                    }
+                    case STRY:
+                    {
+                        // ah: GlobalInkVariableManager variables
+                        int count   = 0;
+                        offset      = DeserializeScalar<int>(ref count, buffer, offset);
+
+                        Dictionary<string, object> variables = new();
+                        string key = "", value = "";
+                        for(int i = 0; i < count; i++)
+                        {
+                            offset         = DeserializeString(ref key, buffer, offset, MAX_INK_VARIABLE_SIZE);
+                            offset         = DeserializeString(ref value, buffer, offset, MAX_INK_VARIABLE_SIZE);
+                            variables[key] = value;
+                        }
+
+                        ChunkSTRY stry = new();
+                        stry.m_exists  = true;
+                        stry.m_entries = variables;
+
+                        if(result.m_story.m_exists)
+                        {
+                            Debug.LogError("Duplicate STRY chunks in save file");
+                        }
+                        result.m_story = stry;
+                        break;
+                    }
+                    case PLAY:
+                    {
+                        ChunkPLAY play = new();
+                        play.m_exists  = true;
+
+                        // ah: active filter
+                        int filter    = 0;
+                        offset        = DeserializeScalar<int>(ref filter, buffer, offset);
+                        play.m_filter = (FilterKind)filter;
+
+                        // ah: unlocked filter
+                        int unlocked          = 0;
+                        offset                = DeserializeScalar<int>(ref unlocked, buffer, offset);
+                        play.m_unlockedFilter = unlocked == 1;
+
+                        // ah: unlocked flipped
+                        offset                 = DeserializeScalar<int>(ref unlocked, buffer, offset);
+                        play.m_unlockedFlipped = unlocked == 1;
+
+
+                        // ah: player data
+                        offset = DeserializeVector3(ref play.m_playerP, buffer, offset);
+                        offset = DeserializeQuaternion(ref play.m_playerR, buffer, offset);
+
+                        // ah: spawn data
+                        offset = DeserializeVector3(ref play.m_spawnP, buffer, offset);
+                        offset = DeserializeQuaternion(ref play.m_spawnR, buffer, offset);
+
+                        // ah: spawnpoint build index
+                        offset = DeserializeScalar<int>(ref play.m_sceneIndex, buffer, offset);
+
+                        result.m_play = play;
+                        break;
+                    }
                 }
-                PersistentDataManager.SerializeScene(scene.name, objs.ToArray());
             }
         }
-    }
-
-    public static void SerializePlayer(Player player)
-    {
-        // Magic, Version
-        int header_size = sizeof(int) * 2;
-
-        // Filter active, Position, Rotation, spawn point position, spawn point rotation, scene build index
-        int obj_size    = sizeof(float) * 14 + sizeof(int) * 2; 
-
-        int total_size = header_size + obj_size;
-        byte[] buffer  = new byte[total_size];
-
-        // Magic
-        buffer[0]  = (byte)'P';
-        buffer[1]  = (byte)'L';
-        buffer[2]  = (byte)'A';
-        buffer[3]  = (byte)'Y';
-        int offset = 4;
-
-        // Version
-        offset = SerializeScalar<int>(ref buffer, 0, offset);
-
-        // Filter active
-        offset = SerializeScalar<int>(ref buffer, (int)FilterManager.m_activeFilter, offset);
-
-        // Position
-        float[] pos = new float[3]
-        {
-            player.transform.position.x,
-            player.transform.position.y,
-            player.transform.position.z
-        };
-        offset = memcpy(ref buffer, SerializeArray(pos), offset);
-
-
-        // Rotation 
-        float[] rot = new float[4] 
-        {
-            player.transform.rotation.x,
-            player.transform.rotation.y,
-            player.transform.rotation.z,
-            player.transform.rotation.w
-        };
-        offset = memcpy(ref buffer, SerializeArray(rot), offset);
-
-        float[] spawn_point_position = new float[3]
-        {
-            LevelCheckpointManager.m_currentSpawnPointPosition.x,
-            LevelCheckpointManager.m_currentSpawnPointPosition.y,
-            LevelCheckpointManager.m_currentSpawnPointPosition.z,
-        };
-        offset = memcpy(ref buffer, SerializeArray(spawn_point_position), offset);
-
-        float[] spawn_point_rotation = new float[4]
-        {
-            LevelCheckpointManager.m_currentSpawnPointRotation.x,
-            LevelCheckpointManager.m_currentSpawnPointRotation.y,
-            LevelCheckpointManager.m_currentSpawnPointRotation.z,
-            LevelCheckpointManager.m_currentSpawnPointRotation.w,
-        };
-        offset = memcpy(ref buffer, SerializeArray(spawn_point_rotation), offset);
-
-        offset = SerializeScalar<int>(ref buffer, LevelCheckpointManager.m_sceneBuildIndex, offset);
-
-        var path = Path.Combine(Application.persistentDataPath, "player.bin");
-        File.WriteAllBytes(path, buffer);
-
-    }
-
-    private struct DeserializedPlayer
-    {
-        public uint magic;
-        public int version;
-        public int filter;
-        public Vector3 player_p;
-        public Quaternion player_r;
-        public Vector3 spawn_p;
-        public Quaternion spawn_r;
-        public int scene_index;
+        return result;
     }
 
     public static LevelData LevelToLoad(LevelsData levels)
     {
-        var path = Path.Combine(Application.persistentDataPath, "player.bin");
+        // ah: init gamestate if it doesn't exist
+        if(!m_gameState.m_isValid)
+        {
+            DeserializeAll();
+        }
 
         LevelData result = levels.m_levels[0];
-        if(File.Exists(path))
+        if(m_gameState.m_isValid)
         {
-            byte[] buffer = File.ReadAllBytes(path);
-            DeserializedPlayer player = DeserializePlayer(buffer);
-
-            string scene_path = SceneUtility.GetScenePathByBuildIndex(player.scene_index);
-
-
-            for(int i = 0; i < levels.m_levels.Length; i++)
+            ChunkPLAY play = m_gameState.m_play;
+            if(play.m_exists)
             {
-                LevelData level = levels.m_levels[i];
-                if(scene_path.Equals(level.m_scenePath + level.m_sceneName + ".unity", StringComparison.OrdinalIgnoreCase))
-                {
-                    result = level;
-                    break;
-                }
+                // ah: Find the target scene path
+                string target_scene = SceneUtility.GetScenePathByBuildIndex(play.m_sceneIndex);
 
-                bool found = false;
-                SceneData scene_data = level.m_scene;
-                for(int j = 0; j < scene_data.m_subscenes.Length; j++)
+
+                // ah: See if the target scene path exists within levels 
+                for(int i = 0; i < levels.m_levels.Length; i++)
                 {
-                    Subscene subscene = scene_data.m_subscenes[j];
-                    if(scene_path.Equals(subscene.m_scenePath + subscene.m_scene + ".unity", StringComparison.OrdinalIgnoreCase))
+                    LevelData level = levels.m_levels[i];
+
+                    // ah: check if main scene is correct even though
+                    // that should never be the case
+                    string scene_path = level.m_scenePath + level.m_sceneName + ".unity";
+
+                    if(string.Equals(target_scene, scene_path, StringComparison.OrdinalIgnoreCase))
                     {
                         result = level;
-                        found = true;
                         break;
                     }
 
-                }
 
-                if(found) break;
+                    // ah: check versus subscenes
+                    bool found = false;
+                    for(int j = 0; j < level.m_scene.m_subscenes.Length; j++)
+                    {
+                        Subscene subscene = level.m_scene.m_subscenes[j];
+
+                        string subscene_path = subscene.m_scenePath + subscene.m_scene + ".unity";
+                        if(string.Equals(target_scene, subscene_path, StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = level;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(found)
+                    {
+                        break;
+                    }
+                }
             }
         }
-
         return result;
     }
 
-    private static DeserializedPlayer
-    DeserializePlayer(byte[] buffer)
+    public static DeserializedPlayerResult DeserializePlayer(Player player)
     {
-        DeserializedPlayer result = new();
-        int offset = 0;
-
-        offset = DeserializeScalar<uint>(ref result.magic, buffer, offset);
-        offset = DeserializeScalar<int>(ref result.version, buffer, offset);
-        offset = DeserializeScalar<int>(ref result.filter, buffer, offset);
-
-        // Position
-        float[] position = new float[3];
-        offset = DeserializeArray<float>(ref position, buffer, offset);
-        result.player_p = new Vector3(position[0], position[1], position[2]);
-
-        // Rotation
-        float[] rotation = new float[4];
-        offset = DeserializeArray<float>(ref rotation, buffer, offset);
-        result.player_r = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
-
-
-        float[] spawn_point_position = new float[3];
-        offset = DeserializeArray<float>(ref spawn_point_position, buffer, offset);
-        result.spawn_p = new Vector3(spawn_point_position[0], spawn_point_position[1], spawn_point_position[2]);
-
-        float[] spawn_point_rotation = new float[4];
-        offset = DeserializeArray<float>(ref spawn_point_rotation, buffer, offset);
-        result.spawn_r = new Quaternion(spawn_point_rotation[0], spawn_point_rotation[1], spawn_point_rotation[2], spawn_point_rotation[3]);
-
-        offset         = DeserializeScalar<int>(ref result.scene_index, buffer, offset);
-        return result;
-    }
-
-
-    public static DeserializedPlayerResult
-    DeserializePlayer(Player player)
-    {
-        var path = Path.Combine(Application.persistentDataPath, "player.bin");
+        // ah: init gamestate if it doesn't exist
+        if(!m_gameState.m_isValid)
+        {
+            DeserializeAll();
+        }
 
         DeserializedPlayerResult result = new();
-        result.active_filter = FilterKind.None;
-
-        if(File.Exists(path))
+        if(m_gameState.m_isValid)
         {
-            result.found = true;
-            byte[] buffer = File.ReadAllBytes(path);
+            ChunkPLAY play = m_gameState.m_play;
+            if(play.m_exists)
+            {
+                result.found         = true;
+                result.active_filter = play.m_filter;
+                result.m_unlockedFilter = play.m_unlockedFilter;
+                result.m_unlockedFlipped = play.m_unlockedFlipped;
 
-            DeserializedPlayer data = DeserializePlayer(buffer);
+                player.transform.position = play.m_playerP;
+                player.transform.rotation = play.m_playerR;
 
-            player.gameObject.transform.position = data.player_p;
-            player.gameObject.transform.rotation = data.player_r;
-            LevelCheckpointManager.SetNewSpawnPoint(data.spawn_p, data.spawn_r, data.scene_index);
-        }
-        else
-        {
-            Debug.Log("[PDM] Didn't find any player data to deserialize");
+                LevelCheckpointManager.SetNewSpawnPoint(play.m_spawnP, play.m_spawnR, play.m_sceneIndex);
+            }
         }
 
         return result;
     }
 
-    public static void DeserializeScene(String name, SerializableObject[] objs)
+    public static void DeserializeLoadedScenes()
     {
-        var path = Path.Combine(Application.persistentDataPath, $"{name}.bin");
-
-        if(File.Exists(path))
+        // ah: init gamestate if it doesn't exist
+        if(!m_gameState.m_isValid)
         {
-            byte[] buffer = File.ReadAllBytes(path);
-            int offset = 0;
+            DeserializeAll();
+        }
 
-            // Magic
+        ChunkSTRY stry = m_gameState.m_story;
+        if(stry.m_exists)
+        {
+            GlobalInkVariableManager.SetVariables(m_gameState.m_story.m_entries);
+        }
+
+        ChunkLVLS lvls = m_gameState.m_levels;
+        if(lvls.m_exists)
+        {
+            // ah: Create a dictionary that maps id to data
+            Dictionary<Guid, ObjectData> sgos     = new();
+            Dictionary<Guid, ObjectData> spawners = new();
+            Dictionary<Guid, FlippedData> flipped = new();
+            Dictionary<Guid, ForceInteractorTriggerData> triggers = new();
+
+            // ah: map lvl chunks based on id
+            for(int i = 0; i < lvls.m_levels.Count; i++)
             {
-                uint magic = 0;
-                offset = DeserializeScalar<uint>(ref magic, buffer, offset);
-
-                char b0 = (char)((magic >> 0 ) & 0xFF);
-                char b1 = (char)((magic >> 8 ) & 0xFF);
-                char b2 = (char)((magic >> 16) & 0xFF);
-                char b3 = (char)((magic >> 24) & 0xFF);
-
-            }
-
-
-            int version = 0;
-            offset = DeserializeScalar<int>(ref version, buffer, offset);
-
-            int object_count = 0;
-            offset = DeserializeScalar<int>(ref object_count, buffer, offset);
-
-
-            Dictionary<string, ObjectData> obj_dict = new();
-            for(int i = 0; i < object_count; i++)
-            {
-                byte[] guid_buf  = new byte[16];
-                offset = DeserializeArray<byte>(ref guid_buf, buffer, offset, 1);
-
-                float[] position = new float[3];
-                offset = DeserializeArray<float>(ref position, buffer, offset);
-
-                float[] rotation = new float[4];
-                offset = DeserializeArray<float>(ref rotation, buffer, offset);
-
-                obj_dict[new Guid(guid_buf).ToString()] = new ObjectData(position, rotation);
-            }
-
-            for(int i = 0; i < objs.Length; i++)
-            {
-                SerializableObject obj = objs[i];
-                string key = obj.m_ID.ToString();
-                if(obj_dict.ContainsKey(key))
+                ChunkLVL lvl = lvls.m_levels[i];
+                for(int j = 0; lvl.m_sgos != null && j < lvl.m_sgos.Count; j++)
                 {
-                    ObjectData data = obj_dict[key];
+                    ObjectData obj = lvl.m_sgos[j];
+                    sgos[new Guid(obj.id)] = obj;
+                }
 
-                    obj.gameObject.transform.position = data.position;
-                    obj.gameObject.transform.rotation = data.rotation;
+                for(int j = 0; lvl.m_spawners != null && j < lvl.m_spawners.Count; j++)
+                {
+                    ObjectData obj = lvl.m_spawners[j];
+                    spawners[new Guid(obj.id)] = obj;
+                }
+
+                for(int j = 0; lvl.m_flipped != null && j < lvl.m_flipped.Count; j++)
+                {
+                    FlippedData obj = lvl.m_flipped[j];
+                    flipped[new Guid(obj.id)] = obj;
+                }
+
+                for(int j = 0; lvl.m_triggers != null && j < lvl.m_triggers.Count; j++)
+                {
+                    ForceInteractorTriggerData obj = lvl.m_triggers[j];
+                    triggers[new Guid(obj.id)] = obj;
                 }
             }
 
+            // ah: Query for objects and check if serialized data exists
+            {
+                SerializableObject[] objs = UnityEngine.Object.FindObjectsByType<SerializableObject>(FindObjectsSortMode.None);
+                for(int i = 0; i < objs.Length; i++)
+                {
+                    SerializableObject obj = objs[i];
+                    var guid = new Guid(obj.m_id);
+
+                    // ah: check if to serialize position and rotation
+                    if(obj.m_serializePositionAndRotation)
+                    {
+                        if(sgos.ContainsKey(guid))
+                        {
+                            ObjectData data = sgos[guid];
+                            obj.transform.position = data.position;
+                            obj.transform.rotation = data.rotation;
+                        }
+                    }
+
+                    // ah: check if spawner
+                    Spawner spawner = obj.GetComponent<Spawner>();
+                    if(spawner != null)
+                    {
+                        if(spawners.ContainsKey(guid))
+                        {
+                            ObjectData data = spawners[guid];
+                            spawner.Spawn();
+                            spawner.m_object.transform.position = data.position;
+                            spawner.m_object.transform.rotation = data.rotation;
+                        }
+                    }
+
+                    // ah: check if gravityflipped
+                    GravityFlippedObject flip = obj.GetComponent<GravityFlippedObject>();
+                    if(flip != null)
+                    {
+                        if(flipped.ContainsKey(guid))
+                        {
+                            flip.SetGravity(flipped[guid].m_usesGravity);
+                        }
+                    }
+
+                    // ah: check if trigger
+                    ForceInteractorTrigger trigger = obj.GetComponent<ForceInteractorTrigger>();
+                    if(trigger != null)
+                    {
+                        if(triggers.ContainsKey(guid))
+                        {
+                            ForceInteractorTriggerData data = triggers[guid];
+                            trigger.SetActive(!data.m_hasBeenActivated);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    public static Guid GuidFromStringHash(string str)
+    {
+        Guid result = new();
+        using (MD5 md5 = MD5.Create())
+        {
+            byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(str));
+            result = new Guid(hash);
+        }
+        return result;
+    }
+
+    public static void SerializeLoadedScenes(bool save = true)
+    {
+
+        // ah: Create a dictionary that maps scenes to a ChunkLVL
+        Dictionary<Guid, ChunkLVL> scene_chunks = new();
+        for(int i = 0; i < SceneManager.loadedSceneCount; i++)
+        {
+            var id           = GuidFromStringHash(SceneManager.GetSceneAt(i).path);
+            ChunkLVL lvl     = new();
+            lvl.m_id         = id.ToByteArray();
+            scene_chunks[id] = lvl;
+        }
+
+        // ah: map objects 
+        SerializableObject[] sgos = UnityEngine.Object.FindObjectsByType<SerializableObject>(FindObjectsSortMode.None);
+        for(int i = 0; i < sgos.Length; i++)
+        {
+            SerializableObject obj = sgos[i];
+            Guid scene_guid = GuidFromStringHash(obj.gameObject.scene.path);
+            if(scene_chunks[scene_guid].m_sgos == null)
+            {
+                ChunkLVL chunk = scene_chunks[scene_guid];
+                chunk.m_sgos     = new();
+                chunk.m_triggers = new();
+                chunk.m_spawners = new();
+                chunk.m_flipped  = new();
+                scene_chunks[scene_guid] = chunk;
+            }
+
+            // ah: sgos
+            if(obj.m_serializePositionAndRotation)
+            {
+                ObjectData data = new(obj.m_id, obj.transform.position, obj.transform.rotation);
+                scene_chunks[scene_guid].m_sgos.Add(data);
+            }
+
+            // ah:spawners
+            Spawner spawner = obj.GetComponent<Spawner>();
+            if(spawner != null)
+            {
+                GameObject child = spawner.m_object;
+                if(scene_chunks[scene_guid].m_spawners == null)
+                {
+                    ChunkLVL chunk = scene_chunks[scene_guid];
+                    chunk.m_spawners   = new();
+                    scene_chunks[scene_guid] = chunk;
+                }
+                scene_chunks[scene_guid].m_spawners.Add(new(obj.m_id, child.transform.position, child.transform.rotation));
+            }
+
+            // ah: gravity flipped
+            GravityFlippedObject flip = obj.GetComponent<GravityFlippedObject>();
+            if(flip != null)
+            {
+                scene_chunks[scene_guid].m_flipped.Add(new(obj.m_id, flip.m_useGravity ? 1 : 0));
+            }
+
+            // ah: Force InteractorTrigger
+            ForceInteractorTrigger trigger = obj.GetComponent<ForceInteractorTrigger>();
+            if(trigger != null)
+            {
+                scene_chunks[scene_guid].m_triggers.Add(new(obj.m_id, trigger.m_hasBeenActivated ? 1 : 0));
+            }
+        }
+
+        // ah: write new level state
+        m_gameState.m_isValid = true;
+        m_gameState.m_levels.m_levels = new();
+        m_gameState.m_levels.m_exists = true;
+
+        foreach(KeyValuePair<Guid, ChunkLVL> kv in scene_chunks)
+        {
+            m_gameState.m_levels.m_levels.Add(kv.Value);
+        }
+
+        if(save)
+        {
+            Serialize(m_gameState);
+        }
+    }
+
+    public static void DeserializeAll()
+    {
+        m_gameState = Deserialize();
+    }
+
+    public static void SerializeAll()
+    {
+        // ah: serialize PLAY to GameState
+        m_gameState.m_play.m_exists = true;
+
+        // ah: filter
+        m_gameState.m_play.m_filter         = FilterManager.m_activeFilter;
+        m_gameState.m_play.m_unlockedFilter = FilterManager.m_filterUnlocked;
+
+        // ah: flipped
+        m_gameState.m_play.m_unlockedFlipped = GravityFlippedManager.m_unlocked;
+
+        // ah: player
+        Player player = UnityEngine.Object.FindFirstObjectByType<Player>();
+        if(player != null)
+        {
+            m_gameState.m_play.m_playerP = player.transform.position;
+            m_gameState.m_play.m_playerP = player.transform.position;
         }
         else
         {
-            Debug.Log($"[PDM] Couldn't find persistent data for '{name}' in {path}");
+            Debug.LogError("Tried to serialize game without a player?");
         }
-    }
 
-    public static void SerializeScene(String name, SerializableObject[] objs)
-    {
+        // ah: spawn
+        m_gameState.m_play.m_spawnP     = LevelCheckpointManager.m_currentSpawnPointPosition;
+        m_gameState.m_play.m_spawnR     = LevelCheckpointManager.m_currentSpawnPointRotation;
+        m_gameState.m_play.m_sceneIndex = LevelCheckpointManager.m_sceneBuildIndex;
 
-        // Magic, Version, Object count
-        int header_size = sizeof(int) * 3;
-
-
-        // 16-byte GUID, Position, Rotation
-        int id_size     = sizeof(byte) * 16;
-        int obj_size    = sizeof(float) * 7 + id_size; 
-
-        int total_size = header_size + obj_size * objs.Length;
-        byte[] buffer  = new byte[total_size];
-
-        // Magic
-        buffer[0]  = (byte)'S';
-        buffer[1]  = (byte)'C';
-        buffer[2]  = (byte)'E';
-        buffer[3]  = (byte)'N';
-        int offset = 4;
-
-        // Version
-        offset = SerializeScalar<int>(ref buffer, 0, offset);
-
-        // Object count
-        offset = SerializeScalar<int>(ref buffer, objs.Length, offset);
-
-        foreach(SerializableObject obj in objs)
+        // ah: serialize STRY to GameState
+        m_gameState.m_story.m_exists  = true;
+        m_gameState.m_story.m_entries = new();
+        foreach(KeyValuePair<string, object> kv in GlobalInkVariableManager.m_inkVariables)
         {
-            // ID
-            offset = memcpy(ref buffer, obj.m_ID.ToByteArray(), offset);
-
-            // Position
-            float[] pos = new float[3]
-            {
-                obj.transform.position.x,
-                obj.transform.position.y,
-                obj.transform.position.z
-            };
-            offset = memcpy(ref buffer, SerializeArray(pos), offset);
-
-
-            // Rotation 
-            float[] rot = new float[4] 
-            {
-                obj.transform.rotation.x,
-                obj.transform.rotation.y,
-                obj.transform.rotation.z,
-                obj.transform.rotation.w
-            };
-            offset = memcpy(ref buffer, SerializeArray(rot), offset);
-
+            m_gameState.m_story.m_entries[kv.Key] = kv.Value;
         }
-        
 
-        var path = Path.Combine(Application.persistentDataPath, $"{name}.bin");
-        Debug.Log($"[PDM] Serializing {name}, offset: {offset}, expected {total_size} to {path}");
-        File.WriteAllBytes(path, buffer);
+        SerializeLoadedScenes(false);
+        Serialize(m_gameState);
     }
-
-
-
-
 
 }

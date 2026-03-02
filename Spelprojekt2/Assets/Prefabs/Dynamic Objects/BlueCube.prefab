@@ -15,7 +15,9 @@ GameObject:
   - component: {fileID: 2846308342998063466}
   - component: {fileID: 3350494049519190331}
   - component: {fileID: -1345212627984704744}
-  - component: {fileID: 3785609980439772403}
+  - component: {fileID: -5555097904568235063}
+  - component: {fileID: -4063969707175925295}
+  - component: {fileID: -6596205261519356945}
   m_Layer: 7
   m_Name: BlueCube
   m_TagString: Untagged
@@ -164,7 +166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ddbdbdee6fa5a149a6d285a5d3ac280, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3785609980439772403
+--- !u!114 &-5555097904568235063
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -173,17 +175,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 9063331542980127942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f405be571a33ff348475964ef585708, type: 3}
+  m_Script: {fileID: 11500000, guid: dd5ec1d5f326bd54e842e7fcd12f4e9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_action:
-    type: 1
-    eventId: BoxDrop
-    vcaName: 
-    vcaValue: 0
-    parameter: {fileID: 0}
-    parameterName: 
-    parameterValue: 0
-    snapshot: 
-    snapshotEnable: 0
-    fade: 0
+  m_audioCue: {fileID: 11400000, guid: c651f1e4f29260fb998d05b25151e37c, type: 2}
+--- !u!114 &-4063969707175925295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9063331542980127942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f0aab27c4382bda7801496c9854370f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_serializePositionAndRotation: 1
+  m_ID: 
+--- !u!114 &-6596205261519356945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9063331542980127942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 841dabb42eca402981c82b8c3398e445, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_interactableSet: {fileID: 11400000, guid: f6924d1f7265a9b49b1fa0fe6014aeed, type: 2}
+  m_active: 1
+  m_requireUninteract: 1
+  m_canControlWhileInteracting: 1
+  m_cancelable: 1
+  m_onInteraction:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
+  m_toggleHighlighted:
+    m_PersistentCalls:
+      m_Calls: []
+  m_holdDistance: 2.25
+  m_linearMovementThreshold: 4
+  m_maxVelocity: 10
+  m_acceleration: 30
+  m_deceleration: 20
+  m_snapThreshold: 0.05
+  m_capsuleHeight: 1.5
+  m_holdRangeCorrectionStrength: 3

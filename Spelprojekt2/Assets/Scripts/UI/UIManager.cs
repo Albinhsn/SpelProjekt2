@@ -19,6 +19,9 @@ public class UIManager : MonoBehaviour
     private static UIManager I;
 
     [SerializeField]
+    private string m_gameName;
+
+    [SerializeField]
     private Font font;
 
     [SerializeField]
@@ -47,6 +50,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private float m_sliderWidth;
+
+    [SerializeField]
+    private int m_titleFontHeight;
 
     [SerializeField]
     private Texture2D m_btnTexture;
@@ -255,6 +261,22 @@ public class UIManager : MonoBehaviour
         return result;
     }
 
+    float VolumeSlider(string title, float initial_value)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+
+        GUIStyle label_style = new GUIStyle(GUI.skin.label);
+        label_style.font     = font;
+        label_style.fontSize = (int)GetScreenScaledSize(15);
+        GUILayout.Label(title, label_style);
+
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        return Slider(initial_value);
+    }
+
     void
     AreaBegin(float w, float h)
     {
@@ -339,7 +361,7 @@ public class UIManager : MonoBehaviour
     {
         Player player = Instantiate(m_playerPrefab);
 
-        // Deserialize player
+        PersistentDataManager.DeserializeLoadedScenes();
         DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player);
         if(ok.found)
         {
@@ -375,6 +397,36 @@ public class UIManager : MonoBehaviour
 
             case UIState.MainMenu:
             {
+                // ah: title
+                {
+
+                    GUIContent content = new GUIContent(m_gameName);
+
+                    GUIStyle title_style  = new(GUI.skin.label);
+                    title_style.alignment = TextAnchor.MiddleCenter;
+                    title_style.fontSize  = (int)GetScreenScaledSize((float)m_titleFontHeight);
+                    title_style.font = font;
+
+                    title_style.active = title_style.normal;
+                    title_style.normal.textColor = new Color(
+                            245.0f / 255.0f,
+                            40.0f / 255.0f, 
+                            145.0f / 255.0f,
+                            0.8f);
+                    title_style.active = title_style.normal;
+                    title_style.hover  = title_style.normal;
+
+                    var size  = title_style.CalcSize(content);
+
+                    size.x *= 1.5f;
+                    float x = (Screen.width - size.x) * 0.5f;
+                    float y = (Screen.height - size.y) * 0.2f;
+
+
+                    Rect rect = new(x,y,size.x,size.y);
+                    GUI.Label(rect, content, title_style);
+                }
+
                 AreaBegin(m_areaWidth, m_areaHeight);
 
                 if(MenuBtn("Play", btn_index++))
@@ -397,7 +449,7 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Delete save", btn_index++))
                 {
-                    PersistentDataManager.RemoveAllSerializedData();
+                    PersistentDataManager.DeleteSave();
                     GlobalInkVariableManager.ClearAll();
                     FilterManager.m_filterUnlocked = false;
                 }
@@ -405,7 +457,7 @@ public class UIManager : MonoBehaviour
                 GUILayout.Space((int)GetScreenScaledSize(25));
                 if(MenuBtn("Quit", btn_index++))
                 {
-                    PersistentDataManager.RemoveAllSerializedData();
+                    PersistentDataManager.DeleteSave();
                 #if UNITY_EDITOR
                     UnityEditor.EditorApplication.isPlaying = false;
                 #endif
@@ -417,7 +469,7 @@ public class UIManager : MonoBehaviour
             }
             case UIState.Settings:
             {
-                AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 1.25f);
+                AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 2.5f);
 
                 // Volume slider
                 {
@@ -428,14 +480,44 @@ public class UIManager : MonoBehaviour
 
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
-
-                    if(m_audioSystem != null)
+                    
+                    // ah: master
                     {
                         float audio_volume = m_audioSystem.GetMasterVolume();
-                        float new_volume   = Slider(audio_volume);
+                        float new_volume   = VolumeSlider("Master", audio_volume);
                         if(new_volume != audio_volume)
                         {
                             m_audioSystem.SetMasterVolume(new_volume);
+                        }
+                    }
+
+                    // ah: music
+                    {
+                        float audio_volume = m_audioSystem.GetMusicVolume();
+                        float new_volume   = VolumeSlider("Music", audio_volume);
+                        if(new_volume != audio_volume)
+                        {
+                            m_audioSystem.SetMusicVolume(new_volume);
+                        }
+                    }
+
+                    // ah: sfx
+                    {
+                        float audio_volume = m_audioSystem.GetSfxVolume();
+                        float new_volume   = VolumeSlider("Sfx", audio_volume);
+                        if(new_volume != audio_volume)
+                        {
+                            m_audioSystem.SetSfxVolume(new_volume);
+                        }
+                    }
+
+                    // ah: UI
+                    {
+                        float audio_volume = m_audioSystem.GetUiVolume();
+                        float new_volume   = VolumeSlider("UI", audio_volume);
+                        if(new_volume != audio_volume)
+                        {
+                            m_audioSystem.SetUiVolume(new_volume);
                         }
                     }
                 }
@@ -517,22 +599,12 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Save", btn_index++))
                 {
-                    PersistentDataManager.SerializeLoadedLevels();
-
-                    Player player = FindFirstObjectByType<Player>();
-                    if(player != null)
-                    {
-                        PersistentDataManager.SerializePlayer(player);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Tried to save without any player?");
-                    }
+                    PersistentDataManager.SerializeAll();
                 }
 
                 if(MenuBtn("Reset to checkpoint", btn_index++))
                 {
-                    LevelCheckpointManager.ResetToCheckpoint();
+                    LevelCheckpointManager.Respawn();
                 }
 
                 if(MenuBtn("Settings", btn_index++))
@@ -542,22 +614,14 @@ public class UIManager : MonoBehaviour
 
                 if(MenuBtn("Main Menu", btn_index++))
                 {
-                    PersistentDataManager.SerializeLoadedLevels();
+                    PersistentDataManager.SerializeAll();
                     Player player = FindFirstObjectByType<Player>();
-                    if(player != null)
-                    {
-                        PersistentDataManager.SerializePlayer(player);
-                        Destroy(player.gameObject);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Tried to save without any player?");
-                    }
+                    Destroy(player.gameObject);
 
                     // HACK(ah): just want no ui shown here, don't want to enter state
                     this.m_state  = UIState.None;
-                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
                     LevelManager.m_onTransitionEnd += SetupMainMenu;
+                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
                 }
 
                 AreaEnd();

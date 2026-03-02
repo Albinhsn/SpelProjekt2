@@ -10,7 +10,7 @@ VAR PickItUp = false
 
 = Surprise
 ~FirstIneractionN = true
-OH JEEZ! UH... HELLO? #speaker=Unknown
+OH JEEZ! UH... HELLO? #speaker=Unknown #camera=0
     * [Hello?]
         WOAH, you talk like us! That's cool. I mean. #speaker=Unknown 
         Who are you stranger? What are you doing here in the localites sacred land? #speaker=Unknown
@@ -25,8 +25,8 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
             Also be wary, we're not really accepting of outsiders. #speaker=Nitwit
             -> choice
             + [The Construction Site.]
-            It's been a work in progress since... #speaker=Nitwit
-            Oh. I don't even remember what it's meant to be. #speaker=Nitwit
+            A pair of office buildings, it's been a work in progress since... #speaker=Nitwit
+            Oh. I don't even remember. #speaker=Nitwit
             -> choice
             + [The USER.]
             The USER is our creator and god, He has sole authority over our world.#speaker=Nitwit
@@ -34,13 +34,13 @@ OH JEEZ! UH... HELLO? #speaker=Unknown
             -> choice
             * [Move on.]
             Great! Well, you should pick up that thing over there. Seems mysterious. #speaker=Nitwit
-            Also if you really want to get to the <color="purple">Bearing</color> then you need to get rid of those glitches over there. #speaker=Nitwit #camera=1
-            The Priest should know more, he's by the roof of the buildings in his study. #speaker=Nitwit #camera=2
+            Also if you really want to get to the <color="purple">Bearing</color> you should go on ahead. #speaker=Nitwit
+            The Priest should know more, he's on the roof of the buildings in his study. #speaker=Nitwit #camera=1
             Well, good luck! #speaker=Nitwit #camera=0
             -> DONE
     -> DONE
 
 = Calm
-    If you haven't picked up the thingy yet, you should. #speaker=Nitwit #camera=0
+    If you haven't picked up the thingy yet, you should. #speaker=Nitwit #camera=1
     I'm kinda blind right now so I can't tell if you did. #speaker=Nitwit
     -> DONE

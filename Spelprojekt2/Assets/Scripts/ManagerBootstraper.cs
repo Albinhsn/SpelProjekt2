@@ -20,5 +20,10 @@ public static class ManagerBootstraper
             FilterManager fm = go.AddComponent<FilterManager>();
             fm.m_filterChanged = new();
         }
+
+        if(ManagerDoesntExist<GravityFlippedManager>())
+        {
+            GravityFlippedManager fm = go.AddComponent<GravityFlippedManager>();
+        }
     }
 }

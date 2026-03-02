@@ -37,17 +37,18 @@ public class Player : MonoBehaviour
 
     private Rigidbody m_rb;
 
+    /*
     void OnValidate()
     {
         if(m_maxPickupDistance > m_itemDistanceFromPlayer*3)
         {
             Debug.LogWarning("'Max Pickup Distance' should not be higher than three times the 'Item Distance From Player', otherwise the item will be dropped immediately after picking it up");
         }
-    }
+    }*/
 
     void Awake()
     {
-        m_pickupItemAction.action.Enable();
+        //m_pickupItemAction.action.Enable();
         m_collider = GetComponent<Collider>();
         m_rb = GetComponent<Rigidbody>();
     }
@@ -55,7 +56,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         FilterManager fm = FindFirstObjectByType<FilterManager>();
-        fm.m_filterChanged.AddListener(this.DropItemIfPickedupItemIsFiltered);
+        //fm.m_filterChanged.AddListener(this.DropItemIfPickedupItemIsFiltered);
         this.m_onTriggerEnterWithFilter.AddListener(fm.SetCollisionEnterWithFilter);
         this.m_onTriggerLeaveWithFilter.AddListener(fm.SetCollisionLeaveWithFilter);
     }
@@ -78,6 +79,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    /*//
     public void DropItemIfPickedupItemIsFiltered(FilterKind kind, bool active)
     {
         if(active && m_pickedupItem != null)
@@ -224,5 +226,5 @@ public class Player : MonoBehaviour
                 DropItem();
             }
         }
-    }
+    }*/
 }
