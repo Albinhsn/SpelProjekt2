@@ -58,7 +58,7 @@ public class PlayerCamera : MonoBehaviour
         m_startZoomSmoothSpeed = m_zoomSmoothSpeed;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if(InputManager.CameraFirstPerson())
         {
@@ -92,6 +92,7 @@ public class PlayerCamera : MonoBehaviour
         HandleShoulderSwitch();
         
         UpdateCamera();
+        Decollider();
     }
     void FirstPersonCamera()
     {
@@ -105,52 +106,74 @@ public class PlayerCamera : MonoBehaviour
     }
     void Decollider()
     {
-        Vector3 camDir = (transform.position - m_parent.position).normalized;
+        // Vector3 camDir = (transform.position - m_parent.position).normalized;
+        // RaycastHit hit;
+
+        // if(Physics.Raycast(m_parent.position, camDir, out hit, m_currentDistance))
+        // {
+        //     m_rotationSmoothTime = 0;
+        //     m_zoomSmoothSpeed = 100;
+        //     m_shoulderSmoothSpeed = 100;
+        // }
+        // else
+        // {
+        //     m_rotationSmoothTime = m_startRotationSmoothTime;
+        //     m_zoomSmoothSpeed = m_startZoomSmoothSpeed;
+        //     m_shoulderSmoothSpeed = m_startShoulderSmoothSpeed;
+        // }
+
+        // m_decolliderDistanceChange = 0f;
+        Vector3 dir = (m_basePosition - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
+        // if(Physics.Raycast(m_parent.position, dir, out hit, m_maxZoomDistance))
+        // {
+        //     // m_decolliderDistanceChange = Mathf.Clamp(m_maxZoomDistance - (m_maxZoomDistance - m_targetDistance) - ((hit.point - m_parent.position).magnitude - m_decolliderSphereRadius),0, m_maxZoomDistance);
+        // }
+        Vector3 camDir = (transform.position - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
         RaycastHit hit;
 
-        if(Physics.Raycast(m_parent.position, camDir, out hit, m_currentDistance))
-        {
-            m_rotationSmoothTime = 0;
-            m_zoomSmoothSpeed = 100;
-            m_shoulderSmoothSpeed = 100;
-        }
-        else
-        {
-            m_rotationSmoothTime = m_startRotationSmoothTime;
-            m_zoomSmoothSpeed = m_startZoomSmoothSpeed;
-            m_shoulderSmoothSpeed = m_startShoulderSmoothSpeed;
-        }
-
-        m_decolliderDistanceChange = 0f;
-        Vector3 dir = (m_basePosition - m_parent.position).normalized;
-        if(Physics.Raycast(m_parent.position, dir, out hit, m_maxZoomDistance))
-        {
-            m_decolliderDistanceChange = Mathf.Clamp(m_maxZoomDistance - (m_maxZoomDistance - m_targetDistance) - ((hit.point - m_parent.position).magnitude - m_decolliderSphereRadius),0, m_maxZoomDistance);
-        }
-
-        if(Physics.Raycast(m_parent.position, camDir, out hit, m_targetDistance+1))
-        {            
-            m_shoulderOffsetThisFrame -= .05f;
-        }
-        else 
-        {
-            float sign = m_isRightShoulder ? -1 : 1;
-            camDir = Quaternion.Euler(0,5 * sign,0) * camDir;
-            if(!Physics.Raycast(m_parent.position, camDir, out hit, m_targetDistance+1))
-            {
-                m_shoulderOffsetThisFrame += .05f;
-            }
-        }
         
-        m_shoulderOffsetThisFrame = Mathf.Clamp(m_shoulderOffsetThisFrame,0,m_shoulderOffset);
+        
+
+        // if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), dir, out hit, m_targetDistance))
+        // {
+        //     Vector3 pos = hit.point - (camDir * m_decolliderSphereRadius);
+        //     transform.position = pos;
+        //     // Debug.Log(pos);
+        //     m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
+        //     // m_decolliderDistanceChange = Mathf.Clamp(m_maxZoomDistance - (m_maxZoomDistance - m_targetDistance) - ((hit.point - m_parent.position).magnitude - m_decolliderSphereRadius),0, m_maxZoomDistance);
+        // }
+
+        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance))
+        {
+            Vector3 pos = hit.point - (camDir * m_decolliderSphereRadius);
+            transform.position = pos;
+            // Debug.Log(pos);
+            m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
+        }
+
+        // if(Physics.Raycast(m_parent.position, camDir, out hit, m_targetDistance+1))
+        // {            
+        //     m_shoulderOffsetThisFrame -= .05f;
+        // }
+        // else 
+        // {
+            // float sign = m_isRightShoulder ? -1 : 1;
+            // camDir = Quaternion.Euler(0,5 * sign,0) * camDir;
+        //     if(!Physics.Raycast(m_parent.position, camDir, out hit, m_targetDistance+1))
+        //     {
+        //         m_shoulderOffsetThisFrame += .05f;
+        //     }
+        // }
+
+        // m_shoulderOffsetThisFrame = Mathf.Clamp(m_shoulderOffsetThisFrame,0,m_shoulderOffset);
     }
 
     void HandleRotation()
     {
         Vector2 input = InputManager.ReadLookValue();
 
-        m_targetYaw += input.x * m_mouseSensitivity;
-        m_targetPitch -= input.y * m_mouseSensitivity;
+        m_targetYaw += input.x * m_mouseSensitivity * Time.deltaTime;
+        m_targetPitch -= input.y * m_mouseSensitivity * Time.deltaTime;
         m_targetPitch = Mathf.Clamp(m_targetPitch, -m_pitchClamp, m_pitchClamp);
 
         m_currentYaw = Mathf.SmoothDampAngle(m_currentYaw, m_targetYaw, ref m_yawVelocity, m_rotationSmoothTime);
@@ -174,7 +197,7 @@ public class PlayerCamera : MonoBehaviour
         m_targetDistance += zoomInput * m_zoomSpeed * Time.deltaTime;
         
         m_targetDistance = Mathf.Clamp(m_targetDistance, m_minZoomDistance, m_maxZoomDistance);
-        Decollider();
+        // Decollider();
         float targetDecollide = Mathf.Clamp(m_targetDistance - m_decolliderDistanceChange, 0, m_maxZoomDistance);
         m_currentDistance = Mathf.Lerp(m_currentDistance, targetDecollide, m_zoomSmoothSpeed * Time.deltaTime);
     }
