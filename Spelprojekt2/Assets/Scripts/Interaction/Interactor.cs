@@ -114,7 +114,7 @@ namespace Interaction
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
                 
 
-                if (obj_radial_distance < sel_distance && !Physics.Raycast(m_targetOrigin.position, obj_relative_position.normalized, obj_linear_distance, m_blockLineOfSight))
+                if (obj_radial_distance < sel_distance && !Physics.Raycast(m_targetOrigin.position, obj_relative_position.normalized, obj_linear_distance, m_blockLineOfSight, QueryTriggerInteraction.Ignore))
                 {
                     sel = obj;
                     sel_distance = obj_radial_distance;
