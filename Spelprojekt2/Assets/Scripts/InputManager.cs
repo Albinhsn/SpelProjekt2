@@ -88,7 +88,7 @@ public sealed class InputManager
     }
     public static bool Interact()
     {
-        return Instance.m_inputActions.Player.Interact.WasPerformedThisFrame();
+        return Instance.m_inputActions.Player.Interact.WasPressedThisFrame();
     }
     public static bool Paused()
     {
