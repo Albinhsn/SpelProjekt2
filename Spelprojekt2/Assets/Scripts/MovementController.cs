@@ -31,6 +31,7 @@ public class MovementController : MonoBehaviour
     private bool m_isJumping;
     private PlayerCamera m_playerCamera;
     private Vector3 m_referenceVector = Vector3.zero;
+    private Transform m_cameraTransform;
 
     private float jumpCooldown = 0;
 
@@ -39,6 +40,11 @@ public class MovementController : MonoBehaviour
         m_rb = GetComponent<Rigidbody>();
         m_playerCamera = GetComponentInChildren<PlayerCamera>();
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
+    }
+
+    private void Start()
+    {
+        m_cameraTransform = Camera.main.transform;
     }
 
     private void OnDestroy()
@@ -97,6 +103,8 @@ public class MovementController : MonoBehaviour
         }
 
         m_rb.position += m_referenceVector * Time.deltaTime;
+        m_cameraTransform.position += m_referenceVector * Time.deltaTime;
+        
         jumpCooldown -= Time.deltaTime;
     }
 
