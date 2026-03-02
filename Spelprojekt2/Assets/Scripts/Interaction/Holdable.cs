@@ -18,7 +18,9 @@ namespace Interaction
         private float m_forwardLinearArc = 0.1f;
         
         private float m_currentVelocity;
-        private Vector3 m_targetPosition => m_activeInteractor.position + m_activeInteractor.aimDirection * m_holdDistance;
+
+        private Vector3 m_upwardAimDirection => new Vector3(m_activeInteractor.aimDirection.x, MathF.Max(0, m_activeInteractor.aimDirection.y), m_activeInteractor.aimDirection.z).normalized;
+        private Vector3 m_targetPosition => m_activeInteractor.position + m_upwardAimDirection * m_holdDistance;
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;

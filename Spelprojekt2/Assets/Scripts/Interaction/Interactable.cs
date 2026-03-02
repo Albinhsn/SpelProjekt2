@@ -22,6 +22,10 @@ namespace Interaction
         public bool canControlWhileInteracting => m_canControlWhileInteracting;
 
 
+        private void Start()
+        {
+            VirtOnEnable();
+        }
         private void OnEnable()
         {
             VirtOnEnable();
@@ -31,6 +35,11 @@ namespace Interaction
             if (m_active) m_interactableSet.Add(this);
         }
         private void OnDisable()
+        {
+            VirtOnDisable();
+        }
+
+        private void OnDestroy()
         {
             VirtOnDisable();
         }
