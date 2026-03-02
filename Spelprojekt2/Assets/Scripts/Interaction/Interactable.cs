@@ -52,6 +52,7 @@ namespace Interaction
         public virtual void Interact(Interactor interactor)
         { 
             m_onInteraction.Invoke(interactor);
+            Debug.Log($"interacting with {gameObject.name}");
         }
 
         public virtual bool TryCancelInteract(Interactor interactor)
