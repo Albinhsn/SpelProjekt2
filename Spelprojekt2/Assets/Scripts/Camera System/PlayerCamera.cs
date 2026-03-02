@@ -106,20 +106,25 @@ public class PlayerCamera : MonoBehaviour
         Vector3 dir = (m_basePosition - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
         Vector3 camDir = (transform.position - (m_parent.position + (Vector3.up * m_thirdPersonCameraHeight))).normalized;
         RaycastHit hit;
-        // Ray hit;
+
+        float mag = 0;
+        
+        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance + 1, Int32.MaxValue, QueryTriggerInteraction.Ignore))
+        {
+            mag = (m_parent.position - hit.point).magnitude;
+                
+            transform.position = hit.point - (dir * m_decolliderSphereRadius);
+            m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
+            
+        }
 
         if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), dir, out hit, m_targetDistance, Int32.MaxValue, QueryTriggerInteraction.Ignore))
         {
-
-            transform.position = hit.point - (camDir * m_decolliderSphereRadius);
-            m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
-        }
-
-        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance + 1, Int32.MaxValue, QueryTriggerInteraction.Ignore))
-        {
-
-            transform.position = hit.point - (camDir * m_decolliderSphereRadius);
-            m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
+            if((m_parent.position - hit.point).magnitude < mag - 1)
+            {
+                transform.position = hit.point - (dir * m_decolliderSphereRadius);
+                m_currentDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
+            }
         }
     }
 
