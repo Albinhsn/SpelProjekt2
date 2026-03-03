@@ -31,7 +31,6 @@ public class SkySettingsEditor : Editor
         }
 
         serializedObj.ApplyModifiedProperties();
-        EditorUtility.SetDirty(obj);
 
 
         if(GUILayout.Button("Apply Settings"))
