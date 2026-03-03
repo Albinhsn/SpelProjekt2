@@ -56,6 +56,10 @@ public sealed class InputManager
     {
         return Instance.m_inputActions.UI.Navigate.ReadValue<Vector2>() + Instance.m_inputActions.UI.NavigateController.ReadValue<Vector2>();    
     }
+    public static Vector2 ReadPointerPosition()
+    {
+        return Instance.m_inputActions.UI.Point.ReadValue<Vector2>();
+    }
     public static Vector2 ReadLookValue()
     {
         return Instance.m_inputActions.Player.Look.ReadValue<Vector2>();
