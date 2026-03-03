@@ -15,7 +15,6 @@ Shader "Custom/PickedupItem"
             Name "Forward"
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
-            Cull Off
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -56,6 +55,11 @@ Shader "Custom/PickedupItem"
                 return out_min + (value - in_min) * (out_max - out_min) / (in_max - in_min);
             }
 
+            float Fresnel(float3 normal, float3 view_dir, float power)
+            {
+                return pow((1.0 - saturate(dot(normalize(normal), normalize(view_dir)))), power);
+            }
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -66,6 +70,8 @@ Shader "Custom/PickedupItem"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
+                float3 view_dir : TEXCOORD1;
+                float3 normal : NORMAL;
                 UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
@@ -74,17 +80,43 @@ Shader "Custom/PickedupItem"
 
             v2f vert (appdata v)
             {
+                float _MaxVertexDisplacement = 0.1f;
                 v2f o;
                 float noise = GradientNoise(v.vertex.xz + _Time.x * 4) * 2 * 3.14159265358;
-                o.vertex = UnityObjectToClipPos(v.vertex + v.normal * Remap2(sin(noise), -1, 1, -0.05, 0.05));
-                o.uv = v.uv;
+
+                float3 p    = v.vertex.xyz + v.normal * Remap2(sin(noise), -1, 1, 0, _MaxVertexDisplacement);
+                p = v.vertex.xyz;
+                o.vertex    = UnityObjectToClipPos(float4(p, v.vertex.w));
+                o.normal    = normalize(v.normal);
+                o.uv        = v.uv;
+
+                float3 world_p = mul(UNITY_MATRIX_M, float4(p, 1.0)).xyz;
+                o.view_dir     = normalize(_WorldSpaceCameraPos - world_p);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
             }
 
             float4 frag (v2f i) : SV_Target
             {
-                return _Color;
+                float _FresnelPower = 5.37;
+                float _NoiseTimeScale = 0.3;
+
+                float _Noise1UVScale = 14.0;
+                float _Noise1TimeScale = _NoiseTimeScale;
+
+                float _Noise2UVScale = 13.4;
+                float _Noise2TimeScale = -_NoiseTimeScale;
+
+                // Fresnel 
+                float fresnel_sample = Fresnel(i.normal, i.view_dir, _FresnelPower);
+                
+                // Double perlin samples
+                float noise1 = GradientNoise(i.uv * _Noise1UVScale + _Time.y * _Noise1TimeScale) + 0.5;
+                float noise2 = GradientNoise(i.uv * _Noise2UVScale + _Time.y * _Noise2TimeScale) + 0.5;
+
+                float sample = fresnel_sample * noise1 * noise2;
+                // return float4(noise1, noise1, noise1, 1.0);
+                return float4(_Color.rgb, _Color.a * sample);
             }
             ENDHLSL
         }
