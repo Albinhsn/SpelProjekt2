@@ -66,18 +66,19 @@ namespace Interaction.Dialogue
             }
         }
 
-        private void Update()
+        private void Update()//Input handling
         {
             if(!m_interacting) return;
 
 
-            if (m_altCount == 0)
+            if (m_altCount == 0)//Continuation
             {
-                if (InputManager.SelectUIOption()) m_relay.Select(-1);
+                if (InputManager.UIAdvance()) m_relay.Select(-1);
             }
             else
             {
                 HandleAlternatives();
+                HandleAlternativeSelect();
             }
             
         }
@@ -159,17 +160,9 @@ namespace Interaction.Dialogue
                 m_alternatives.Add(Instantiate(m_altButtonPrefab, m_altButtonContainer).GetComponent<TextMeshProUGUI>());
                 RectTransform alt_transform = m_alternatives[a].GetComponent<RectTransform>();
                 alt_transform.anchoredPosition = new Vector2(0, 0 - alt_transform.rect.height / 2 - m_altButtonOffset - a * alt_transform.rect.height);
-                int alt = a;
-                SetFont(0, alt_text_out);
+                SetFont(0, m_alternatives[a]);
                 
-                alt_text_out.color = Color.white;//Coloration, must use color drivers from Button component
-                ColorBlock button_colors = new ColorBlock();
-                button_colors.normalColor = m_colorSet.defaultColor;
-                button_colors.selectedColor = m_colorSet.defaultColor;
-                button_colors.highlightedColor = m_colorSet.highlightColor;
-                button_colors.pressedColor = m_colorSet.highlightColor;
-                button_colors.colorMultiplier = 1;
-                m_alternatives[a].colors = button_colors;
+                m_alternatives[a].color = m_colorSet.defaultColor;
             }
 
             for (int a = 0; a < m_alternatives.Count; a++)
@@ -189,32 +182,62 @@ namespace Interaction.Dialogue
         private void HandleAlternatives()
         {
             //Input handling
+            int prev_selection = m_selectedAlt;
             Vector2 pointer_input = InputManager.ReadPointerPosition();
-            if (m_lastPointerPosition != pointer_input) //Use pointer input only if pointer has moved. Enables discrete input while hovering
+            if (m_lastPointerPosition != pointer_input) //Use pointer input only if pointer has moved. Enables discrete input
             {
-                //TODO: pointer selection
+                m_selectedAlt = GetPointerAltSector();
                 m_lastPointerPosition = pointer_input;
+                
+            }
+            else
+            {
+                //Discrete navigation input
+                int navigation_input = (int)MathF.Ceiling(InputManager.ReadUINavigationValue().y);
+                m_holdCooldown -= Time.deltaTime;
+                if (m_holdCooldown <= 0 || m_lastDiscreteInput != navigation_input)
+                {
+                    m_holdCooldown = m_inputRepeatDelay;
+                    m_lastDiscreteInput = navigation_input;
+                    m_selectedAlt += navigation_input;
+                    //Wrap
+                    if (m_selectedAlt >= m_altCount) m_selectedAlt = 0;
+                    else if (m_selectedAlt < 0) m_selectedAlt = m_altCount - 1;
+                }
             }
 
-            //Discrete navigation input
-            int navigation_input = (int)MathF.Ceiling(InputManager.ReadUINavigationValue().y);
-            m_holdCooldown -= Time.deltaTime;
-            if (m_holdCooldown <= 0 || m_lastDiscreteInput != navigation_input)
-            {
-                m_holdCooldown = m_inputRepeatDelay;
-                m_lastDiscreteInput = navigation_input;
-                m_selectedAlt += navigation_input;
-                //Wrap
-                if (m_selectedAlt >= m_altCount) m_selectedAlt = 0;
-                else if (m_selectedAlt < 0) m_selectedAlt = m_altCount - 1;
-            }
-            
-            
             //Visuals
-            for (int a = 0; a < m_altCount; a++)
+            if (m_selectedAlt != prev_selection)
             {
-                m_alternatives
+                for (int a = 0; a < m_altCount; a++)
+                {
+                    if (a == m_selectedAlt) Highlight(m_alternatives[a]);
+                    else Unhighlight(m_alternatives[a]);
+                }
             }
+        }
+
+        private void HandleAlternativeSelect()
+        {
+            if(m_selectedAlt == -1) return;
+
+            if (InputManager.SelectUIOption() || InputManager.UIPointerSelect() && m_selectedAlt == GetPointerAltSector()) m_relay.Select(m_selectedAlt);
+
+        }
+
+        private int GetPointerAltSector()
+        {
+            //TODO: Mouse logic
+            return -1;
+        }
+
+        private void Highlight(TextMeshProUGUI text)
+        {
+            text.color = m_colorSet.highlightColor;
+        }
+        private void Unhighlight(TextMeshProUGUI text)
+        {
+            text.color = m_colorSet.defaultColor;
         }
 
         private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
