@@ -25,6 +25,9 @@ public class FilterObject : MonoBehaviour
 {
     public FilterKind m_kind;
 
+    [SerializeField]
+    private bool m_dontChangeRBKinematic;
+
     public bool Activated => m_activated;
     private bool m_activated;
     private MeshRenderer m_renderer;
@@ -118,7 +121,7 @@ public class FilterObject : MonoBehaviour
             m_collider.isTrigger = true;
         }
 
-        if(m_rb != null)
+        if(m_rb != null && !m_dontChangeRBKinematic)
         {
             m_rb.isKinematic = true;
         }
@@ -152,7 +155,7 @@ public class FilterObject : MonoBehaviour
             m_collider.isTrigger = false;
         }
 
-        if(m_rb != null)
+        if(m_rb != null && !m_dontChangeRBKinematic)
         {
             m_rb.isKinematic = false;
         }
