@@ -34,7 +34,7 @@ public struct CreatePickupItemMeshJob : IJob
 
     public void Execute()
     {
-        int max_steps   = m_mesh.m_maxStepCount;
+        int max_steps   = m_maxStepCount;
         float3 curr     = m_start;
         bool done       = false;
 
@@ -59,11 +59,11 @@ public struct CreatePickupItemMeshJob : IJob
                 float c, s;
                 math.sincos(angle_inc * i, out s, out c);
 
-                float3 normal = s * up + c * right;
+                float3 normal = s * m_up + c * right;
                 float3 vertex = curr + normal;
                 float2 uv = new float2(
                         i / (float)m_verticesPerStep,
-                        step_iter / (float)max_steps,
+                        step_iter / (float)max_steps
                         );
                 m_mesh.m_vertices[vertex_count] = vertex;
                 m_mesh.m_normals[vertex_count]  = normal;
@@ -84,23 +84,23 @@ public struct CreatePickupItemMeshJob : IJob
                     bool clockwise;
                     {
                         float3 v0 = vertex;
-                        float3 v1 = m_mesh.vertices[prev_row_same_vertex];
-                        float3 v2 = m_mesh.vertices[prev_row_next_vertex];
+                        float3 v1 = m_mesh.m_vertices[prev_row_same_vertex];
+                        float3 v2 = m_mesh.m_vertices[prev_row_next_vertex];
 
                         float3 n = math.cross(v1 - v0, v2 - v0);
                         clockwise = math.dot(n, normal) > 0;
 
                         if(clockwise)
                         {
-                            m_mesh.indices[index_count + 0] = curr_vertex;
-                            m_mesh.indices[index_count + 1] = prev_row_same_vertex;
-                            m_mesh.indices[index_count + 2] = prev_row_next_vertex;
+                            m_mesh.m_indices[index_count + 0] = curr_vertex;
+                            m_mesh.m_indices[index_count + 1] = prev_row_same_vertex;
+                            m_mesh.m_indices[index_count + 2] = prev_row_next_vertex;
                         }
                         else
                         {
-                            m_mesh.indices[index_count + 0] = curr_vertex;
-                            m_mesh.indices[index_count + 1] = prev_row_next_vertex;
-                            m_mesh.indices[index_count + 2] = prev_row_same_vertex;
+                            m_mesh.m_indices[index_count + 0] = curr_vertex;
+                            m_mesh.m_indices[index_count + 1] = prev_row_next_vertex;
+                            m_mesh.m_indices[index_count + 2] = prev_row_same_vertex;
                         }
                     }
 
@@ -108,15 +108,15 @@ public struct CreatePickupItemMeshJob : IJob
                     {
                         if(clockwise)
                         {
-                            m_mesh.indices[index_count + 0] = curr_vertex;
-                            m_mesh.indices[index_count + 1] = next_vertex;
-                            m_mesh.indices[index_count + 2] = prev_row_next_vertex;
+                            m_mesh.m_indices[index_count + 0] = curr_vertex;
+                            m_mesh.m_indices[index_count + 1] = next_vertex;
+                            m_mesh.m_indices[index_count + 2] = prev_row_next_vertex;
                         }
                         else
                         {
-                            m_mesh.indices[index_count + 0] = curr_vertex;
-                            m_mesh.indices[index_count + 1] = prev_row_next_vertex;
-                            m_mesh.indices[index_count + 1] = next_vertex;
+                            m_mesh.m_indices[index_count + 0] = curr_vertex;
+                            m_mesh.m_indices[index_count + 1] = prev_row_next_vertex;
+                            m_mesh.m_indices[index_count + 1] = next_vertex;
                         }
                     }
                 }
@@ -129,8 +129,8 @@ public struct CreatePickupItemMeshJob : IJob
             curr = next;
         }
 
-        m_mesh.counts[0] = vertex_count;
-        m_mesh.counts[1] = index_count;
+        m_mesh.m_counts[0] = vertex_count;
+        m_mesh.m_counts[1] = index_count;
     }
 
 }
@@ -200,8 +200,6 @@ public class PickupItemIndicatorManager : MonoBehaviour
                 m_uvs             = new NativeArray<float2>(vertex_count, Allocator.Persistent),
                 m_indices         = new NativeArray<int>(index_count, Allocator.Persistent),
                 m_counts          = new NativeArray<int>(2, Allocator.Persistent),
-                m_maxStepCount    = m_maxStepCount,
-                m_verticesPerStep = m_verticesPerStep,
             };
         }
 
@@ -258,12 +256,16 @@ public class PickupItemIndicatorManager : MonoBehaviour
                 Vector3 target              = m_targetRequests[(i + tail) % MAX_TARGET_REQUESTS];
                 CreatePickupItemMeshJob job = new CreatePickupItemMeshJob
                 {
-                    m_maxStepSize    = m_maxStepSize,
-                    m_maxAngleChange = m_maxAngleChange,
-                    m_meshRadius     = m_meshRadius,
-                    m_start          = this.transform.position,
-                    m_end            = target,
-                    m_mesh           = m_meshes[i],
+                    m_maxStepSize     = m_maxStepSize,
+                    m_maxAngleChange  = m_maxAngleChange,
+                    m_meshRadius      = m_meshRadius,
+                    m_start           = this.transform.position,
+                    m_end             = target,
+                    m_mesh            = m_meshes[i],
+                    m_maxStepCount    = m_maxStepCount,
+                    m_verticesPerStep = m_verticesPerStep,
+                    m_forward         = this.transform.forward,
+                    m_up              = this.transform.up,
                 };
 
                 handles[i]           = job.Schedule();
