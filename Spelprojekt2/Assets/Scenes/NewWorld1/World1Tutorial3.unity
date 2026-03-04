@@ -5785,7 +5785,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a11d28568aaa1034ea68f37f21457235, type: 2}
+  - {fileID: 2100000, guid: c1dd220c905e7be419bfe289c9b49c55, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -14803,6 +14803,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.4365
       objectReference: {fileID: 0}
+    - target: {fileID: 2974574439184774940, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6fc64bdb21a578548bb734a30fb8e903, type: 2}
     - target: {fileID: 3163582755166936532, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -14858,6 +14862,18 @@ PrefabInstance:
     - target: {fileID: 5646025674515700794, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
       propertyPath: m_LocalPosition.y
       value: -0.81
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232810350626547953, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232810350626547953, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MoveToIndex
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232810350626547953, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7911134414467882935, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
       propertyPath: m_Name
