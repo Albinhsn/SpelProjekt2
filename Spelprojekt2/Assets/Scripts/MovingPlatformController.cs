@@ -102,9 +102,7 @@ public class MovingPlatformController : MonoBehaviour
 		//Yes, it is unoptimized
 		if (moving && !IsFiltered())
 		{
-
-			if (Vector3.Dot(m_movementDirection, m_platform.transform.position) > 
-                Vector3.Dot(m_movementDirection, m_targets[m_currentTarget].position)) //Destination reached within next update;
+			if ((m_targets[m_currentTarget].position - m_platform.transform.position).magnitude <= m_speed * Time.deltaTime)//Destination reached within next update;
 			{
 				m_platform.transform.position = m_targets[m_currentTarget].position;
 				m_currentPosition = m_currentTarget;
