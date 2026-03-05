@@ -13,17 +13,6 @@ MonoBehaviour:
   m_Name: EventRegistry
   m_EditorClassIdentifier: 
   events:
-  - id: MainMusic
-    evt:
-      Guid:
-        Data1: 1636199939
-        Data2: 1295459759
-        Data3: -2036209249
-        Data4: 561428599
-      Path: event:/Music/MainMusic
-    createInstanceOnStart: 0
-    startOnBoot: 0
-    preloadSampleData: 0
   - id: MenuMusic
     evt:
       Guid:
@@ -97,7 +86,18 @@ MonoBehaviour:
         Data2: 1187799154
         Data3: 1874114974
         Data4: -717546134
-      Path: event:/Audio/SFX/Interactables/Int_ButtonPress
+      Path: event:/Audio/SFX/Interactables/(WIP)Int_ButtonPress
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: Button
+    evt:
+      Guid:
+        Data1: -284315911
+        Data2: 1187799154
+        Data3: 1874114974
+        Data4: -717546134
+      Path: event:/Audio/SFX/Interactables/(WIP)Int_ButtonPress
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
