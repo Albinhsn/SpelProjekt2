@@ -90,7 +90,7 @@ public class PlayerCamera : MonoBehaviour
         if(!m_changedToFirstPersonThisFrame)
         {
             m_changedToFirstPersonThisFrame = true;
-            m_targetDistance = m_cameraDistanceFromPlayer;
+            m_currentDistance = m_targetDistance = m_cameraDistanceFromPlayer;
             InputManager.EnablePlayerMovement();
         }
         HandleRotation(m_rotationSmoothTime);
@@ -102,8 +102,7 @@ public class PlayerCamera : MonoBehaviour
     {
         if(m_changedToFirstPersonThisFrame)
         {
-            m_targetDistance = 0;
-            m_currentDistance = 0;
+            m_currentDistance = m_targetDistance = 0;
             m_changedToFirstPersonThisFrame = false;
             InputManager.DisablePlayerMovement();
         }
