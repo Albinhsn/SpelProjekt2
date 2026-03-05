@@ -56,14 +56,6 @@ public sealed class InputManager
     {
         return Instance.m_inputActions.UI.Navigate.ReadValue<Vector2>() + Instance.m_inputActions.UI.NavigateController.ReadValue<Vector2>();    
     }
-    public static Vector2 ReadPointerPosition()
-    {
-        return Instance.m_inputActions.UI.Point.ReadValue<Vector2>();
-    }
-    public static bool UIPointerSelect()
-    {
-        return Instance.m_inputActions.UI.PointerSelect.WasPressedThisFrame();
-    }
     public static Vector2 ReadLookValue()
     {
         return Instance.m_inputActions.Player.Look.ReadValue<Vector2>();
@@ -83,11 +75,7 @@ public sealed class InputManager
     }
     public static bool SelectUIOption()
     {
-        return Instance.m_inputActions.UI.Select.WasPressedThisFrame() || Instance.m_inputActions.UI.Submit.WasPressedThisFrame();
-    }
-    public static bool UIAdvance()
-    {
-        return Instance.m_inputActions.UI.Advance.WasPressedThisFrame();
+        return Instance.m_inputActions.UI.Select.WasPressedThisFrame();
     }
     public static bool Jumped()
     {
