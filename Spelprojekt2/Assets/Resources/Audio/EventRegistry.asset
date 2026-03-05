@@ -13,28 +13,6 @@ MonoBehaviour:
   m_Name: EventRegistry
   m_EditorClassIdentifier: 
   events:
-  - id: MenuMusic
-    evt:
-      Guid:
-        Data1: 1628337942
-        Data2: 1075317644
-        Data3: -1532117589
-        Data4: 645156199
-      Path: event:/Music/MenuMusic
-    createInstanceOnStart: 0
-    startOnBoot: 0
-    preloadSampleData: 0
-  - id: TutorialMusic
-    evt:
-      Guid:
-        Data1: 1893677124
-        Data2: 1083721330
-        Data3: -857736318
-        Data4: 1193271649
-      Path: event:/Music/TutorialMusic
-    createInstanceOnStart: 0
-    startOnBoot: 0
-    preloadSampleData: 0
   - id: Fan
     evt:
       Guid:
@@ -54,17 +32,6 @@ MonoBehaviour:
         Data3: -112305521
         Data4: 697811712
       Path: event:/Audio/SFX/Interactables/Int_BoxDrop
-    createInstanceOnStart: 0
-    startOnBoot: 0
-    preloadSampleData: 0
-  - id: PuzzleComplete
-    evt:
-      Guid:
-        Data1: 200236152
-        Data2: 1285204982
-        Data3: -1571845743
-        Data4: 1494860498
-      Path: event:/Music/Stingers/PuzzleComplete
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
@@ -90,6 +57,28 @@ MonoBehaviour:
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
+  - id: MenuMusic
+    evt:
+      Guid:
+        Data1: 1628337942
+        Data2: 1075317644
+        Data3: -1532117589
+        Data4: 645156199
+      Path: event:/Music/MenuMusic
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: TutorialMusic
+    evt:
+      Guid:
+        Data1: 1893677124
+        Data2: 1083721330
+        Data3: -857736318
+        Data4: 1193271649
+      Path: event:/Music/TutorialMusic
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
   - id: W1Music
     evt:
       Guid:
@@ -97,18 +86,18 @@ MonoBehaviour:
         Data2: 1295459759
         Data3: -2036209249
         Data4: 561428599
-      Path: event:/Music/MainMusic
+      Path: event:/Music/Main Music/MainMusic
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
   - id: W1Low
     evt:
       Guid:
-        Data1: 966926191
-        Data2: 1181782530
-        Data3: 1672275884
-        Data4: -685921746
-      Path: event:/Music/Low
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
@@ -119,18 +108,29 @@ MonoBehaviour:
         Data2: 1226046891
         Data3: 1533689774
         Data4: -2026467435
-      Path: event:/Music/Mid
+      Path: event:/Music/Main Music/Mid
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
-  - id: W1Mid
+  - id: W1High
     evt:
       Guid:
         Data1: 285017597
         Data2: 1262136302
         Data3: -755701864
         Data4: -278652304
-      Path: event:/Music/High
+      Path: event:/Music/Main Music/High
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: BearingMusic
+    evt:
+      Guid:
+        Data1: 108911283
+        Data2: 1104845842
+        Data3: -364794945
+        Data4: 1611752119
+      Path: event:/Music/Bearing
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
@@ -145,14 +145,14 @@ MonoBehaviour:
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
-  - id: BearingMusic
+  - id: PuzzleComplete
     evt:
       Guid:
-        Data1: 108911283
-        Data2: 1104845842
-        Data3: -364794945
-        Data4: 1611752119
-      Path: event:/Music/Bearing
+        Data1: 200236152
+        Data2: 1285204982
+        Data3: -1571845743
+        Data4: 1494860498
+      Path: event:/Music/Stingers/PuzzleComplete
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
