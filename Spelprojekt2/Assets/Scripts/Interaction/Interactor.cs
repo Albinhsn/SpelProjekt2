@@ -21,7 +21,7 @@ namespace Interaction
         [ItemCanBeNull] private Interactable[] m_selected;
         private int m_interacting = -1; //Interaction type. -1=not interacting
 
-        public Vector3 aimDirection => InputManager.GetForwardAimDir();
+        public Vector3 aimDirection => m_targetOrigin.forward;
 
         public Vector3 position => m_targetOrigin.position;
 
@@ -105,6 +105,7 @@ namespace Interaction
             
             foreach (Interactable obj in m_interactableSets[set_index].GetEnumerable())
             {
+                Debug.Log(obj.name);
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
                 float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
                 

@@ -14,8 +14,25 @@ public class SkySettings : MonoBehaviour
         Apply();
 #endif
     }
+    public static void Apply(SkySettings settings)
+    {
+        SkySettingsData data = settings.m_data;
+        if(data != null)
+        {
+            Camera cam = Camera.main;
+            if(cam != null)
+            {
+                HDAdditionalCameraData camera_data = cam.gameObject.GetComponent<HDAdditionalCameraData>();
+                camera_data.clearColorMode     = data.m_clearKind;
+                camera_data.backgroundColorHDR = data.m_clearColor;
 
-    public void Apply()
+                Light sun       = RenderSettings.sun;
+                sun.intensity   = data.m_directionalLightEmissionInLux;
+            }
+        }
+    }
+
+    public  void Apply()
     {
         if(m_data != null)
         {

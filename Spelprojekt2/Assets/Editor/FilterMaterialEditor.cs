@@ -45,6 +45,5 @@ public class FilterMaterialEditor : Editor
 
         }
         serializedObj.ApplyModifiedProperties();
-        EditorUtility.SetDirty(obj);
     }
 }
