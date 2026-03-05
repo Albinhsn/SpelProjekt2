@@ -13,6 +13,7 @@ namespace Interaction.Dialogue
         [SerializeField] private TextAsset m_inkData;
         [SerializeField] private DialogueRelay m_dlsRelay;
         [Tooltip("Index 0 is default while interacting")][SerializeField] private CinemachineCamera[] m_cameraOverrides;
+        [SerializeField] private float m_typeDelay = 0.1f;
         private Story m_story;
         private bool m_interacting;
         [CanBeNull] private Interactor m_activeInteractor;
@@ -47,10 +48,12 @@ namespace Interaction.Dialogue
             }
             m_activeInteractor = interactor;
             SetActiveCamera(0);
+
+            DialoguePacket packet = new DialoguePacket(m_story, m_typeDelay);
             
             m_interacting = true;
             m_story.Continue();
-            m_dlsRelay.Initiate(m_story, this);
+            m_dlsRelay.Initiate(packet, this);
         }
         
         private void UpdateDialogue()

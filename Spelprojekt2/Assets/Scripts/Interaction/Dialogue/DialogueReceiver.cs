@@ -38,6 +38,8 @@ namespace Interaction.Dialogue
         private string m_speakerName;
         private bool m_subscribed;
         private bool m_initialSubscribed;
+        private float m_dfTypeDelay;
+        private float m_typeDelay;
 
         
         private bool m_interacting => m_activeStory is not null;
@@ -116,15 +118,20 @@ namespace Interaction.Dialogue
             
         }
 
-        private void InitiateDialogue(Story story)
+        private void InitiateDialogue(DialoguePacket packet)
         {
             UIManager.EnterState(UIState.Dialogue);
+            
             
             m_speakerName = "";
             SetFont(0, m_textOut);
             Assert.IsTrue(m_activeStory is null);
             m_dialogueContainer.gameObject.SetActive(true);
-            m_activeStory = story;
+            
+            m_activeStory = packet.story;
+            m_typeDelay = packet.typeDelay;
+            m_dfTypeDelay = packet.typeDelay;
+            
             if(m_activeStory.globalTags is not null) ParseGlobalTags(m_activeStory.globalTags.ToArray());
             UpdateDialogue();
         }
@@ -319,6 +326,10 @@ namespace Interaction.Dialogue
                     {
                         case "speaker":
                             m_speakerName = value;
+                            break;
+                        case "speed":
+                            if (value == "default") m_typeDelay = m_dfTypeDelay;
+                            else m_typeDelay = float.Parse(value);
                             break;
                     }
                 }
