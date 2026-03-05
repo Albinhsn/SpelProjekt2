@@ -4,7 +4,7 @@ using UnityEngine;
 public class MovingPlatformReceiver : MonoBehaviour
 {
     private Rigidbody m_rb;
-    public Rigidbody rigidbody => m_rb;
+    public Rigidbody rb => m_rb;
     private Vector3 m_currentMovement = Vector3.zero;
     public event System.Action<Vector3> d_onMovementChanged;
 

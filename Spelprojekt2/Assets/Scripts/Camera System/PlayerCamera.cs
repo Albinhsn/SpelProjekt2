@@ -21,7 +21,6 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float m_zoomSmoothSpeed = 10f;
 
     [Header("Shoulder")]
-    [SerializeField] private float m_shoulderOffset = 1.2f;
     [SerializeField] private float m_shoulderDisplacementStartDistance = 3f;
     [SerializeField] private float m_shoulderSmoothSpeed = 8f;
 
