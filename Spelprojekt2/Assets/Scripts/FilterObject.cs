@@ -25,6 +25,9 @@ public class FilterObject : MonoBehaviour
 {
     public FilterKind m_kind;
 
+    [SerializeField]
+    private bool m_dontChangeRBKinematic;
+
     public bool Activated => m_activated;
     private bool m_activated;
     private MeshRenderer m_renderer;
@@ -118,12 +121,12 @@ public class FilterObject : MonoBehaviour
             m_collider.isTrigger = true;
         }
 
-        if(m_rb != null)
+        if(m_rb != null && !m_dontChangeRBKinematic)
         {
             m_rb.isKinematic = true;
         }
         
-        m_interactableComponent?.SetIsInteractable(true);
+        m_interactableComponent?.SetIsInteractable(false);
 
         // NOTE(ah): We do this because there is a chance that if two objects are colliding
         // and we change one to being filtered even though the collider is trigger and the rb
@@ -152,12 +155,12 @@ public class FilterObject : MonoBehaviour
             m_collider.isTrigger = false;
         }
 
-        if(m_rb != null)
+        if(m_rb != null && !m_dontChangeRBKinematic)
         {
             m_rb.isKinematic = false;
         }
         
-        m_interactableComponent?.SetIsInteractable(false);
+        m_interactableComponent?.SetIsInteractable(true);
         m_interactableComponent?.ForceCancelInteraction();
     }
 }

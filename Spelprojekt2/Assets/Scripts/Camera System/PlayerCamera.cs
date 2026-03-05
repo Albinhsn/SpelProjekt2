@@ -186,7 +186,7 @@ public class PlayerCamera : MonoBehaviour
             zoomT = 1f - Mathf.InverseLerp(m_minZoomDistance, 0, m_currentDistance);
         }
 
-        float targetShoulder = zoomT * (m_isRightShoulder ? 1f : -1f);
+        float targetShoulder = m_shoulderOffset * zoomT * (m_isRightShoulder ? 1f : -1f);
 
         m_currentShoulderOffset = Mathf.Lerp(m_currentShoulderOffset, targetShoulder, m_shoulderSmoothSpeed * Time.deltaTime);
 
