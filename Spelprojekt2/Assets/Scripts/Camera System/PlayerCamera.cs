@@ -7,7 +7,7 @@ public class PlayerCamera : MonoBehaviour
 {
     [Header("Orbit")]
     [SerializeField] private float m_mouseSensitivity = 15f;
-    [SerializeField] private float m_pitchClamp = 60f;
+    [SerializeField] private float m_pitchAngleClamp = 60f;
     [SerializeField] private float m_rotationSmoothTime = 0.05f;
     [Header("Third Person")]
     [SerializeField] private float m_thirdPersonCameraHeight = .5f;
@@ -18,8 +18,9 @@ public class PlayerCamera : MonoBehaviour
     [Header("First Person/Zoom")]
     [SerializeField] private float m_firstPersonCameraHeight = .75f;
     [SerializeField] private float m_maxZoomDistance = 15;
-    [SerializeField] private float m_zoomSpeed = 50;
+    [SerializeField] private float m_zoomSensitivity = 50;
     [SerializeField] private float m_zoomSmoothSpeed = 10;
+    [SerializeField] private float m_firstPersonRotationSmoothTime = .2f;
     [SerializeField] private float m_firstPersonDecolliderRadius = 1f;
 
     [Header("Shoulder")]
@@ -92,7 +93,7 @@ public class PlayerCamera : MonoBehaviour
             m_targetDistance = m_cameraDistanceFromPlayer;
             InputManager.EnablePlayerMovement();
         }
-        HandleRotation();
+        HandleRotation(m_rotationSmoothTime);
         Decollider();
         
         UpdateCamera();
@@ -107,7 +108,7 @@ public class PlayerCamera : MonoBehaviour
             InputManager.DisablePlayerMovement();
         }
 
-        HandleRotation();
+        HandleRotation(m_firstPersonRotationSmoothTime);
         HandleZoom();
         FirstPersonDecollider();
 
@@ -129,7 +130,7 @@ public class PlayerCamera : MonoBehaviour
             zoomInput = -1f;
         }
 
-        m_targetDistance += zoomInput * m_zoomSpeed * Time.deltaTime;
+        m_targetDistance += zoomInput * m_zoomSensitivity * Time.deltaTime;
         
         m_targetDistance = Mathf.Clamp(m_targetDistance, 0, m_maxZoomDistance);
         m_currentDistance = Mathf.Lerp(m_currentDistance, m_targetDistance, m_zoomSmoothSpeed * Time.deltaTime);
@@ -165,17 +166,17 @@ public class PlayerCamera : MonoBehaviour
         }
     }
 
-    void HandleRotation()
+    void HandleRotation(float smoothFactor)
     {
         Vector2 input = InputManager.ReadLookValue();
 
         m_targetYaw += input.x * m_mouseSensitivity * Time.deltaTime;
         m_targetPitch -= input.y * m_mouseSensitivity * Time.deltaTime;
-        m_targetPitch = Mathf.Clamp(m_targetPitch, -m_pitchClamp, m_pitchClamp);
+        m_targetPitch = Mathf.Clamp(m_targetPitch, -m_pitchAngleClamp, m_pitchAngleClamp);
 
-        m_currentYaw = Mathf.SmoothDampAngle(m_currentYaw, m_targetYaw, ref m_yawVelocity, m_rotationSmoothTime);
+        m_currentYaw = Mathf.SmoothDampAngle(m_currentYaw, m_targetYaw, ref m_yawVelocity, smoothFactor);
 
-        m_currentPitch = Mathf.SmoothDampAngle(m_currentPitch, m_targetPitch, ref m_pitchVelocity, m_rotationSmoothTime);
+        m_currentPitch = Mathf.SmoothDampAngle(m_currentPitch, m_targetPitch, ref m_pitchVelocity, smoothFactor);
     }
 
     void HandleShoulderSwitch()
