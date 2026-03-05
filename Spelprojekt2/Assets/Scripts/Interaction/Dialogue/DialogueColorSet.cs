@@ -6,10 +6,12 @@ namespace Interaction.Dialogue
     [CreateAssetMenu(menuName = "Data/DialogueSystem/ColorSet")]
     public class DialogueColorSet : ScriptableObject
     {
-        [SerializeField] private Color m_highlight;
+        [SerializeField] private Color m_alternativeDefault;
+        [SerializeField] private Color m_alternativeHighlight;
         [SerializeField] private ColorEntry[] m_colors = { new ColorEntry("default", Color.white) };
-        public Color defaultColor => m_colors[0].color;
-        public Color highlightColor => m_highlight;
+        public Color textDefaultColor => m_colors[0].color;
+        public Color alternativeHighlightColor => m_alternativeHighlight;
+        public Color alternativeDefaultColor => m_alternativeDefault;
 
         private void OnValidate()
         {
