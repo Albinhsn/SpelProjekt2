@@ -15,8 +15,7 @@ namespace srUtils.Unity
 
         [SerializeField] private string description;
         [SerializeField] private List<Object> objectList = new List<Object>();
-#endif
-#if !UNITY_EDITOR
+#else
         private readonly HashSet<Object> objectList = new HashSet<Object>();
 #endif
         [SerializeField] [CanBeNull] private IntPort countOutput;
@@ -26,9 +25,12 @@ namespace srUtils.Unity
         
         public void Add(Object obj)
         {
-            objectList.Add(obj);
-            OnUpdated?.Invoke();
-            if(countOutput is not null) countOutput.value = count;
+            if(!objectList.Contains(obj))
+            {
+                objectList.Add(obj);
+                OnUpdated?.Invoke();
+                if(countOutput is not null) countOutput.value = count;
+            }
         }
 
         public void Remove(Object obj)

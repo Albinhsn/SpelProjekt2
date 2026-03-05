@@ -10,6 +10,7 @@ public class Fan : MonoBehaviour
     [Header("Lift Settings")]
     [SerializeField] float m_windStrength = 15f;
     [SerializeField] float m_maxHeight = 10f;
+    [SerializeField] float m_xzPullStrength = 10f;
 
     [Header("Top Bob Settings")]
     [SerializeField] float m_bobAmplitude = 0.5f;
@@ -123,9 +124,9 @@ public class Fan : MonoBehaviour
 
             Vector2 xzDistance = XZDistanceToCenter(other.transform);
             rb.linearVelocity = new Vector3(
-                -xzDistance.x,
+                -xzDistance.x * m_xzPullStrength,
                 rb.linearVelocity.y,
-                -xzDistance.y
+                -xzDistance.y * m_xzPullStrength
             );
         }
     }

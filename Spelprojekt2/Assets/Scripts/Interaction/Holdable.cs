@@ -18,6 +18,9 @@ namespace Interaction
         [SerializeField] private float m_snapThreshold = 0.05f;
         [SerializeField] private float m_capsuleHeight = 1.5f;
         [SerializeField] private float m_holdRangeCorrectionStrength = 3;
+        [SerializeField] private float m_itemDistanceFromPlayer = 2;
+        [SerializeField] private float m_itemFloatHeight = .75f;
+        [SerializeField] private float m_itemMaxSpeed = 10;
         private float m_forwardLinearArc = 0.1f;
         
         private float m_currentVelocity;
@@ -66,6 +69,7 @@ namespace Interaction
             m_rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             m_isHeld = true;
             m_currentVelocity = 0;
+            m_rb.constraints |= RigidbodyConstraints.FreezeRotation;
             
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
         }
@@ -76,6 +80,8 @@ namespace Interaction
             m_activeInteractor = null;
             m_isHeld = false;
             base.TryCancelInteraction();
+            m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+
             return true;
         }
 
@@ -89,7 +95,47 @@ namespace Interaction
         {
             if (m_isHeld)
             {
-                //Update velocity
+                Vector3 targetPos = m_activeInteractor.transform.position + m_activeInteractor.transform.forward * m_itemDistanceFromPlayer + new Vector3(0, m_itemFloatHeight, 0);
+                Vector3 itemToPlayerDir = m_activeInteractor.transform.position - transform.position;
+                Vector2 itemToPlayerDirXZ = new Vector2(itemToPlayerDir.x, itemToPlayerDir.z).normalized;
+                Vector2 itemToPlayerDirXZNormal = new Vector2(-itemToPlayerDirXZ.y, itemToPlayerDirXZ.x);
+                float itemToPlayerDist = itemToPlayerDir.magnitude;
+                float itemToPlayerDistXZ = new Vector2(itemToPlayerDir.x, itemToPlayerDir.z).magnitude;
+                float distanceToCircle = itemToPlayerDist - m_itemDistanceFromPlayer;
+                float distanceToCircleXZ = itemToPlayerDistXZ - m_itemDistanceFromPlayer;
+                Vector3 itemToTargetPosDir = transform.position + (itemToPlayerDir * distanceToCircle);
+                Vector3 directionToTargetFromCircle = targetPos - itemToTargetPosDir;
+                float distanceToTargetFromItemXZ = new Vector2(targetPos.x - transform.position.x, targetPos.z - transform.position.z).magnitude;
+
+                // if item is outside of the circle the value is negative, if it's inside, the value is positive
+                float forwardDir = -Mathf.Sign(distanceToCircleXZ);
+                float Dir = Mathf.Sign(Vector2.Dot(itemToPlayerDirXZNormal, new Vector2(directionToTargetFromCircle.x, directionToTargetFromCircle.z)));
+
+                float angle = Mathf.Clamp(Mathf.Abs(distanceToCircleXZ) * 100f,0,45f);
+
+                Vector3 targetVelocity = new Vector3(
+                    itemToPlayerDirXZNormal.x * Mathf.Cos(Mathf.Deg2Rad*forwardDir*Dir*angle) - itemToPlayerDirXZNormal.y * Mathf.Sin(Mathf.Deg2Rad*forwardDir*Dir*angle),
+                    targetPos.y - transform.position.y,
+                    itemToPlayerDirXZNormal.x * Mathf.Sin(Mathf.Deg2Rad*forwardDir*Dir*angle) + itemToPlayerDirXZNormal.y * Mathf.Cos(Mathf.Deg2Rad*forwardDir*Dir*angle)
+                );
+    
+                // targetVelocity = targetPos - transform.position;
+                
+                float speed = Mathf.Clamp(distanceToTargetFromItemXZ*distanceToTargetFromItemXZ, 0, m_itemMaxSpeed);
+                float verticalSpeed = Mathf.Clamp(Mathf.Abs(targetPos.y - transform.position.y * targetPos.y - transform.position.y * 2), 0, m_itemMaxSpeed);
+                Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+                if(rb != null)
+                {
+                    rb.linearVelocity = GameObject.FindFirstObjectByType<Player>().GetComponent<Rigidbody>().linearVelocity;
+                    rb.linearVelocity += new Vector3(targetVelocity.x * Dir * speed, targetVelocity.y * verticalSpeed, targetVelocity.z * Dir * speed);
+                    // rb.linearVelocity += targetVelocity.normalized;
+                }
+                Vector3 dir = m_activeInteractor.transform.position - transform.position;
+                if(dir.magnitude > m_itemDistanceFromPlayer * 3f)
+                {
+                    TryCancelInteraction();
+                }
+                /*Update velocity
                 m_currentVelocity = m_targetDistance > m_decThreshold ? MathF.Min(m_maxVelocity, m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) : MathF.Max(0, m_currentVelocity - m_deceleration * Time.fixedDeltaTime);
                 
                 if (m_targetDistance < m_snapThreshold + m_currentVelocity * Time.fixedDeltaTime)//Snap
@@ -99,7 +145,13 @@ namespace Interaction
                     return;
                 }
                 
-                
+
+
+                float outer = 0;//MathF.Max(0, m_outerDistance / m_linearMovementThreshold); //Linear movement outside of spherical movement range
+                float cone = (m_forwardAngleCorrespondence - (1 - m_forwardLinearArc)) / m_forwardLinearArc;
+                float t = MathF.Min(1, //Spherical v linear movement T
+                                  MathF.Max(cone, //Linear movement cone 
+                                  outer));
                 if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc && m_targetDistance < m_distanceToInteractor)
                 {
                     m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
@@ -109,10 +161,7 @@ namespace Interaction
                     m_rb.linearVelocity = (
                         Vector3.Slerp(
                             Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
-                                MathF.Min(1, //Spherical v linear movement T
-                                  MathF.Max((m_forwardAngleCorrespondence - (1 - m_forwardLinearArc)) / m_forwardLinearArc, //Linear movement cone 
-                                  MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
-                                  )))),
+                                t),
                         -m_interactorDirection, //Hold range correction
                         MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)))//Hold range correction T
                     ).normalized; 
