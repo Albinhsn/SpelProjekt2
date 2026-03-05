@@ -28,14 +28,17 @@ public class PlayerTransformHandler : MonoBehaviour
         Vector3 right = Rejection(InputManager.GetRightAimDir(), new Vector3(0, 1, 0)); 
         Vector2 input = InputManager.ReadMovementValue(); 
         Vector3 dir = forward * input.y + right * input.x; 
-        if(m_parentRb.linearVelocity.magnitude > 0.1f && input != Vector2.zero) 
-        { 
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(dir.normalized, Vector3.up), m_transformRotationSpeed); 
-        } 
-        else 
-        { 
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(forward.normalized, Vector3.up), m_transformRotationSpeed); 
-        } 
+        if (input != Vector2.zero)
+        {
+            if(m_parentRb.linearVelocity.magnitude > 0.1f) 
+            { 
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(dir.normalized, Vector3.up), m_transformRotationSpeed); 
+            } 
+            else
+            { 
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(forward.normalized, Vector3.up), m_transformRotationSpeed); 
+            } 
+        }
         HandleTransparancy();
     } 
 
