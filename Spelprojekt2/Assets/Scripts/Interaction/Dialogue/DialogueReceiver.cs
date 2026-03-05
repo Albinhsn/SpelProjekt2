@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Ink.Runtime;
 using JetBrains.Annotations;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -17,20 +18,20 @@ namespace Interaction.Dialogue
         [SerializeField] private DialogueColorSet m_colorSet;
         
         [Header("Local")]
-        [SerializeField] private GameObject m_dialogueContainer;
+        [SerializeField] private RectTransform m_dialogueContainer;
         [SerializeField] private TextMeshProUGUI m_textOut;
-        [SerializeField] private GameObject m_canContinueIndicator;
-        [SerializeField] private Transform m_altButtonContainer;
+        [SerializeField] private RectTransform m_altButtonContainer;
         [SerializeField] private GameObject m_altButtonPrefab;
         [SerializeField] private float m_altButtonOffset;
         [SerializeField] private float m_inputRepeatDelay = 0.1f;
         
-        private List<TextMeshProUGUI> m_alternatives;
-        private int m_altCount;
-        private int m_selectedAlt = -1;
+        private List<TextMeshProUGUI> m_pooledAltObjects;
+        private int m_currentAltCount;
+        [SerializeField] private int m_selectedAlt = 0;
         
         //Static
         private Vector2Int m_screenBounds;
+        private Rect m_readOnlyAltTransform;
         
         //Per-interaction
         [CanBeNull] private Story m_activeStory;
@@ -48,7 +49,9 @@ namespace Interaction.Dialogue
             m_initialSubscribed = false;
 
             m_screenBounds = new Vector2Int(Screen.currentResolution.width, Screen.currentResolution.height);
-
+            TextMeshProUGUI alt = Instantiate(m_altButtonPrefab, m_altButtonContainer).GetComponent<TextMeshProUGUI>();
+            m_readOnlyAltTransform = alt.rectTransform.rect;
+            Destroy(alt.gameObject);
         }
 
         void Start()
@@ -59,8 +62,8 @@ namespace Interaction.Dialogue
                 m_relay.d_onDialogueInitiation += InitiateDialogue;
                 m_relay.d_onDialogueUpdate += UpdateDialogue;
                 m_relay.d_onDialogueExit += EndDialogue;
-                m_dialogueContainer.SetActive(false);
-                if (m_alternatives is null) m_alternatives = new List<TextMeshProUGUI>();
+                m_dialogueContainer.gameObject.SetActive(false);
+                if (m_pooledAltObjects is null) m_pooledAltObjects = new List<TextMeshProUGUI>();
                 m_subscribed = true;
                 m_initialSubscribed = true;
             }
@@ -70,8 +73,7 @@ namespace Interaction.Dialogue
         {
             if(!m_interacting) return;
 
-
-            if (m_altCount == 0)//Continuation
+            if (m_currentAltCount == 0)//Continuation
             {
                 if (InputManager.UIAdvance()) m_relay.Select(-1);
             }
@@ -90,8 +92,8 @@ namespace Interaction.Dialogue
                 m_relay.d_onDialogueInitiation += InitiateDialogue;
                 m_relay.d_onDialogueUpdate += UpdateDialogue;
                 m_relay.d_onDialogueExit += EndDialogue;
-                m_dialogueContainer.SetActive(false);
-                if (m_alternatives is null) m_alternatives = new List<TextMeshProUGUI>();
+                m_dialogueContainer.gameObject.SetActive(false);
+                if (m_pooledAltObjects is null) m_pooledAltObjects = new List<TextMeshProUGUI>();
                 m_subscribed = true;
                 
             }
@@ -121,15 +123,15 @@ namespace Interaction.Dialogue
             m_speakerName = "";
             SetFont(0, m_textOut);
             Assert.IsTrue(m_activeStory is null);
-            m_dialogueContainer.SetActive(true);
+            m_dialogueContainer.gameObject.SetActive(true);
             m_activeStory = story;
             if(m_activeStory.globalTags is not null) ParseGlobalTags(m_activeStory.globalTags.ToArray());
             UpdateDialogue();
         }
         private void UpdateDialogue()
         {
-            m_selectedAlt = -1;
-            m_altCount = 0;
+            m_selectedAlt = 0;
+            m_currentAltCount = 0;
             if(m_activeStory.currentTags is not null) ParseTags(m_activeStory.currentTags.ToArray());
             
             if (m_speakerName != "")
@@ -138,12 +140,14 @@ namespace Interaction.Dialogue
             }
             else m_textOut.text = m_activeStory.currentText;
             
-            if(m_activeStory.currentChoices is not null) SetAlternatives(m_activeStory.currentChoices.ToArray());
-            m_canContinueIndicator.SetActive(m_activeStory.canContinue);
+            SetAlternatives(m_activeStory.currentChoices.ToArray());
+
+            m_textOut.rectTransform.anchoredPosition = new Vector2(m_textOut.rectTransform.anchoredPosition.x,
+                -m_altButtonContainer.rect.height + (m_textOut.rectTransform.rect.height / 2 + m_readOnlyAltTransform.height + m_altButtonOffset + (m_altButtonOffset + m_readOnlyAltTransform.height) * m_currentAltCount));
         }
         private void EndDialogue()
         {
-            m_dialogueContainer.SetActive(false);
+            m_dialogueContainer.gameObject.SetActive(false);
             m_activeStory = null;
             m_speakerName = "";
             
@@ -153,31 +157,46 @@ namespace Interaction.Dialogue
 
         private void SetAlternatives(Choice[] alts)
         {
-            m_altCount = alts.Length;
-            m_selectedAlt = -1;
-            for (int a = m_alternatives.Count; a < m_altCount; a++)
+            if (alts.Length == 0)
             {
-                m_alternatives.Add(Instantiate(m_altButtonPrefab, m_altButtonContainer).GetComponent<TextMeshProUGUI>());
-                RectTransform alt_transform = m_alternatives[a].GetComponent<RectTransform>();
-                alt_transform.anchoredPosition = new Vector2(0, 0 - alt_transform.rect.height / 2 - m_altButtonOffset - a * alt_transform.rect.height);
-                SetFont(0, m_alternatives[a]);
+                for (int a = 0; a < m_pooledAltObjects.Count; a++)
+                {
+                    m_pooledAltObjects[a].gameObject.SetActive(false);
+                }
+                return;
+            }
+            
+            m_currentAltCount = alts.Length;
+            for (int a = m_pooledAltObjects.Count; a < m_currentAltCount; a++)
+            {
+                m_pooledAltObjects.Add(Instantiate(m_altButtonPrefab, m_altButtonContainer).GetComponent<TextMeshProUGUI>());
+                RectTransform alt_transform = m_pooledAltObjects[a].rectTransform;
+                alt_transform.anchoredPosition = new Vector2(0, -m_altButtonContainer.rect.height + (m_readOnlyAltTransform.height + m_altButtonOffset + (m_altButtonOffset + m_readOnlyAltTransform.height) * (m_currentAltCount - a - 1)));
+                SetFont(0, m_pooledAltObjects[a]);
                 
-                m_alternatives[a].color = m_colorSet.defaultColor;
+                m_pooledAltObjects[a].color = m_colorSet.alternativeDefaultColor;
             }
 
-            for (int a = 0; a < m_alternatives.Count; a++)
+            for (int a = 0; a < m_pooledAltObjects.Count; a++)
             {
-                if (a < m_altCount)
+                if (a < m_currentAltCount)
                 {
-                    m_alternatives[a].gameObject.SetActive(true);
-                    m_alternatives[a].GetComponentInChildren<TextMeshProUGUI>().text = alts[a].text;
+                    m_pooledAltObjects[a].gameObject.SetActive(true);
+                    m_pooledAltObjects[a].text = alts[a].text;
                 }
-                else m_alternatives[a].gameObject.SetActive(false);
+                else m_pooledAltObjects[a].gameObject.SetActive(false);
             }
+            
+            
+            m_selectedAlt = 0;
+            m_lastDiscreteInput = 0;
+            m_holdCooldown = 0;
+            m_lastPointerPosition = InputManager.ReadPointerPosition();
+            Highlight(m_pooledAltObjects[0]);
         }
 
         private Vector2 m_lastPointerPosition;
-        private int m_lastDiscreteInput;
+        private int m_lastDiscreteInput = 0;
         private float m_holdCooldown;
         private void HandleAlternatives()
         {
@@ -188,31 +207,33 @@ namespace Interaction.Dialogue
             {
                 m_selectedAlt = GetPointerAltSector();
                 m_lastPointerPosition = pointer_input;
-                
             }
             else
             {
                 //Discrete navigation input
-                int navigation_input = (int)MathF.Ceiling(InputManager.ReadUINavigationValue().y);
+                int navigation_input = (int)MathF.Ceiling(-InputManager.ReadUINavigationValue().y);
                 m_holdCooldown -= Time.deltaTime;
-                if (m_holdCooldown <= 0 || m_lastDiscreteInput != navigation_input)
+                if (navigation_input != 0 || m_lastDiscreteInput != navigation_input)
                 {
-                    m_holdCooldown = m_inputRepeatDelay;
-                    m_lastDiscreteInput = navigation_input;
-                    m_selectedAlt += navigation_input;
-                    //Wrap
-                    if (m_selectedAlt >= m_altCount) m_selectedAlt = 0;
-                    else if (m_selectedAlt < 0) m_selectedAlt = m_altCount - 1;
+                    if (m_holdCooldown <= 0 || m_lastDiscreteInput != navigation_input)
+                    {
+                        m_holdCooldown = m_inputRepeatDelay;
+                        m_lastDiscreteInput = navigation_input;
+                        m_selectedAlt += navigation_input;
+                        //Wrap
+                        if (m_selectedAlt >= m_currentAltCount) m_selectedAlt = 0;
+                        else if (m_selectedAlt < 0) m_selectedAlt = m_currentAltCount - 1;
+                    }
                 }
             }
 
             //Visuals
             if (m_selectedAlt != prev_selection)
             {
-                for (int a = 0; a < m_altCount; a++)
+                for (int a = 0; a < m_currentAltCount; a++)
                 {
-                    if (a == m_selectedAlt) Highlight(m_alternatives[a]);
-                    else Unhighlight(m_alternatives[a]);
+                    if (a == m_selectedAlt) Highlight(m_pooledAltObjects[a]);
+                    else Unhighlight(m_pooledAltObjects[a]);
                 }
             }
         }
@@ -221,23 +242,32 @@ namespace Interaction.Dialogue
         {
             if(m_selectedAlt == -1) return;
 
-            if (InputManager.SelectUIOption() || InputManager.UIPointerSelect() && m_selectedAlt == GetPointerAltSector()) m_relay.Select(m_selectedAlt);
-
+            if (InputManager.SelectUIOption() ||
+                InputManager.UIPointerSelect() && m_selectedAlt == GetPointerAltSector())
+            {
+                Unhighlight(m_pooledAltObjects[m_selectedAlt]);
+                m_relay.Select(m_selectedAlt);
+            }
         }
 
         private int GetPointerAltSector()
         {
-            //TODO: Mouse logic
+            Vector2 pointer_position = InputManager.ReadPointerPosition();
+            for (int a = 0; a < m_currentAltCount; a++)
+            {
+                Rect bounds = m_pooledAltObjects[a].rectTransform.rect;
+                if (bounds.Contains(pointer_position)) return a;
+            }
             return -1;
         }
 
         private void Highlight(TextMeshProUGUI text)
         {
-            text.color = m_colorSet.highlightColor;
+            text.color = m_colorSet.alternativeHighlightColor;
         }
         private void Unhighlight(TextMeshProUGUI text)
         {
-            text.color = m_colorSet.defaultColor;
+            text.color = m_colorSet.alternativeDefaultColor;
         }
 
         private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
@@ -270,7 +300,7 @@ namespace Interaction.Dialogue
                 }
             }
 
-            if (use_default_color) m_textOut.color = m_colorSet.defaultColor;
+            if (use_default_color) m_textOut.color = m_colorSet.textDefaultColor;
         }
 
         private void ParseGlobalTags(string[] tags)
