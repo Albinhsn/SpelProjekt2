@@ -75,7 +75,7 @@ namespace Interaction.Dialogue
 
             if (m_currentAltCount == 0)//Continuation
             {
-                if (InputManager.UIAdvance()) m_relay.Select(-1);
+                if (InputManager.UIAdvance() || InputManager.UIPointerSelect()) m_relay.Select(-1);
             }
             else
             {
@@ -170,8 +170,6 @@ namespace Interaction.Dialogue
             for (int a = m_pooledAltObjects.Count; a < m_currentAltCount; a++)
             {
                 m_pooledAltObjects.Add(Instantiate(m_altButtonPrefab, m_altButtonContainer).GetComponent<TextMeshProUGUI>());
-                RectTransform alt_transform = m_pooledAltObjects[a].rectTransform;
-                alt_transform.anchoredPosition = new Vector2(0, -m_altButtonContainer.rect.height + (m_readOnlyAltTransform.height + m_altButtonOffset + (m_altButtonOffset + m_readOnlyAltTransform.height) * (m_currentAltCount - a - 1)));
                 SetFont(0, m_pooledAltObjects[a]);
                 
                 m_pooledAltObjects[a].color = m_colorSet.alternativeDefaultColor;
@@ -183,6 +181,7 @@ namespace Interaction.Dialogue
                 {
                     m_pooledAltObjects[a].gameObject.SetActive(true);
                     m_pooledAltObjects[a].text = alts[a].text;
+                    m_pooledAltObjects[a].rectTransform.anchoredPosition = new Vector2(0, -m_altButtonContainer.rect.height + (m_readOnlyAltTransform.height + m_altButtonOffset + (m_altButtonOffset + m_readOnlyAltTransform.height) * (m_currentAltCount - a - 1)));
                 }
                 else m_pooledAltObjects[a].gameObject.SetActive(false);
             }
@@ -256,6 +255,7 @@ namespace Interaction.Dialogue
             for (int a = 0; a < m_currentAltCount; a++)
             {
                 Rect bounds = m_pooledAltObjects[a].rectTransform.rect;
+                bounds.center = m_pooledAltObjects[a].rectTransform.position;
                 if (bounds.Contains(pointer_position)) return a;
             }
             return -1;
