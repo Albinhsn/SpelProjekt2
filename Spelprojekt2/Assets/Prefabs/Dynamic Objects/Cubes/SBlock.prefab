@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7387583375799030221}
   - component: {fileID: 8915592059541386452}
   m_Layer: 7
-  m_Name: FallingSBlock
+  m_Name: SBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -12, y: 0.8464944, z: -0.80999947}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5893399214888264593}
@@ -138,7 +138,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 122
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &2052881146214243202
 MonoBehaviour:
@@ -210,6 +210,9 @@ MonoBehaviour:
   m_snapThreshold: 0.05
   m_capsuleHeight: 1.5
   m_holdRangeCorrectionStrength: 3
+  m_itemDistanceFromPlayer: 2
+  m_itemFloatHeight: 0.75
+  m_itemMaxSpeed: 10
 --- !u!1 &6695603633368037678
 GameObject:
   m_ObjectHideFlags: 0
