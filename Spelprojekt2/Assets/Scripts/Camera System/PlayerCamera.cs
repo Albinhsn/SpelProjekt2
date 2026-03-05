@@ -168,9 +168,12 @@ public class PlayerCamera : MonoBehaviour
     void HandleRotation(float smoothFactor)
     {
         Vector2 input = InputManager.ReadLookValue();
+        if(input != Vector2.zero)
+        {
+            m_targetYaw += input.x * m_mouseSensitivity * Time.deltaTime;
+            m_targetPitch -= input.y * m_mouseSensitivity * Time.deltaTime;
+        }
 
-        m_targetYaw += input.x * m_mouseSensitivity * Time.deltaTime;
-        m_targetPitch -= input.y * m_mouseSensitivity * Time.deltaTime;
         m_targetPitch = Mathf.Clamp(m_targetPitch, -m_pitchAngleClamp, m_pitchAngleClamp);
 
         m_currentYaw = Mathf.SmoothDampAngle(m_currentYaw, m_targetYaw, ref m_yawVelocity, smoothFactor);
