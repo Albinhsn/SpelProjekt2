@@ -123,25 +123,21 @@ public sealed class InputManager
     public static void DisablePlayerInput()
     {
         Instance.m_inputActions.Player.Disable();
+    }
 
-        //Temp while using cinemachine for camera control
-        var camera = GameObject.FindFirstObjectByType<CinemachineInputAxisController>();
-        if(camera != null)
-        {
-            camera.enabled = false;
-        }
+    public static void DisablePlayerMovement()
+    {
+        Instance.m_inputActions.Player.Move.Disable();
     }
 
     public static void EnablePlayerInput()
     {
         Instance.m_inputActions.Player.Enable();
+    }
 
-        //Temp while using cinemachine for camera control
-        var camera = GameObject.FindFirstObjectByType<CinemachineInputAxisController>();
-        if(camera != null)
-        {
-            camera.enabled = true;
-        }
+    public static void EnablePlayerMovement()
+    {
+        Instance.m_inputActions.Player.Move.Enable();
     }
 
     public static bool FlipGravity()
