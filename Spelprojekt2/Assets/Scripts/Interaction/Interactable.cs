@@ -21,6 +21,7 @@ namespace Interaction
 
         public bool requireUninteract => m_requireUninteract;
         public bool canControlWhileInteracting => m_canControlWhileInteracting;
+        public IndicatorKind m_indicator;
 
         [CanBeNull] protected Interactor m_activeInteractor = null;
 
@@ -48,12 +49,15 @@ namespace Interaction
             m_interactableSet.Remove(this);
         }
 
+        public virtual void SendIndicatorRequest(Vector3 src_p, Vector3 src_forward, Vector3 src_up)
+        {
+        }
+
 
         public virtual void Interact(Interactor interactor)
         { 
             m_onInteraction.Invoke(interactor);
             m_activeInteractor = interactor;
-            Debug.Log($"interacting with {gameObject.name}");
         }
 
         public virtual bool TryCancelInteraction()

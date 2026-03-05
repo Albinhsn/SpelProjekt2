@@ -61,6 +61,14 @@ namespace Interaction
             base.VirtOnDisable();
         }
 
+        public override void SendIndicatorRequest(Vector3 src_p, Vector3 src_forward, Vector3 src_up)
+        {
+            if(!m_isHeld)
+            {
+                PickupItemIndicatorManager.Request(src_p, src_forward, src_up, this.transform.position, m_indicator);
+            }
+        }
+
         private CollisionDetectionMode m_savedCollissionDetectionMode;
         public override void Interact(Interactor interactor)
         {
@@ -89,6 +97,14 @@ namespace Interaction
         {
             TryCancelInteraction();
             base.ForceCancelInteraction();
+        }
+
+        void Update()
+        {
+            if(m_isHeld)
+            {
+                PickupItemIndicatorManager.Request(m_activeInteractor.position, m_activeInteractor.transform.forward, m_activeInteractor.transform.up, this.transform.position, IndicatorKind.Held);
+            }
         }
 
         private void FixedUpdate()
@@ -135,51 +151,6 @@ namespace Interaction
                 {
                     TryCancelInteraction();
                 }
-                /*Update velocity
-                m_currentVelocity = m_targetDistance > m_decThreshold ? MathF.Min(m_maxVelocity, m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) : MathF.Max(0, m_currentVelocity - m_deceleration * Time.fixedDeltaTime);
-                
-                if (m_targetDistance < m_snapThreshold + m_currentVelocity * Time.fixedDeltaTime)//Snap
-                {
-                    m_currentVelocity = m_targetDistance / Time.fixedDeltaTime;
-                    m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                    return;
-                }
-                
-
-
-                float outer = 0;//MathF.Max(0, m_outerDistance / m_linearMovementThreshold); //Linear movement outside of spherical movement range
-                float cone = (m_forwardAngleCorrespondence - (1 - m_forwardLinearArc)) / m_forwardLinearArc;
-                float t = MathF.Min(1, //Spherical v linear movement T
-                                  MathF.Max(cone, //Linear movement cone 
-                                  outer));
-                if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc && m_targetDistance < m_distanceToInteractor)
-                {
-                    m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                }
-                else
-                {
-                    m_rb.linearVelocity = (
-                        Vector3.Slerp(
-                            Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
-                                t),
-                        -m_interactorDirection, //Hold range correction
-                        MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)))//Hold range correction T
-                    ).normalized; 
-
-                    m_rb.linearVelocity *= m_currentVelocity;//Velocity scale
-                }
-                
-                //Wall clip prevention (unnecessary, now using continuous collision detection while held
-                /*RaycastHit[] hit = Physics.RaycastAll(transform.position, m_rb.linearVelocity.normalized,
-                    m_currentVelocity * Time.deltaTime, srUtils.Unity.Utils.GetPhysicsLayerMask(gameObject.layer));
-                for (int a = 0; a < hit.Length; a++)
-                {
-                    if (hit[a].rigidbody != m_rb) //Wall detected
-                    {
-                        
-                        break;
-                    }
-                }*/
             }
         }
 

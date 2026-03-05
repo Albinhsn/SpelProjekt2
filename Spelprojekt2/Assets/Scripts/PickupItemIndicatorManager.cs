@@ -156,12 +156,30 @@ public struct CreatePickupItemMeshJob : IJob
 
 }
 
-[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
+public enum IndicatorKind
+{
+    None,
+    Held,
+    ClosestTarget,
+    Target,
+}
+
 public class PickupItemIndicatorManager : MonoBehaviour
 {
 
     private static PickupItemIndicatorManager I;
 
+    [Header("Materials")]
+    [SerializeField]
+    private Material m_heldMaterial;
+
+    [SerializeField]
+    private Material m_indicatorMaterial;
+
+    [SerializeField]
+    private Material m_closestMaterial;
+
+    [Header("Mesh Creation Settings")]
     [SerializeField]
     private float m_maxStepSize;
 
@@ -187,12 +205,14 @@ public class PickupItemIndicatorManager : MonoBehaviour
         public Vector3 dst;
         public Vector3 forward;
         public Vector3 up;
-        public IndicatorRequest(Vector3 src, Vector3 forward, Vector3 up, Vector3 dst)
+        public IndicatorKind kind;
+        public IndicatorRequest(Vector3 src, Vector3 forward, Vector3 up, Vector3 dst, IndicatorKind kind)
         {
             this.src = src;
             this.dst = dst;
             this.forward = forward;
             this.up      = up;
+            this.kind    = kind;
         }
     }
 
@@ -200,9 +220,6 @@ public class PickupItemIndicatorManager : MonoBehaviour
     private uint m_indicatorRequestHead;
     private uint m_indicatorRequestTail;
     private const uint MAX_INDICATOR_REQUESTS = 256;
-
-    private MeshRenderer m_rend;
-    private MeshFilter   m_filter;
 
     void Awake()
     {
@@ -234,9 +251,6 @@ public class PickupItemIndicatorManager : MonoBehaviour
                 m_counts          = new NativeArray<int>(2, Allocator.Persistent),
             };
         }
-
-        m_rend   = GetComponent<MeshRenderer>();
-        m_filter = GetComponent<MeshFilter>();
 
     }
 
@@ -275,14 +289,14 @@ public class PickupItemIndicatorManager : MonoBehaviour
         Awake();
     }
 
-    public static void Request(Vector3 src, Vector3 forward, Vector3 up, Vector3 dst)
+    public static void Request(Vector3 src, Vector3 forward, Vector3 up, Vector3 dst, IndicatorKind kind)
     {
         uint index = I.m_indicatorRequestHead++;
         if(I.m_indicatorRequestTail + MAX_INDICATOR_REQUESTS <= index)
         {
             Debug.LogError("Above limit for max target requests");
         }
-        I.m_indicatorRequests[index % MAX_INDICATOR_REQUESTS] = new(src, forward, up, dst);
+        I.m_indicatorRequests[index % MAX_INDICATOR_REQUESTS] = new(src, forward, up, dst, kind);
     }
 
     void LateUpdate()
@@ -324,7 +338,8 @@ public class PickupItemIndicatorManager : MonoBehaviour
                 handles[i].Complete();
             }
 
-            // ah: Combine meshes
+            // ah: Create submeshes
+            Mesh combined_mesh = new();
             {
                 int combined_vertex_count = 0;
                 int combined_index_count  = 0;
@@ -338,9 +353,7 @@ public class PickupItemIndicatorManager : MonoBehaviour
                 NativeArray<float3> vertices = new NativeArray<float3>(combined_vertex_count, Allocator.Temp);
                 NativeArray<float3> normals  = new NativeArray<float3>(combined_vertex_count, Allocator.Temp);
                 NativeArray<float2> uvs      = new NativeArray<float2>(combined_vertex_count, Allocator.Temp);
-                NativeArray<int> indices     = new NativeArray<int>(combined_index_count, Allocator.Temp);
                 int vertex_offset = 0;
-                int index_offset  = 0;
                 for(int i = 0; i < job_count; i++)
                 {
                     PickupItemMesh mesh = m_meshes[i];
@@ -348,35 +361,59 @@ public class PickupItemIndicatorManager : MonoBehaviour
                     NativeArray<float3>.Copy(mesh.m_normals, 0, normals, vertex_offset, mesh.m_counts[0]);
                     NativeArray<float2>.Copy(mesh.m_uvs, 0, uvs, vertex_offset, mesh.m_counts[0]);
 
-                    int index_count = mesh.m_counts[1];
-                    for(int j = 0; j < index_count; j++)
-                    {
-                        indices[index_offset + j] = mesh.m_indices[j] + vertex_offset;
-                    }
-
                     vertex_offset += mesh.m_counts[0];
-                    index_offset  += index_count;
-
                 }
 
-                Mesh combined_mesh = new Mesh();
-
+                combined_mesh.subMeshCount = (int)job_count;
                 combined_mesh.SetVertices(vertices);
                 combined_mesh.SetUVs(0, uvs);
                 combined_mesh.SetNormals(normals);
-                combined_mesh.SetIndices(indices, MeshTopology.Triangles, 0, true, 0);
+
+                vertex_offset = 0;
+                for(int i = 0; i < job_count; i++)
+                {
+                    PickupItemMesh mesh = m_meshes[i];
+                    int index_count     = mesh.m_counts[1];
+                    NativeArray<int> indices     = new NativeArray<int>(index_count, Allocator.Temp);
+                    NativeArray<int>.Copy(mesh.m_indices, 0, indices, 0, index_count);
+
+                    combined_mesh.SetIndices(indices, MeshTopology.Triangles, i, true, vertex_offset);
+                    vertex_offset += mesh.m_counts[0];
+                }
                 combined_mesh.RecalculateTangents();
                 combined_mesh.RecalculateBounds();
                 combined_mesh.UploadMeshData(true);
+                
+            }
 
-                m_filter.mesh = combined_mesh;
+            // ah: Render
+            {
+                for(int i = 0; i < job_count; i++)
+                {
+                    IndicatorRequest req = m_indicatorRequests[(i + tail) % MAX_INDICATOR_REQUESTS];
+                    Material mat;
+                    switch(req.kind)
+                    {
+                        case IndicatorKind.Held: mat = m_heldMaterial; break;
+                        case IndicatorKind.ClosestTarget: mat = m_closestMaterial; break;
+                        case IndicatorKind.Target: mat = m_indicatorMaterial; break;
+                        default:mat = null; break;
+                    }
+                    if(mat != null)
+                    {
+                        RenderParams rp = new(mat);
+                        rp.worldBounds  = new (Vector3.zero, Vector3.one * 10000);
+
+                        Graphics.RenderMeshPrimitives(rp, combined_mesh, i);
+                    }
+                }
+
             }
 
             // Reset request count
         }
         else
         {
-            m_filter.mesh = new();
         }
         m_indicatorRequestTail = m_indicatorRequestHead;
 
