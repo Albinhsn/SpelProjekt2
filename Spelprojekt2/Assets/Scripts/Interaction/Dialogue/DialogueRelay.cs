@@ -10,7 +10,7 @@ namespace Interaction.Dialogue
     [CreateAssetMenu(menuName = "Data/DialogueSystem/DialogueSysRelay")]
     public class DialogueRelay : ResettableScriptableObject
     {
-        [CanBeNull] public event System.Action<Story> d_onDialogueInitiation;
+        [CanBeNull] public event System.Action<DialoguePacket> d_onDialogueInitiation;
         [CanBeNull] public event System.Action d_onDialogueUpdate;
         [CanBeNull] public event System.Action d_onDialogueExit;
         [CanBeNull] private DialogueSender m_activeSender = null;
@@ -34,7 +34,7 @@ namespace Interaction.Dialogue
             m_activeSender = null;
         }
 
-        public void Initiate(Story story, DialogueSender sender)
+        public void Initiate(DialoguePacket packet, DialogueSender sender)
         {
             if (m_activeSender is not null && m_activeSender != sender)
             {
@@ -43,7 +43,7 @@ namespace Interaction.Dialogue
             }
 
             m_activeSender = sender;
-            d_onDialogueInitiation?.Invoke(story);
+            d_onDialogueInitiation?.Invoke(packet);
         }
 
         public void UpdateDialogue() => d_onDialogueUpdate?.Invoke();
