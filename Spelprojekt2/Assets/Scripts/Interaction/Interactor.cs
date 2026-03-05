@@ -105,7 +105,6 @@ namespace Interaction
             
             foreach (Interactable obj in m_interactableSets[set_index].GetEnumerable())
             {
-                Debug.Log(obj.name);
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
                 float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
                 
