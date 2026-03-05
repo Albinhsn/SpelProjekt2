@@ -26,6 +26,9 @@ public class PlayerCamera : MonoBehaviour
     [Header("Shoulder")]
     [SerializeField] private float m_shoulderOffset = .8f;
     [SerializeField] private float m_shoulderSmoothSpeed = 8f;
+    [Header("LayerMasks")]
+    [SerializeField] private LayerMask m_layerToDecollideThirdPerson;
+    [SerializeField] private LayerMask m_layerToDecollideFirstPerson;
 
     private float m_targetYaw;
     private float m_targetPitch;
@@ -138,7 +141,7 @@ public class PlayerCamera : MonoBehaviour
     void FirstPersonDecollider()
     {
         RaycastHit hit;
-        if(Physics.Raycast(m_parent.position + (Vector3.up * m_firstPersonCameraHeight),transform.forward, out hit, m_targetDistance + m_firstPersonDecolliderRadius, Int32.MaxValue, QueryTriggerInteraction.Ignore))
+        if(Physics.Raycast(m_parent.position + (Vector3.up * m_firstPersonCameraHeight),transform.forward, out hit, m_targetDistance + m_firstPersonDecolliderRadius, m_layerToDecollideFirstPerson, QueryTriggerInteraction.Ignore))
         {
             m_targetDistance = (hit.point - m_parent.position).magnitude - m_firstPersonDecolliderRadius;
             m_currentDistance = m_targetDistance;
@@ -152,16 +155,13 @@ public class PlayerCamera : MonoBehaviour
         Vector3 camDir = Quaternion.Euler(m_currentPitch, m_currentYaw, 0) * m_baseDirection;
         RaycastHit hit;
         
-        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance + m_decolliderRadius, Int32.MaxValue, QueryTriggerInteraction.Ignore))
+        if(Physics.Raycast(m_parent.position + (Vector3.up * m_thirdPersonCameraHeight), camDir, out hit, m_targetDistance + m_decolliderRadius, m_layerToDecollideThirdPerson, QueryTriggerInteraction.Ignore))
         {
-            // m_targetDistance = (hit.point - m_parent.position).magnitude - m_decolliderSphereRadius;
-            
             m_currentDistance = Mathf.SmoothDamp(m_currentDistance,(hit.point - m_parent.position).magnitude - m_decolliderRadius, ref m_distanceVelocity, m_distanceSmoothTime);
         }
         else
         {
             m_currentDistance = Mathf.SmoothDamp(m_currentDistance, m_cameraDistanceFromPlayer,ref m_distanceVelocity, m_distanceSmoothTime);
-            // m_targetDistance = m_cameraDistanceFromPlayer;
         }
     }
 
