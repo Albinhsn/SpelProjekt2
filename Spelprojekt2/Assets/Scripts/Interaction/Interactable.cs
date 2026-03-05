@@ -29,10 +29,7 @@ namespace Interaction
         {
             VirtOnEnable();
         }
-        private void OnEnable()
-        {
-            VirtOnEnable();
-        }
+        
         protected virtual void VirtOnEnable()
         {
             if (m_active) m_interactableSet.Add(this);
