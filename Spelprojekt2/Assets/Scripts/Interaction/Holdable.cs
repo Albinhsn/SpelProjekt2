@@ -9,8 +9,11 @@ namespace Interaction
     [RequireComponent(typeof(DynamicRigidbody))]
     public class Holdable : Interactable
     {
+
+        [Header("Audio")]
         [SerializeField] private AudioCueSO m_pickupCue;
         
+        [Header("Hold settings")]
         [SerializeField] private float m_holdDistance = 2.25f;
         [SerializeField] private float m_linearMovementThreshold = 4;
         [SerializeField] private float m_maxVelocity = 10;
@@ -49,7 +52,7 @@ namespace Interaction
 
         private void Awake()
         {
-            m_rb = GetComponent<Rigidbody>();
+            m_rb              = GetComponent<Rigidbody>();
         }
 
         protected override void VirtOnDisable()
@@ -64,6 +67,14 @@ namespace Interaction
             base.VirtOnDisable();
         }
 
+        public override void SendIndicatorRequest()
+        {
+            if(!m_isHeld && m_indicatorKind != IndicatorKind.None)
+            {
+                PickupItemIndicatorManager.Request(this.transform.position, m_indicatorKind);
+            }
+        }
+
         private CollisionDetectionMode m_savedCollissionDetectionMode;
         public override void Interact(Interactor interactor)
         {
@@ -75,6 +86,7 @@ namespace Interaction
             m_rb.constraints |= RigidbodyConstraints.FreezeRotation;
             // gameObject.layer = m_PickedUpLayerMask;            
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
+
         }
 
         public override bool TryCancelInteraction()
@@ -93,6 +105,14 @@ namespace Interaction
         {
             TryCancelInteraction();
             base.ForceCancelInteraction();
+        }
+
+        void Update()
+        {
+            if(m_isHeld)
+            {
+                PickupItemIndicatorManager.Request(this.transform.position, IndicatorKind.Held);
+            }
         }
 
         private void FixedUpdate()
@@ -139,51 +159,6 @@ namespace Interaction
                 {
                     TryCancelInteraction();
                 }
-                /*Update velocity
-                m_currentVelocity = m_targetDistance > m_decThreshold ? MathF.Min(m_maxVelocity, m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) : MathF.Max(0, m_currentVelocity - m_deceleration * Time.fixedDeltaTime);
-                
-                if (m_targetDistance < m_snapThreshold + m_currentVelocity * Time.fixedDeltaTime)//Snap
-                {
-                    m_currentVelocity = m_targetDistance / Time.fixedDeltaTime;
-                    m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                    return;
-                }
-                
-
-
-                float outer = 0;//MathF.Max(0, m_outerDistance / m_linearMovementThreshold); //Linear movement outside of spherical movement range
-                float cone = (m_forwardAngleCorrespondence - (1 - m_forwardLinearArc)) / m_forwardLinearArc;
-                float t = MathF.Min(1, //Spherical v linear movement T
-                                  MathF.Max(cone, //Linear movement cone 
-                                  outer));
-                if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc && m_targetDistance < m_distanceToInteractor)
-                {
-                    m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                }
-                else
-                {
-                    m_rb.linearVelocity = (
-                        Vector3.Slerp(
-                            Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
-                                t),
-                        -m_interactorDirection, //Hold range correction
-                        MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)))//Hold range correction T
-                    ).normalized; 
-
-                    m_rb.linearVelocity *= m_currentVelocity;//Velocity scale
-                }
-                
-                //Wall clip prevention (unnecessary, now using continuous collision detection while held
-                /*RaycastHit[] hit = Physics.RaycastAll(transform.position, m_rb.linearVelocity.normalized,
-                    m_currentVelocity * Time.deltaTime, srUtils.Unity.Utils.GetPhysicsLayerMask(gameObject.layer));
-                for (int a = 0; a < hit.Length; a++)
-                {
-                    if (hit[a].rigidbody != m_rb) //Wall detected
-                    {
-                        
-                        break;
-                    }
-                }*/
             }
         }
 
