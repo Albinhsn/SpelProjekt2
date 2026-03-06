@@ -19,7 +19,6 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        PickupItemIndicatorManager.SetSourceTransform(this.transform);
         FilterManager fm = FindFirstObjectByType<FilterManager>();
         this.m_onTriggerEnterWithFilter.AddListener(fm.SetCollisionEnterWithFilter);
         this.m_onTriggerLeaveWithFilter.AddListener(fm.SetCollisionLeaveWithFilter);

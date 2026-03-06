@@ -28,6 +28,10 @@ namespace Interaction
         private void Awake()
         {
             m_selected = new Interactable[m_interactableSets.Length];
+        }
+
+        void Start()
+        {
             PickupItemIndicatorManager.SetSourceTransform(m_targetOrigin);
         }
 
