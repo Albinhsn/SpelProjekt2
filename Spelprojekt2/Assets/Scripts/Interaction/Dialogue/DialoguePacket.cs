@@ -7,7 +7,6 @@ namespace Interaction.Dialogue
         private Story m_story;
         private float m_typeDelay;
         private char m_typingIndicator;
-        //TODO: audio
 
         public Story story => m_story;
         public float typeDelay => m_typeDelay;

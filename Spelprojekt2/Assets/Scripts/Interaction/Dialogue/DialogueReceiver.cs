@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AudioKit.FMOD;
 using Ink.Runtime;
 using JetBrains.Annotations;
 using TMPro;
@@ -24,10 +25,11 @@ namespace Interaction.Dialogue
         [SerializeField] private GameObject m_altButtonPrefab;
         [SerializeField] private float m_altButtonOffset;
         [SerializeField] private float m_inputRepeatDelay = 0.1f;
+        [SerializeField] private string m_speakerSoundEvent = "dsSpeakingSound";
         
         private List<TextMeshProUGUI> m_pooledAltObjects;
         private int m_currentAltCount;
-        [SerializeField] private int m_selectedAlt = 0;
+        private int m_selectedAlt = 0;
         
         //Static
         private Vector2Int m_screenBounds;
@@ -103,7 +105,7 @@ namespace Interaction.Dialogue
                     if (m_activeCharIndex < m_activeText.Length) m_textOut.text += m_typingIndicator;
                     m_remainingTypeDelay = m_typeDelay;
                     
-                    //TODO: play a sound
+                    AudioEventHub.I.PlayOneShot(m_speakerSoundEvent, Vector3.zero);
                 }
                 
                 return;
@@ -163,7 +165,6 @@ namespace Interaction.Dialogue
         private void InitiateDialogue(DialoguePacket packet)
         {
             UIManager.EnterState(UIState.Dialogue);
-            
             
             m_prefix = "";
             SetFont(0, m_textOut);
