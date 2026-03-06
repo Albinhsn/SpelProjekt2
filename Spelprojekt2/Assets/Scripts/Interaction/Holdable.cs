@@ -16,9 +16,6 @@ namespace Interaction
         [Header("Hold settings")]
         [SerializeField] private float m_holdDistance = 2.25f;
         [SerializeField] private float m_linearMovementThreshold = 4;
-        [SerializeField] private float m_maxVelocity = 10;
-        [SerializeField] private float m_acceleration = 30;
-        [SerializeField] private float m_deceleration = 20;
         [SerializeField] private float m_snapThreshold = 0.05f;
         [SerializeField] private float m_capsuleHeight = 1.5f;
         [SerializeField] private float m_holdRangeCorrectionStrength = 3;
@@ -29,12 +26,10 @@ namespace Interaction
         private LayerMask m_startLayer => gameObject.layer;
         private float m_forwardLinearArc = 0.1f;
         
-        private float m_currentVelocity;
 
         private Vector3 m_upwardAimDirection => new Vector3(m_activeInteractor.aimDirection.x, MathF.Max(0, m_activeInteractor.aimDirection.y), m_activeInteractor.aimDirection.z).normalized;
         private Vector3 m_targetPosition => m_activeInteractor.position + m_upwardAimDirection * m_holdDistance;
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
-        private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;
         private Vector3 m_closestLocalPoint => transform.position - m_activeInteractor.position; //m_rb.ClosestPointOnBounds(m_activeInteractor.position) - m_activeInteractor.position;
 
@@ -42,7 +37,6 @@ namespace Interaction
             ? new Vector2(m_closestLocalPoint.x, m_closestLocalPoint.z).magnitude
             : MathF.Min(m_closestLocalPoint.magnitude, (m_closestLocalPoint + new Vector3(0, -m_capsuleHeight, 0)).magnitude); 
         private float m_outerDistance => m_distanceToInteractor - m_holdDistance;
-        private float m_decThreshold => MathF.Pow(m_rb.linearVelocity.magnitude, 2) / (2 * m_deceleration);
         private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - Vector3.Dot(m_interactorDirection, m_linearTargetDirection) * m_interactorDirection).normalized;
         private float m_forwardAngleCorrespondence => Vector3.Dot(m_activeInteractor.aimDirection, (transform.position - m_activeInteractor.position).normalized);
 
@@ -82,7 +76,6 @@ namespace Interaction
             m_savedCollissionDetectionMode = m_rb.collisionDetectionMode;
             m_rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             m_isHeld = true;
-            m_currentVelocity = 0;
             m_rb.constraints |= RigidbodyConstraints.FreezeRotation;
             // gameObject.layer = m_PickedUpLayerMask;            
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
