@@ -21,7 +21,7 @@ namespace Interaction
 
         public bool requireUninteract => m_requireUninteract;
         public bool canControlWhileInteracting => m_canControlWhileInteracting;
-        public IndicatorKind m_indicator;
+        public IndicatorKind m_indicatorKind;
 
         [CanBeNull] protected Interactor m_activeInteractor = null;
 

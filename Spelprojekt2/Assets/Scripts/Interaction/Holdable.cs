@@ -9,8 +9,14 @@ namespace Interaction
     [RequireComponent(typeof(DynamicRigidbody))]
     public class Holdable : Interactable
     {
+        [Header("Indicator")]
+        [SerializeField] private HeldItemIndicator m_indicatorPrefab;
+        [SerializeField] private HeldItemIndicator m_indicator;
+
+        [Header("Audio")]
         [SerializeField] private AudioCueSO m_pickupCue;
         
+        [Header("Hold settings")]
         [SerializeField] private float m_holdDistance = 2.25f;
         [SerializeField] private float m_linearMovementThreshold = 4;
         [SerializeField] private float m_maxVelocity = 10;
@@ -49,7 +55,8 @@ namespace Interaction
 
         private void Awake()
         {
-            m_rb = GetComponent<Rigidbody>();
+            m_rb              = GetComponent<Rigidbody>();
+            m_indicatorPrefab = Resources.Load<HeldItemIndicator>("Prefabs/HeldItemIndicator");
         }
 
         protected override void VirtOnDisable()
@@ -66,9 +73,9 @@ namespace Interaction
 
         public override void SendIndicatorRequest()
         {
-            if(!m_isHeld && m_indicator != IndicatorKind.None)
+            if(!m_isHeld && m_indicatorKind != IndicatorKind.None)
             {
-                PickupItemIndicatorManager.Request(this.transform.position, m_indicator);
+                PickupItemIndicatorManager.Request(this.transform.position, m_indicatorKind);
             }
         }
 
@@ -83,6 +90,12 @@ namespace Interaction
             m_rb.constraints |= RigidbodyConstraints.FreezeRotation;
             // gameObject.layer = m_PickedUpLayerMask;            
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
+
+            if(m_indicatorPrefab != null)
+            {
+                m_indicator = Instantiate(m_indicatorPrefab, Vector3.zero, Quaternion.identity);
+                m_indicator.Init(this.gameObject);
+            }
         }
 
         public override bool TryCancelInteraction()
@@ -93,6 +106,11 @@ namespace Interaction
             base.TryCancelInteraction();
             m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
             // gameObject.layer = m_startLayer;            
+
+            if(m_indicator != null)
+            {
+                Destroy(m_indicator.gameObject);
+            }
 
             return true;
         }

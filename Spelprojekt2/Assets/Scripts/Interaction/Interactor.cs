@@ -105,7 +105,7 @@ namespace Interaction
             
             foreach (Interactable obj in m_interactableSets[set_index].GetEnumerable())
             {
-                obj.m_indicator = IndicatorKind.None;
+                obj.m_indicatorKind = IndicatorKind.None;
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
                 float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
                 
@@ -114,15 +114,15 @@ namespace Interaction
                 float obj_radial_distance = (obj_relative_position - aimDirection * obj_linear_distance).magnitude;
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
                 
-                obj.m_indicator = IndicatorKind.Target;
+                obj.m_indicatorKind = IndicatorKind.Target;
 
                 if (obj_radial_distance < sel_distance && !Physics.Raycast(m_targetOrigin.position, obj_relative_position.normalized, obj_linear_distance, m_blockLineOfSight, QueryTriggerInteraction.Ignore))
                 {
                     if(sel != null)
                     {
-                        sel.m_indicator = IndicatorKind.Target;
+                        sel.m_indicatorKind = IndicatorKind.Target;
                     }
-                    obj.m_indicator = IndicatorKind.ClosestTarget;
+                    obj.m_indicatorKind = IndicatorKind.ClosestTarget;
                     sel = obj;
                     sel_distance = obj_radial_distance;
                 }

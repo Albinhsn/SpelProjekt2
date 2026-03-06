@@ -233,28 +233,30 @@ public class PickupItemIndicatorManager : MonoBehaviour
         m_indicatorRequestHead = m_indicatorRequestTail = 0;
         m_indicatorRequests    = new IndicatorRequest[MAX_INDICATOR_REQUESTS];
 
-        int vertex_count = m_maxStepCount * m_verticesPerStep;
-
-        // TODO(ah): What is this number?
-        int index_count  = (m_maxStepCount - 1) * 6 * m_verticesPerStep;
-        m_meshes = new PickupItemMesh[MAX_INDICATOR_REQUESTS];
-        for(int i = 0; i < MAX_INDICATOR_REQUESTS; i++)
+        if(m_meshes == null)
         {
-            m_meshes[i] = new PickupItemMesh
+            int vertex_count = m_maxStepCount * m_verticesPerStep;
+            int index_count  = (m_maxStepCount - 1) * 6 * m_verticesPerStep;
+            m_meshes = new PickupItemMesh[MAX_INDICATOR_REQUESTS];
+            for(int i = 0; i < MAX_INDICATOR_REQUESTS; i++)
             {
-                m_vertices        = new NativeArray<float3>(vertex_count, Allocator.Persistent),
-                m_normals         = new NativeArray<float3>(vertex_count, Allocator.Persistent),
-                m_uvs             = new NativeArray<float2>(vertex_count, Allocator.Persistent),
-                m_indices         = new NativeArray<int>(index_count, Allocator.Persistent),
-                m_counts          = new NativeArray<int>(2, Allocator.Persistent),
-            };
+                m_meshes[i] = new PickupItemMesh
+                {
+                    m_vertices        = new NativeArray<float3>(vertex_count, Allocator.Persistent),
+                    m_normals         = new NativeArray<float3>(vertex_count, Allocator.Persistent),
+                    m_uvs             = new NativeArray<float2>(vertex_count, Allocator.Persistent),
+                    m_indices         = new NativeArray<int>(index_count, Allocator.Persistent),
+                    m_counts          = new NativeArray<int>(2, Allocator.Persistent),
+                };
+            }
         }
 
     }
 
+
     void OnDestroy()
     {
-        for(int i = 0; i < MAX_INDICATOR_REQUESTS; i++)
+        for(int i = 0; i < MAX_INDICATOR_REQUESTS && m_meshes != null; i++)
         {
             if(m_meshes[i].m_vertices.IsCreated)
             {
@@ -265,11 +267,12 @@ public class PickupItemIndicatorManager : MonoBehaviour
                 m_meshes[i].m_counts.Dispose();
             }
         }
+        m_meshes = null;
     }
 
     void OnDisable()
     {
-        for(int i = 0; i < MAX_INDICATOR_REQUESTS; i++)
+        for(int i = 0; i < MAX_INDICATOR_REQUESTS && m_meshes != null; i++)
         {
             if(m_meshes[i].m_vertices.IsCreated)
             {
@@ -280,6 +283,7 @@ public class PickupItemIndicatorManager : MonoBehaviour
                 m_meshes[i].m_counts.Dispose();
             }
         }
+        m_meshes = null;
     }
 
     void OnEnable()
