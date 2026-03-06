@@ -424,7 +424,7 @@ public class PickupItemIndicatorManager : MonoBehaviour
 
             // Reset request count
         }
-        else if(m_sourceTransform == null)
+        else if(job_count > 0 && m_sourceTransform == null)
         {
             Debug.LogError("Trying to send requests for pickup indicator with no source transform");
         }
