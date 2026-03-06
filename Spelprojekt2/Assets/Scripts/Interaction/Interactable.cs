@@ -49,7 +49,7 @@ namespace Interaction
             m_interactableSet.Remove(this);
         }
 
-        public virtual void SendIndicatorRequest(Vector3 src_p, Vector3 src_forward, Vector3 src_up)
+        public virtual void SendIndicatorRequest()
         {
         }
 

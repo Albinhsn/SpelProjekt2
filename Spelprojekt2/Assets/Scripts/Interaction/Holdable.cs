@@ -61,11 +61,11 @@ namespace Interaction
             base.VirtOnDisable();
         }
 
-        public override void SendIndicatorRequest(Vector3 src_p, Vector3 src_forward, Vector3 src_up)
+        public override void SendIndicatorRequest()
         {
-            if(!m_isHeld)
+            if(!m_isHeld && m_indicator != IndicatorKind.None)
             {
-                PickupItemIndicatorManager.Request(src_p, src_forward, src_up, this.transform.position, m_indicator);
+                PickupItemIndicatorManager.Request(this.transform.position, m_indicator);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Interaction
         {
             if(m_isHeld)
             {
-                PickupItemIndicatorManager.Request(m_activeInteractor.position, m_activeInteractor.transform.forward, m_activeInteractor.transform.up, this.transform.position, IndicatorKind.Held);
+                PickupItemIndicatorManager.Request(this.transform.position, IndicatorKind.Held);
             }
         }
 

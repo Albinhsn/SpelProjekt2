@@ -169,6 +169,10 @@ public class PickupItemIndicatorManager : MonoBehaviour
 
     private static PickupItemIndicatorManager I;
 
+    [Header("Player")]
+    [SerializeField]
+    private Transform m_sourceTransform;
+
     [Header("Materials")]
     [SerializeField]
     private Material m_heldMaterial;
@@ -201,17 +205,11 @@ public class PickupItemIndicatorManager : MonoBehaviour
     
     private struct IndicatorRequest
     {
-        public Vector3 src;
         public Vector3 dst;
-        public Vector3 forward;
-        public Vector3 up;
         public IndicatorKind kind;
-        public IndicatorRequest(Vector3 src, Vector3 forward, Vector3 up, Vector3 dst, IndicatorKind kind)
+        public IndicatorRequest(Vector3 dst, IndicatorKind kind)
         {
-            this.src = src;
             this.dst = dst;
-            this.forward = forward;
-            this.up      = up;
             this.kind    = kind;
         }
     }
@@ -289,14 +287,14 @@ public class PickupItemIndicatorManager : MonoBehaviour
         Awake();
     }
 
-    public static void Request(Vector3 src, Vector3 forward, Vector3 up, Vector3 dst, IndicatorKind kind)
+    public static void Request(Vector3 dst, IndicatorKind kind)
     {
         uint index = I.m_indicatorRequestHead++;
         if(I.m_indicatorRequestTail + MAX_INDICATOR_REQUESTS <= index)
         {
             Debug.LogError("Above limit for max target requests");
         }
-        I.m_indicatorRequests[index % MAX_INDICATOR_REQUESTS] = new(src, forward, up, dst, kind);
+        I.m_indicatorRequests[index % MAX_INDICATOR_REQUESTS] = new(dst, kind);
     }
 
     void LateUpdate()
@@ -308,7 +306,7 @@ public class PickupItemIndicatorManager : MonoBehaviour
         uint job_count = head - tail;
         job_count      = job_count > MAX_INDICATOR_REQUESTS ? MAX_INDICATOR_REQUESTS : job_count;
 
-        if(job_count > 0)
+        if(job_count > 0 && m_sourceTransform != null)
         {
             // ah: Create mesh jobs
             NativeArray<JobHandle> handles = new NativeArray<JobHandle>((int)job_count, Allocator.Temp);
@@ -320,13 +318,13 @@ public class PickupItemIndicatorManager : MonoBehaviour
                     m_maxStepSize     = m_maxStepSize,
                     m_maxAngleChange  = m_maxAngleChange,
                     m_meshRadius      = m_meshRadius,
-                    m_start           = req.src,
+                    m_start           = m_sourceTransform.position,
                     m_end             = req.dst,
                     m_mesh            = m_meshes[i],
                     m_maxStepCount    = m_maxStepCount,
                     m_verticesPerStep = m_verticesPerStep,
-                    m_forward         = req.forward,
-                    m_up              = req.up,
+                    m_forward         = m_sourceTransform.forward,
+                    m_up              = m_sourceTransform.up,
                 };
 
                 handles[i]           = job.Schedule();
@@ -412,8 +410,9 @@ public class PickupItemIndicatorManager : MonoBehaviour
 
             // Reset request count
         }
-        else
+        else if(m_sourceTransform == null)
         {
+            Debug.LogError("Trying to send requests for pickup indicator with no source transform");
         }
         m_indicatorRequestTail = m_indicatorRequestHead;
 

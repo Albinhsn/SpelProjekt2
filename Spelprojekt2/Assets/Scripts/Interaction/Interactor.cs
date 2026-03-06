@@ -137,7 +137,7 @@ namespace Interaction
 
             foreach (Interactable obj in m_interactableSets[set_index].GetEnumerable())
             {
-                obj.SendIndicatorRequest(m_targetOrigin.transform.position, m_targetOrigin.transform.forward, m_targetOrigin.transform.up);
+                obj.SendIndicatorRequest();
             }
         }
         
