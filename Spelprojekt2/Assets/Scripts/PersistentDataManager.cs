@@ -384,7 +384,7 @@ public sealed class PersistentDataManager
         {
             File.Delete(m_dataPath);
         }
-        m_gameState = null;
+        m_gameState.m_isValid = false;
     }
 
     private const int LVLS = (((int)'l') << 24) | (((int)'v') << 16) | (((int)'l') << 8) | (((int)'s') << 0);
