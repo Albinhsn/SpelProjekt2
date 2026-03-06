@@ -174,12 +174,15 @@ public class PickupItemIndicatorManager : MonoBehaviour
     [Header("Materials")]
     [SerializeField]
     private Material m_heldMaterial;
+    private Material m_heldMaterial_;
 
     [SerializeField]
     private Material m_indicatorMaterial;
+    private Material m_indicatorMaterial_;
 
     [SerializeField]
     private Material m_closestMaterial;
+    private Material m_closestMaterial_;
 
     [Header("Mesh Creation Settings")]
     [SerializeField]
@@ -249,15 +252,18 @@ public class PickupItemIndicatorManager : MonoBehaviour
             }
         }
 
+        m_heldMaterial_      = new(m_heldMaterial);
+        m_indicatorMaterial_ = new(m_indicatorMaterial);
+        m_closestMaterial_   = new (m_closestMaterial);
     }
 
     public static void SetEmission(float held, float closest, float target)
     {
         if(I != null)
         {
-            I.m_heldMaterial.SetFloat("_EmissionScale", held);
-            I.m_indicatorMaterial.SetFloat("_EmissionScale", target);
-            I.m_closestMaterial.SetFloat("_EmissionScale", closest);
+            I.m_heldMaterial_.SetFloat("_EmissionScale", held);
+            I.m_indicatorMaterial_.SetFloat("_EmissionScale", target);
+            I.m_closestMaterial_.SetFloat("_EmissionScale", closest);
             Debug.Log($"Settings emission {held}, {closest}, {target}");
         }
         else
@@ -421,9 +427,9 @@ public class PickupItemIndicatorManager : MonoBehaviour
                     Material mat;
                     switch(req.kind)
                     {
-                        case IndicatorKind.Held: mat = m_heldMaterial; break;
-                        case IndicatorKind.ClosestTarget: mat = m_closestMaterial; break;
-                        case IndicatorKind.Target: mat = m_indicatorMaterial; break;
+                        case IndicatorKind.Held: mat = m_heldMaterial_; break;
+                        case IndicatorKind.ClosestTarget: mat = m_closestMaterial_; break;
+                        case IndicatorKind.Target: mat = m_indicatorMaterial_; break;
                         default:mat = null; break;
                     }
                     if(mat != null)
