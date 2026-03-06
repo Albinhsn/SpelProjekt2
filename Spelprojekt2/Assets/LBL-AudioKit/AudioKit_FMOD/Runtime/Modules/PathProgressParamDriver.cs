@@ -1,10 +1,5 @@
 using UnityEngine;
 
-// AudioKit anteckning
-// Driver en parameter från 0..1 baserat på progress längs en "path"
-// Bra för slide-line, rails, tunnlar, chase-korridorer, osv
-// Sätt minst 2 punkter, fler punkter ger fler "steps" i kurvan
-
 namespace AudioKit.FMOD
 {
     [DisallowMultipleComponent]
@@ -21,6 +16,9 @@ namespace AudioKit.FMOD
         [Header("Punkter")]
         [Tooltip("Minst 2. Progress går från point[0] -> point[last]")]
         [SerializeField] private Transform[] points;
+
+        [Tooltip("Måste ha samma längd som Points. Ex: [0,1,2] för Low/Mid/High.")]
+        [SerializeField] private float[] pointValues;
 
         [Header("Värde")]
         [SerializeField] private bool invert;
@@ -50,6 +48,20 @@ namespace AudioKit.FMOD
             paramName = parameter.Resolve(AudioResources.ParamLibrary);
         }
 
+        private void OnValidate()
+        {
+            // Håll pointValues synkad med points (så du slipper manuellt fixa storlek).
+            int n = points != null ? points.Length : 0;
+            if (n < 0) n = 0;
+
+            if (pointValues == null || pointValues.Length != n)
+            {
+                var newVals = new float[n];
+                for (int i = 0; i < n; i++) newVals[i] = i; // default: 0,1,2,3...
+                pointValues = newVals;
+            }
+        }
+
         private void Update()
         {
             if (updateInFixed) return;
@@ -66,20 +78,20 @@ namespace AudioKit.FMOD
         {
             if (player == null) return;
             if (points == null || points.Length < 2) return;
+            if (pointValues == null || pointValues.Length != points.Length) return;
             if (string.IsNullOrEmpty(paramName)) return;
 
-            float t = ComputeProgress01(player.position);
-            if (invert) t = 1f - t;
-
+            float target = ComputeValue(player.position);
             current = smoothTime > 0f
-                ? Mathf.SmoothDamp(current, t, ref vel, smoothTime)
-                : t;
+                ? Mathf.SmoothDamp(current, target, ref vel, smoothTime)
+                : target;
 
             AudioSystem.I?.SetGlobalParam(paramName, current);
         }
 
-        private float ComputeProgress01(Vector3 pos)
+        private float ComputeValue(Vector3 pos)
         {
+            // 1) Räkna totallängd
             float total = 0f;
             for (int i = 0; i < points.Length - 1; i++)
             {
@@ -88,9 +100,9 @@ namespace AudioKit.FMOD
                 if (a == null || b == null) continue;
                 total += Vector3.Distance(a.position, b.position);
             }
+            if (total <= 0.0001f) return pointValues[0];
 
-            if (total <= 0.0001f) return 0f;
-
+            // 2) Hitta närmaste punkt på polyline och "along" i meter längs pathen
             float bestDistSqr = float.PositiveInfinity;
             float bestAlong = 0f;
 
@@ -124,7 +136,31 @@ namespace AudioKit.FMOD
                 alongSoFar += len;
             }
 
-            return Mathf.Clamp01(bestAlong / total);
+            // 3) invert = gå från slutet
+            float along = invert ? (total - bestAlong) : bestAlong;
+            along = Mathf.Clamp(along, 0f, total);
+
+            // 4) Konvertera "along" till segment + t och lerpa mellan pointValues
+            float acc = 0f;
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                var a = points[i];
+                var b = points[i + 1];
+                if (a == null || b == null) continue;
+
+                float len = Vector3.Distance(a.position, b.position);
+                if (len <= 0.0001f) continue;
+
+                if (along <= acc + len || i == points.Length - 2)
+                {
+                    float segT = Mathf.Clamp01((along - acc) / len);
+                    return Mathf.Lerp(pointValues[i], pointValues[i + 1], segT);
+                }
+
+                acc += len;
+            }
+
+            return pointValues[pointValues.Length - 1];
         }
 
         private void OnDrawGizmos()
