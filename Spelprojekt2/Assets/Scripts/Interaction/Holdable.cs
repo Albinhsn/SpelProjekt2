@@ -146,7 +146,7 @@ namespace Interaction
                 // targetVelocity = targetPos - transform.position;
                 
                 float speed = Mathf.Clamp(distanceToTargetFromItemXZ*distanceToTargetFromItemXZ, 0, m_itemMaxSpeed);
-                float verticalSpeed = Mathf.Clamp(Mathf.Abs(targetPos.y - transform.position.y * targetPos.y - transform.position.y * 2), 0, m_itemMaxSpeed);
+                float verticalSpeed = Mathf.Clamp(Mathf.Abs((targetPos.y - transform.position.y) * (targetPos.y - transform.position.y) * 2), 0, m_itemMaxSpeed);
                 Rigidbody rb = gameObject.GetComponent<Rigidbody>();
                 if(rb != null)
                 {
