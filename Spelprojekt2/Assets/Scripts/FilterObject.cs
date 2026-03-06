@@ -40,6 +40,8 @@ public class FilterObject : MonoBehaviour
 
     private HashSet<GameObject> m_collidingObjects;
 
+    private LayerMask m_originalLayer;
+
 
     public static int TagIsFilter(string tag)
     {
@@ -74,6 +76,7 @@ public class FilterObject : MonoBehaviour
         {
             ChangeMaterialColor(fm.m_filterColorData, fm.m_filterMaterialData);   
         }
+        m_originalLayer = this.gameObject.layer;
     }
 
     public void ChangeMaterialColor(FilterColorData filterColorData, FilterMaterialData material_data)
@@ -125,6 +128,9 @@ public class FilterObject : MonoBehaviour
         {
             m_rb.isKinematic = true;
         }
+
+        this.gameObject.layer = LayerMask.NameToLayer("Filtered");
+
         
         m_interactableComponent?.SetIsInteractable(false);
 
@@ -159,6 +165,7 @@ public class FilterObject : MonoBehaviour
         {
             m_rb.isKinematic = false;
         }
+        this.gameObject.layer = m_originalLayer;
         
         m_interactableComponent?.SetIsInteractable(true);
         m_interactableComponent?.ForceCancelInteraction();
