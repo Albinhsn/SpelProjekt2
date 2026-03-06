@@ -111,10 +111,12 @@ namespace Interaction
                 
                 if(obj_linear_distance < 0 || obj_linear_distance > m_range) continue; //Out of range
 
+
                 float obj_radial_distance = (obj_relative_position - aimDirection * obj_linear_distance).magnitude;
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
-                
+
                 obj.m_indicatorKind = IndicatorKind.Target;
+                
 
                 if (obj_radial_distance < sel_distance && !Physics.Raycast(m_targetOrigin.position, obj_relative_position.normalized, obj_linear_distance, m_blockLineOfSight, QueryTriggerInteraction.Ignore))
                 {

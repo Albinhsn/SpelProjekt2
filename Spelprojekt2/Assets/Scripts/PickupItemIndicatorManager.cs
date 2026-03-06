@@ -169,8 +169,6 @@ public class PickupItemIndicatorManager : MonoBehaviour
 
     private static PickupItemIndicatorManager I;
 
-    [Header("Player")]
-    [SerializeField]
     private Transform m_sourceTransform;
 
     [Header("Materials")]
@@ -251,6 +249,18 @@ public class PickupItemIndicatorManager : MonoBehaviour
             }
         }
 
+    }
+
+    public static void SetSourceTransform(Transform transform)
+    {
+        if(I != null)
+        {
+            I.m_sourceTransform = transform;
+        }
+        else
+        {
+            Debug.LogError("Tried to set source transform without instance of PickupItemIndicatorManager");
+        }
     }
 
 
