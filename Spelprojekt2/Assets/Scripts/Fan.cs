@@ -11,6 +11,7 @@ public class Fan : MonoBehaviour
     [SerializeField] float m_windStrength = 15f;
     [SerializeField] float m_maxHeight = 10f;
     [SerializeField] float m_xzPullStrength = 10f;
+    [SerializeField] bool m_isVerticle;
 
     [Header("Top Bob Settings")]
     [SerializeField] float m_bobAmplitude = 0.5f;
@@ -80,7 +81,37 @@ public class Fan : MonoBehaviour
 
             if(gameObject.GetComponentInParent<FilterObject>() != null && gameObject.GetComponentInParent<FilterObject>().Activated) return;
 
-            Rigidbody rb = other.GetComponent<Rigidbody>();
+            if(m_isVerticle)
+            {
+                VerticleFan(other);
+            }
+            else
+            {
+                NonVerticleFan(other);
+            }
+            
+        }
+    }
+    void NonVerticleFan(Collider other)
+    {
+        // if(TryGetComponent(out MovementController player)) 
+        // {
+        //     player.m
+        //     return;
+        // }
+        
+        Rigidbody rb = other.GetComponent<Rigidbody>();
+        if (rb == null) return;
+        
+        rb.MovePosition(rb.transform.position + (transform.up * m_windStrength * Time.fixedDeltaTime));
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawLine(transform.position,transform.position+transform.up);
+    }
+    void VerticleFan(Collider other)
+    {
+        Rigidbody rb = other.GetComponent<Rigidbody>();
             if (rb == null) return;
 
             float height = DistanceToFanBase(other.transform);
@@ -128,7 +159,6 @@ public class Fan : MonoBehaviour
                 rb.linearVelocity.y,
                 -xzDistance.y * m_xzPullStrength
             );
-        }
     }
 
     float DistanceToFanBase(Transform playerTransform)
