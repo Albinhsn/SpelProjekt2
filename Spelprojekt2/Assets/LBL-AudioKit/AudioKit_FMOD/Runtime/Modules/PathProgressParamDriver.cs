@@ -34,17 +34,13 @@ namespace AudioKit.FMOD
         private float vel;
         private float current;
 
-        private void Awake()
+        private void Start()
         {
             if (player == null && !string.IsNullOrEmpty(playerTag))
             {
                 var go = GameObject.FindGameObjectWithTag(playerTag);
                 if (go != null) player = go.transform;
             }
-        }
-
-        private void OnEnable()
-        {
             paramName = parameter.Resolve(AudioResources.ParamLibrary);
         }
 
