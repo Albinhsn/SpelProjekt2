@@ -251,6 +251,21 @@ public class PickupItemIndicatorManager : MonoBehaviour
 
     }
 
+    public static void SetEmission(float held, float closest, float target)
+    {
+        if(I != null)
+        {
+            I.m_heldMaterial.SetFloat("_EmissionScale", held);
+            I.m_indicatorMaterial.SetFloat("_EmissionScale", target);
+            I.m_closestMaterial.SetFloat("_EmissionScale", closest);
+            Debug.Log($"Settings emission {held}, {closest}, {target}");
+        }
+        else
+        {
+            Debug.Log("Tried to apply emission but found no pickupindicator manager");
+        }
+    }
+
     public static void SetSourceTransform(Transform transform)
     {
         if(I != null)

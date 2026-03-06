@@ -29,6 +29,8 @@ public class SkySettings : MonoBehaviour
                 Light sun       = RenderSettings.sun;
                 sun.intensity   = data.m_directionalLightEmissionInLux;
             }
+
+            PickupItemIndicatorManager.SetEmission(data.m_heldEmission, data.m_closestEmission, data.m_indicatorEmission);
         }
     }
 
@@ -45,7 +47,9 @@ public class SkySettings : MonoBehaviour
 
                 Light sun       = RenderSettings.sun;
                 sun.intensity   = m_data.m_directionalLightEmissionInLux;
+
             }
+            PickupItemIndicatorManager.SetEmission(m_data.m_heldEmission, m_data.m_closestEmission, m_data.m_indicatorEmission);
         }
     }
 }
