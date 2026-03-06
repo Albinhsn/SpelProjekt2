@@ -9,9 +9,6 @@ namespace Interaction
     [RequireComponent(typeof(DynamicRigidbody))]
     public class Holdable : Interactable
     {
-        [Header("Indicator")]
-        [SerializeField] private HeldItemIndicator m_indicatorPrefab;
-        [SerializeField] private HeldItemIndicator m_indicator;
 
         [Header("Audio")]
         [SerializeField] private AudioCueSO m_pickupCue;
@@ -56,7 +53,6 @@ namespace Interaction
         private void Awake()
         {
             m_rb              = GetComponent<Rigidbody>();
-            m_indicatorPrefab = Resources.Load<HeldItemIndicator>("Prefabs/HeldItemIndicator");
         }
 
         protected override void VirtOnDisable()
@@ -91,11 +87,6 @@ namespace Interaction
             // gameObject.layer = m_PickedUpLayerMask;            
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
 
-            if(m_indicatorPrefab != null)
-            {
-                m_indicator = Instantiate(m_indicatorPrefab, Vector3.zero, Quaternion.identity);
-                m_indicator.Init(this.gameObject);
-            }
         }
 
         public override bool TryCancelInteraction()
@@ -106,11 +97,6 @@ namespace Interaction
             base.TryCancelInteraction();
             m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
             // gameObject.layer = m_startLayer;            
-
-            if(m_indicator != null)
-            {
-                Destroy(m_indicator.gameObject);
-            }
 
             return true;
         }
