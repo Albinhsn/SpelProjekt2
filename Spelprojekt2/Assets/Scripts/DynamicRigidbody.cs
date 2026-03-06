@@ -33,7 +33,6 @@ public class DynamicRigidbody : MonoBehaviour
             if(!active)
             {
                 m_shouldDestroy = true;
-                Debug.Log("Setting to should destroy");
             }
             else
             {
