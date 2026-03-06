@@ -12,12 +12,13 @@ namespace Interaction
         [Header("Audio")]
         [SerializeField] private AudioCueSO m_pickupCue;
         
+        // NOTE(msm): Only used in Gizmos
+        private float m_linearMovementThreshold = 4;
+        private float m_snapThreshold = 0.05f;
+        private float m_capsuleHeight = 1.5f;
+        private float m_holdRangeCorrectionStrength = 3;
+
         [Header("Hold settings")]
-        [SerializeField] private float m_holdDistance = 2.25f;
-        [SerializeField] private float m_linearMovementThreshold = 4;
-        [SerializeField] private float m_snapThreshold = 0.05f;
-        [SerializeField] private float m_capsuleHeight = 1.5f;
-        [SerializeField] private float m_holdRangeCorrectionStrength = 3;
         [SerializeField] private float m_itemDistanceFromPlayer = 2;
         [SerializeField] private float m_itemFloatHeight = .75f;
         [SerializeField] private float m_itemMaxSpeed = 10;
@@ -27,7 +28,7 @@ namespace Interaction
         
 
         private Vector3 m_upwardAimDirection => new Vector3(m_activeInteractor.aimDirection.x, MathF.Max(0, m_activeInteractor.aimDirection.y), m_activeInteractor.aimDirection.z).normalized;
-        private Vector3 m_targetPosition => m_activeInteractor.position + m_upwardAimDirection * m_holdDistance;
+        private Vector3 m_targetPosition => m_activeInteractor.position + m_upwardAimDirection * m_itemDistanceFromPlayer;
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;
         private Vector3 m_closestLocalPoint => transform.position - m_activeInteractor.position; //m_rb.ClosestPointOnBounds(m_activeInteractor.position) - m_activeInteractor.position;
@@ -35,7 +36,7 @@ namespace Interaction
         private float m_distanceToInteractor => -m_capsuleHeight < m_closestLocalPoint.y && m_closestLocalPoint.y < 0
             ? new Vector2(m_closestLocalPoint.x, m_closestLocalPoint.z).magnitude
             : MathF.Min(m_closestLocalPoint.magnitude, (m_closestLocalPoint + new Vector3(0, -m_capsuleHeight, 0)).magnitude); 
-        private float m_outerDistance => m_distanceToInteractor - m_holdDistance;
+        private float m_outerDistance => m_distanceToInteractor - m_itemDistanceFromPlayer;
         private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - Vector3.Dot(m_interactorDirection, m_linearTargetDirection) * m_interactorDirection).normalized;
         private float m_forwardAngleCorrespondence => Vector3.Dot(m_activeInteractor.aimDirection, (transform.position - m_activeInteractor.position).normalized);
 
@@ -163,19 +164,19 @@ namespace Interaction
             
             
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(m_activeInteractor.position, m_holdDistance); //Min distance on interactor
-            Gizmos.DrawWireSphere(m_activeInteractor.position + Vector3.down * m_capsuleHeight, m_holdDistance); //Interactor capsule lower part
-            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(m_holdDistance, 0, 0), m_activeInteractor.position + new Vector3(m_holdDistance, -m_capsuleHeight, 0));//interactor capsule side lines
-            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(-m_holdDistance, 0, 0), m_activeInteractor.position + new Vector3(-m_holdDistance, -m_capsuleHeight, 0));
-            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(0, 0, m_holdDistance), m_activeInteractor.position + new Vector3(0, -m_capsuleHeight, m_holdDistance));
-            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(0, 0, -m_holdDistance), m_activeInteractor.position + new Vector3(0, -m_capsuleHeight, -m_holdDistance));
+            Gizmos.DrawWireSphere(m_activeInteractor.position, m_itemDistanceFromPlayer); //Min distance on interactor
+            Gizmos.DrawWireSphere(m_activeInteractor.position + Vector3.down * m_capsuleHeight, m_itemDistanceFromPlayer); //Interactor capsule lower part
+            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(m_itemDistanceFromPlayer, 0, 0), m_activeInteractor.position + new Vector3(m_itemDistanceFromPlayer, -m_capsuleHeight, 0));//interactor capsule side lines
+            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(-m_itemDistanceFromPlayer, 0, 0), m_activeInteractor.position + new Vector3(-m_itemDistanceFromPlayer, -m_capsuleHeight, 0));
+            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(0, 0, m_itemDistanceFromPlayer), m_activeInteractor.position + new Vector3(0, -m_capsuleHeight, m_itemDistanceFromPlayer));
+            Gizmos.DrawLine(m_activeInteractor.position + new Vector3(0, 0, -m_itemDistanceFromPlayer), m_activeInteractor.position + new Vector3(0, -m_capsuleHeight, -m_itemDistanceFromPlayer));
             
-            Gizmos.DrawWireSphere(transform.position, m_holdDistance); //Min distance on object
-            Gizmos.DrawWireSphere(transform.position + Vector3.up * m_capsuleHeight, m_holdDistance); //Capsule upper part
-            Gizmos.DrawLine(transform.position + new Vector3(m_holdDistance, 0, 0), transform.position + new Vector3(m_holdDistance, m_capsuleHeight, 0));//Capsule side lines
-            Gizmos.DrawLine(transform.position + new Vector3(-m_holdDistance, 0, 0), transform.position + new Vector3(-m_holdDistance, m_capsuleHeight, 0));
-            Gizmos.DrawLine(transform.position + new Vector3(0, 0, m_holdDistance), transform.position + new Vector3(0, m_capsuleHeight, m_holdDistance));
-            Gizmos.DrawLine(transform.position + new Vector3(0, 0, -m_holdDistance), transform.position + new Vector3(0, m_capsuleHeight, -m_holdDistance));
+            Gizmos.DrawWireSphere(transform.position, m_itemDistanceFromPlayer); //Min distance on object
+            Gizmos.DrawWireSphere(transform.position + Vector3.up * m_capsuleHeight, m_itemDistanceFromPlayer); //Capsule upper part
+            Gizmos.DrawLine(transform.position + new Vector3(m_itemDistanceFromPlayer, 0, 0), transform.position + new Vector3(m_itemDistanceFromPlayer, m_capsuleHeight, 0));//Capsule side lines
+            Gizmos.DrawLine(transform.position + new Vector3(-m_itemDistanceFromPlayer, 0, 0), transform.position + new Vector3(-m_itemDistanceFromPlayer, m_capsuleHeight, 0));
+            Gizmos.DrawLine(transform.position + new Vector3(0, 0, m_itemDistanceFromPlayer), transform.position + new Vector3(0, m_capsuleHeight, m_itemDistanceFromPlayer));
+            Gizmos.DrawLine(transform.position + new Vector3(0, 0, -m_itemDistanceFromPlayer), transform.position + new Vector3(0, m_capsuleHeight, -m_itemDistanceFromPlayer));
             
             
             Gizmos.color = Color.green;
@@ -197,19 +198,19 @@ namespace Interaction
                                 MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
                                 )))),
                     -m_interactorDirection, //Hold range correction
-                    MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)))//Hold range correction T
+                    MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_itemDistanceFromPlayer * m_holdRangeCorrectionStrength)))//Hold range correction T
             ).normalized);  //Active direction
         }
 
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, m_holdDistance); //Min distance on object
-            Gizmos.DrawWireSphere(transform.position + Vector3.up * m_capsuleHeight, m_holdDistance); //Capsule upper part
-            Gizmos.DrawLine(transform.position + new Vector3(m_holdDistance, 0, 0), transform.position + new Vector3(m_holdDistance, m_capsuleHeight, 0));//Capsule side lines
-            Gizmos.DrawLine(transform.position + new Vector3(-m_holdDistance, 0, 0), transform.position + new Vector3(-m_holdDistance, m_capsuleHeight, 0));
-            Gizmos.DrawLine(transform.position + new Vector3(0, 0, m_holdDistance), transform.position + new Vector3(0, m_capsuleHeight, m_holdDistance));
-            Gizmos.DrawLine(transform.position + new Vector3(0, 0, -m_holdDistance), transform.position + new Vector3(0, m_capsuleHeight, -m_holdDistance));
+            Gizmos.DrawWireSphere(transform.position, m_itemDistanceFromPlayer); //Min distance on object
+            Gizmos.DrawWireSphere(transform.position + Vector3.up * m_capsuleHeight, m_itemDistanceFromPlayer); //Capsule upper part
+            Gizmos.DrawLine(transform.position + new Vector3(m_itemDistanceFromPlayer, 0, 0), transform.position + new Vector3(m_itemDistanceFromPlayer, m_capsuleHeight, 0));//Capsule side lines
+            Gizmos.DrawLine(transform.position + new Vector3(-m_itemDistanceFromPlayer, 0, 0), transform.position + new Vector3(-m_itemDistanceFromPlayer, m_capsuleHeight, 0));
+            Gizmos.DrawLine(transform.position + new Vector3(0, 0, m_itemDistanceFromPlayer), transform.position + new Vector3(0, m_capsuleHeight, m_itemDistanceFromPlayer));
+            Gizmos.DrawLine(transform.position + new Vector3(0, 0, -m_itemDistanceFromPlayer), transform.position + new Vector3(0, m_capsuleHeight, -m_itemDistanceFromPlayer));
         }
     }
 }
