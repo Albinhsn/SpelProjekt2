@@ -17,7 +17,7 @@ namespace Interaction
 	    private void OnTriggerEnter(Collider other)
 	    {
 		    if(!m_active) return;
-		    Interactor? interactor = other.GetComponentInChildren<Interactor>();
+		    Interactor interactor = other.GetComponentInChildren<Interactor>();
 		    if (interactor is not null)
 		    {
 			    interactor.CancelInteractions();

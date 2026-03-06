@@ -1,6 +1,7 @@
 using System;
 using AudioKit.FMOD;
 using JetBrains.Annotations;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace Interaction
@@ -21,6 +22,8 @@ namespace Interaction
         [SerializeField] private float m_itemDistanceFromPlayer = 2;
         [SerializeField] private float m_itemFloatHeight = .75f;
         [SerializeField] private float m_itemMaxSpeed = 10;
+        [SerializeField] private LayerMask m_PickedUpLayerMask;
+        private LayerMask m_startLayer => gameObject.layer;
         private float m_forwardLinearArc = 0.1f;
         
         private float m_currentVelocity;
@@ -78,7 +81,7 @@ namespace Interaction
             m_isHeld = true;
             m_currentVelocity = 0;
             m_rb.constraints |= RigidbodyConstraints.FreezeRotation;
-            
+            // gameObject.layer = m_PickedUpLayerMask;            
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
         }
 
@@ -89,6 +92,7 @@ namespace Interaction
             m_isHeld = false;
             base.TryCancelInteraction();
             m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+            // gameObject.layer = m_startLayer;            
 
             return true;
         }
