@@ -24,7 +24,6 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float m_firstPersonDecolliderRadius = 1f;
 
     [Header("Shoulder")]
-    [SerializeField] private float m_shoulderOffset = .8f;
     [SerializeField] private float m_shoulderSmoothSpeed = 8f;
     [Header("LayerMasks")]
     [SerializeField] private LayerMask m_layerToDecollideThirdPerson;

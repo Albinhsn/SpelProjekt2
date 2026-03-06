@@ -111,7 +111,7 @@ public class MovingPlatformController : MonoBehaviour
 				m_platform.UpdateReference(Vector3.zero);
 			}
 
-			m_platform.rigidbody.position += m_movementDirection * (m_speed * Time.deltaTime);//Move
+			m_platform.rb.position += m_movementDirection * (m_speed * Time.deltaTime);//Move
 		}
 	}
 

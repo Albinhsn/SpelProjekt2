@@ -27,7 +27,7 @@ namespace Interaction
 
         private void Awake()
         {
-            m_selected = new Interactable?[m_interactableSets.Length];
+            m_selected = new Interactable[m_interactableSets.Length];
         }
 
         private void Update()

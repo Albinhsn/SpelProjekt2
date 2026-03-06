@@ -14,7 +14,6 @@ namespace Interaction.Dialogue
         [SerializeField] private DialogueRelay m_dlsRelay;
         [Tooltip("Index 0 is default while interacting")][SerializeField] private CinemachineCamera[] m_cameraOverrides;
         private Story m_story;
-        private bool m_interacting;
         [CanBeNull] private Interactor m_activeInteractor;
         [CanBeNull] private InkAssetRegistry m_assetRegistry = null;
 
@@ -48,7 +47,6 @@ namespace Interaction.Dialogue
             m_activeInteractor = interactor;
             SetActiveCamera(0);
             
-            m_interacting = true;
             m_story.Continue();
             m_dlsRelay.Initiate(m_story, this);
         }
@@ -76,7 +74,6 @@ namespace Interaction.Dialogue
                     }
                     break;
                 case -2:
-                    m_interacting = false;
                     break;
                 default:
                     m_story.ChooseChoiceIndex(selection);
@@ -97,7 +94,6 @@ namespace Interaction.Dialogue
             GlobalInkVariableManager.SyncUp(m_story);
             m_dlsRelay.ExitDialogue();
             SetActiveCamera(-1);
-            m_interacting = false;
             m_activeInteractor.FinishInteraction();
             m_activeInteractor = null;
             m_story.ResetState();
