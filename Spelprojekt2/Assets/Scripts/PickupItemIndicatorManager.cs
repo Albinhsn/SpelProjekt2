@@ -264,7 +264,6 @@ public class PickupItemIndicatorManager : MonoBehaviour
             I.m_heldMaterial_.SetFloat("_EmissionScale", held);
             I.m_indicatorMaterial_.SetFloat("_EmissionScale", target);
             I.m_closestMaterial_.SetFloat("_EmissionScale", closest);
-            Debug.Log($"Settings emission {held}, {closest}, {target}");
         }
         else
         {
