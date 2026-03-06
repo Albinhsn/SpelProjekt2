@@ -46,6 +46,7 @@ public class PlayerCamera : MonoBehaviour
     private float m_savedYaw;
     private Vector3 m_basePosition;
     private bool m_changedToFirstPersonThisFrame = true;
+    Quaternion rotation;
     [HideInInspector] public Vector3 m_playerForward, m_playerRight;
 
     private void Start()
@@ -114,10 +115,9 @@ public class PlayerCamera : MonoBehaviour
         HandleZoom();
         FirstPersonDecollider();
 
-        Quaternion fpRotation = Quaternion.Euler(m_currentPitch, m_currentYaw, 0);
 
-        transform.rotation = fpRotation;
-        transform.position = m_parent.position + (Vector3.up * m_firstPersonCameraHeight) + fpRotation * Vector3.forward * m_currentDistance;
+        transform.rotation = rotation;
+        transform.position = m_parent.position + (Vector3.up * m_firstPersonCameraHeight) + rotation * Vector3.forward * m_currentDistance;
     }
     void HandleZoom()
     {
@@ -179,6 +179,8 @@ public class PlayerCamera : MonoBehaviour
         m_currentYaw = Mathf.SmoothDampAngle(m_currentYaw, m_targetYaw, ref m_yawVelocity, smoothFactor);
 
         m_currentPitch = Mathf.SmoothDampAngle(m_currentPitch, m_targetPitch, ref m_pitchVelocity, smoothFactor);
+
+        rotation = Quaternion.Euler(m_currentPitch, m_currentYaw, 0);
     }
 
     void HandleShoulderSwitch()
@@ -191,7 +193,7 @@ public class PlayerCamera : MonoBehaviour
 
     void UpdateCamera()
     {
-        Quaternion rotation = Quaternion.Euler(m_currentPitch, m_currentYaw, 0);
+        
         
         m_basePosition = m_parent.position + (m_thirdPersonCameraHeight * Vector3.up) + rotation * Vector3.back * m_currentDistance;
 
