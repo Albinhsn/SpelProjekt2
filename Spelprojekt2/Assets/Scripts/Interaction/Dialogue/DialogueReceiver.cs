@@ -35,9 +35,18 @@ namespace Interaction.Dialogue
         
         //Per-interaction
         [CanBeNull] private Story m_activeStory;
-        private string m_speakerName;
         private bool m_subscribed;
         private bool m_initialSubscribed;
+        private float m_dfTypeDelay;
+        private float m_typeDelay;
+        private float m_remainingTypeDelay;
+        private string m_prefix;
+        private char m_typingIndicator;
+        private bool m_allowSkipTypeout;
+        private bool m_altsChecked;
+        
+        private string m_activeText;
+        private int m_activeCharIndex;
 
         
         private bool m_interacting => m_activeStory is not null;
@@ -69,10 +78,45 @@ namespace Interaction.Dialogue
             }
         }
 
-        private void Update()//Input handling
+        private void Update()
         {
             if(!m_interacting) return;
+            
+            //Type out text
+            if (m_activeCharIndex < m_activeText.Length)
+            {
+                if (m_allowSkipTypeout && (InputManager.UIAdvance() || InputManager.UIPointerSelect()))//Skip type out
+                {
+                    m_activeCharIndex = m_activeText.Length - 1;
+                    SetAlternatives(m_activeStory.currentChoices.ToArray());
+                    m_altsChecked = true;
+                }
 
+                m_remainingTypeDelay -= Time.deltaTime;
+                if (m_remainingTypeDelay <= 0)
+                {
+
+                    if (m_activeText[m_activeCharIndex] == '<') m_activeCharIndex = m_activeText.IndexOf('>', m_activeCharIndex + 1);
+                    
+                    m_activeCharIndex++;
+                    m_textOut.text = m_prefix + m_activeText.Substring(0, m_activeCharIndex);
+                    if (m_activeCharIndex < m_activeText.Length) m_textOut.text += m_typingIndicator;
+                    m_remainingTypeDelay = m_typeDelay;
+                    
+                    //TODO: play a sound
+                }
+                
+                return;
+            }
+
+            //Set alts and update positions after typeout finished
+            if (!m_altsChecked)
+            {
+                SetAlternatives(m_activeStory.currentChoices.ToArray());
+                m_altsChecked = true;
+            }
+            
+            //Input handling
             if (m_currentAltCount == 0)//Continuation
             {
                 if (InputManager.UIAdvance() || InputManager.UIPointerSelect()) m_relay.Select(-1);
@@ -116,15 +160,21 @@ namespace Interaction.Dialogue
             
         }
 
-        private void InitiateDialogue(Story story)
+        private void InitiateDialogue(DialoguePacket packet)
         {
             UIManager.EnterState(UIState.Dialogue);
             
-            m_speakerName = "";
+            
+            m_prefix = "";
             SetFont(0, m_textOut);
             Assert.IsTrue(m_activeStory is null);
             m_dialogueContainer.gameObject.SetActive(true);
-            m_activeStory = story;
+            
+            m_activeStory = packet.story;
+            m_typeDelay = packet.typeDelay;
+            m_dfTypeDelay = packet.typeDelay;
+            m_typingIndicator = packet.typingIndicator;
+
             if(m_activeStory.globalTags is not null) ParseGlobalTags(m_activeStory.globalTags.ToArray());
             UpdateDialogue();
         }
@@ -132,24 +182,27 @@ namespace Interaction.Dialogue
         {
             m_selectedAlt = 0;
             m_currentAltCount = 0;
+            m_allowSkipTypeout = true;
             if(m_activeStory.currentTags is not null) ParseTags(m_activeStory.currentTags.ToArray());
             
-            if (m_speakerName != "")
-            {
-                m_textOut.text = m_speakerName + ": " + m_activeStory.currentText;
-            }
-            else m_textOut.text = m_activeStory.currentText;
             
-            SetAlternatives(m_activeStory.currentChoices.ToArray());
+            m_textOut.text = m_prefix;
+            m_activeCharIndex = 0;
+            m_remainingTypeDelay = m_typeDelay;
+            m_altsChecked = false;
+            m_activeText = m_activeStory.currentText;
 
-            m_textOut.rectTransform.anchoredPosition = new Vector2(m_textOut.rectTransform.anchoredPosition.x,
-                -m_altButtonContainer.rect.height + (m_textOut.rectTransform.rect.height / 2 + m_readOnlyAltTransform.height + m_altButtonOffset + (m_altButtonOffset + m_readOnlyAltTransform.height) * m_currentAltCount));
+            m_textOut.rectTransform.anchoredPosition = new Vector2(m_textOut.rectTransform.anchoredPosition.x, -m_altButtonContainer.rect.height + m_textOut.rectTransform.rect.height);
+            for (int a = 0; a < m_pooledAltObjects.Count; a++)
+            {
+                m_pooledAltObjects[a].gameObject.SetActive(false);
+            }
         }
         private void EndDialogue()
         {
             m_dialogueContainer.gameObject.SetActive(false);
             m_activeStory = null;
-            m_speakerName = "";
+            m_prefix = "";
             
             
             UIManager.EnterState(UIState.None);
@@ -159,10 +212,6 @@ namespace Interaction.Dialogue
         {
             if (alts.Length == 0)
             {
-                for (int a = 0; a < m_pooledAltObjects.Count; a++)
-                {
-                    m_pooledAltObjects[a].gameObject.SetActive(false);
-                }
                 return;
             }
             
@@ -192,6 +241,9 @@ namespace Interaction.Dialogue
             m_holdCooldown = 0;
             m_lastPointerPosition = InputManager.ReadPointerPosition();
             Highlight(m_pooledAltObjects[0]);
+            
+            m_textOut.rectTransform.anchoredPosition = new Vector2(m_textOut.rectTransform.anchoredPosition.x,
+                -m_altButtonContainer.rect.height + (m_textOut.rectTransform.rect.height / 2 + m_readOnlyAltTransform.height + m_altButtonOffset + (m_altButtonOffset + m_readOnlyAltTransform.height) * m_currentAltCount));
         }
 
         private Vector2 m_lastPointerPosition;
@@ -294,7 +346,14 @@ namespace Interaction.Dialogue
                             use_default_color = false;
                             break;
                         case "speaker":
-                            m_speakerName = value;
+                            m_prefix = value + ": ";
+                            break;
+                        case "delay":
+                            if (value == "default") m_typeDelay = m_dfTypeDelay;
+                            else m_typeDelay = float.Parse(value);
+                            break;
+                        case "disallowSkip":
+                            m_allowSkipTypeout = false;
                             break;
                     }
                 }
@@ -318,7 +377,7 @@ namespace Interaction.Dialogue
                     switch (tags[a].Substring(0, value_index))
                     {
                         case "speaker":
-                            m_speakerName = value;
+                            m_prefix = value + ": ";
                             break;
                     }
                 }
