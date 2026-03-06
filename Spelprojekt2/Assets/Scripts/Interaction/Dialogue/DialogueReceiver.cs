@@ -331,7 +331,12 @@ namespace Interaction.Dialogue
                 int value_index = tags[a].IndexOf('=');
                 if (value_index == -1)//Static tag
                 {
-                    //Switch here
+                    switch (tags[a])
+                    {
+                        case "disallowSkip":
+                            m_allowSkipTypeout = false;
+                            break;
+                    }
                 }
                 else
                 {
@@ -352,9 +357,7 @@ namespace Interaction.Dialogue
                             if (value == "default") m_typeDelay = m_dfTypeDelay;
                             else m_typeDelay = float.Parse(value);
                             break;
-                        case "disallowSkip":
-                            m_allowSkipTypeout = false;
-                            break;
+                        
                     }
                 }
             }
