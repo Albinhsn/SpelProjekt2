@@ -1,4 +1,5 @@
 #font=0
+...
 <i>Suddenly, a light moves in front of the door.</i> #camera=0 # anim=move:bool=true;
 What are you? #camera=0 #speaker=You
 I am the USER and your creator. #speaker=USER # anim=idle:bool=true;
