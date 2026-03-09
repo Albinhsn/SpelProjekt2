@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 1897441585925400100}
   - component: {fileID: 7621269452756472986}
   - component: {fileID: 1727856893659873901}
-  - component: {fileID: 7448908755222038539}
   m_Layer: 0
   m_Name: PlayerNew
   m_TagString: Player
@@ -54,6 +53,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_playerJumpSound: {fileID: 11400000, guid: 20351e68e394a1e4487db27c86a66e2a, type: 2}
   m_footstepSound: {fileID: 11400000, guid: a90337aafda62406abd9b84e5d5c1cec, type: 2}
+  m_animator: {fileID: 0}
   m_speed: 5
   m_jumpForce: 5
   m_smoothAccelerationFactor: 0.1
@@ -170,28 +170,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 0.1, z: 0.5}
   m_Center: {x: 0, y: -0.85, z: 0}
---- !u!95 &7448908755222038539
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 566903425411078747}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2123492860174904639
 GameObject:
   m_ObjectHideFlags: 0
