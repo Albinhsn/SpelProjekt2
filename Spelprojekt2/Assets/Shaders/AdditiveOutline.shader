@@ -12,7 +12,7 @@ Shader "Custom/AdditiveOutline"
 
         Pass
         {
-            Cull Off
+            Cull Front
             Zwrite Off
             Blend SrcAlpha OneMinusSrcAlpha
             

@@ -116,7 +116,11 @@ public class OutlineMeshPreparator : MonoBehaviour
                 new NativeArray<BoneWeight1>(weights.ToArray(), Allocator.None));
             dst_mesh.name = $"(opr) {src_mesh.name}";
             
-            GetComponent<SkinnedMeshRenderer>().sharedMesh = dst_mesh;
+            SkinnedMeshRenderer dst_renderer = GetComponent<SkinnedMeshRenderer>();
+            dst_renderer.sharedMesh = dst_mesh;
+            dst_renderer.bones = src_renderer.bones;
+            dst_renderer.quality = src_renderer.quality;
+            dst_renderer.rootBone = src_renderer.rootBone;
         }
         else //Non-skinned mesh renderer
         {
