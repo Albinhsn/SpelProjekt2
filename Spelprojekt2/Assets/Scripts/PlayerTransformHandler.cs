@@ -9,15 +9,14 @@ public class PlayerTransformHandler : MonoBehaviour
     [SerializeField,Tooltip("The speed at which the player rotates to face the direction of movement")] float m_transformRotationSpeed = .4f; 
     [SerializeField] private float m_transmarencyStartDistance = 2f;
     [SerializeField] private float m_fullTransparencyDistance = 1f;
+    [SerializeField] private SkinnedMeshRenderer m_meshRenderer;
     private PlayerCamera m_camera; 
     private Rigidbody m_parentRb; 
-    private MeshRenderer m_meshRenderer;
     private Color m_originalColor;
     
     void Awake() 
     { 
-        m_originalColor = GetComponent<MeshRenderer>().material.color;
-        m_meshRenderer = GetComponent<MeshRenderer>();
+        m_originalColor = m_meshRenderer != null ? m_meshRenderer.material.color : new Color(1,1,1,1);
         m_camera = FindFirstObjectByType<PlayerCamera>(); 
         m_parentRb = transform.parent.GetComponent<Rigidbody>(); 
     
@@ -51,6 +50,9 @@ public class PlayerTransformHandler : MonoBehaviour
             alphaResult = 0;
         }
 
-        m_meshRenderer.material.color = new Color(m_originalColor.r, m_originalColor.g, m_originalColor.b, alphaResult);
+        if(m_meshRenderer != null)
+        {
+            m_meshRenderer.material.color = new Color(m_originalColor.r, m_originalColor.g, m_originalColor.b, alphaResult);
+        }
     }
 }
