@@ -1,5 +1,4 @@
 #font=0
-...
 <i>Suddenly, a light moves in front of the door.</i> #camera=0 # anim=move:bool=true;
 What are you? #camera=0 #speaker=You
 I am the USER and your creator. #speaker=USER # anim=idle:bool=true;
@@ -11,7 +10,7 @@ Wait! Can't you... Nevermind. #speaker=Alea #camera=0 # anim=disappear:bool=true
 -> choice
 === choice ===
  + [The <color="purple">Bearing</color>.]
- The island looks different in comparison to the other ones.
+ The island looks as if it's upside down, in comparison to the other ones.
  -> choice
  + [The USER.]
  A strange thing or person, a guiding light maybe?
