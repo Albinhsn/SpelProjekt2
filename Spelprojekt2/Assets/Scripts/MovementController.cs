@@ -124,6 +124,7 @@ public class MovementController : MonoBehaviour
         if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
         {
             SetAnimBool("jumped", true);
+            SetAnimBool("isGrounded", false);
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
