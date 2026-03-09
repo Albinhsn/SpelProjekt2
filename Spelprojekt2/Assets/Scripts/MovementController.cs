@@ -9,7 +9,7 @@ using FMOD.Studio;
 using AudioKit.FMOD;
 using static LinAlg.LinAlg;
 
-[RequireComponent(typeof(Rigidbody), typeof(Animator))]
+[RequireComponent(typeof(Rigidbody))]
 public class MovementController : MonoBehaviour
 {
 
@@ -21,6 +21,8 @@ public class MovementController : MonoBehaviour
     private FMOD.Studio.EventInstance m_footstepInstance;
 
     [Header("Movement")]
+    [SerializeField] private Animator m_animator;
+
     [SerializeField, Tooltip("The movement speed of the player")]
     private float m_speed;
 
@@ -34,7 +36,6 @@ public class MovementController : MonoBehaviour
     private Vector3 m_referenceVector = Vector3.zero;
     private Transform m_cameraTransform;
 
-    private Animator m_animator;
     private Dictionary<string, int> m_animationParameters;
 
     private float jumpCooldown = 0;
@@ -42,13 +43,11 @@ public class MovementController : MonoBehaviour
     void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
-        m_animator = GetComponent<Animator>();
         m_playerCamera = GetComponentInChildren<PlayerCamera>();
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
 
         m_animationParameters = new();
-        Debug.Log($"Found {m_animator.parameters.Length} parameters");
-        for(int i = 0; i < m_animator.parameters.Length; i++)
+        for(int i = 0; m_animator != null && i < m_animator.parameters.Length; i++)
         {
             var param = m_animator.parameters[i];
             m_animationParameters[param.name] = param.nameHash;
