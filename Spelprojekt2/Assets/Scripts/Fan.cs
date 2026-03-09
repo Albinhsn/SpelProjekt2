@@ -32,11 +32,21 @@ public class Fan : MonoBehaviour
     {
         m_soundInstance = RuntimeManager.CreateInstance(m_soundCue.evt);
         m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(this.transform.position));
+        m_soundInstance.start();
 
+        if(m_isActive)
+        {
+            TurnOn();
+        }
+        else
+        {
+            m_soundInstance.setParameterByName("looping", 0.0f);
+        }
     }
 
     void OnDestroy()
     {
+        m_soundInstance.setParameterByName("looping", 0.0f);
         m_soundInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
         m_soundInstance.release();
     }
@@ -162,13 +172,12 @@ public class Fan : MonoBehaviour
     void PlaySound()
     {
         m_soundIsPlaying = true;
-        m_soundInstance.start();
+        m_soundInstance.setParameterByName("looping", 1.0f);
     }
 
     void StopSound()
     {
-        m_soundIsPlaying = false;
-        m_soundInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+        m_soundInstance.setParameterByName("looping", 0.0f);
     }
 
     void Update()
