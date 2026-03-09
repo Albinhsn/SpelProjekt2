@@ -11,6 +11,7 @@ public class OutlineMeshPreparator : MonoBehaviour
 {
     [SerializeField] private GameObject m_srcMeshObject;
     [SerializeField] private float m_weldThreshold = float.Epsilon;
+    [SerializeField] private bool m_recalculate;
     private bool m_useSkinnedMeshRenderer;
 
     private void OnValidate()
@@ -59,7 +60,7 @@ public class OutlineMeshPreparator : MonoBehaviour
                         m_weldThreshold) //Add to existing vertex entry
                     {
                         vertex_collection[b].indices.Add(a);
-                        vertex_collection[b].normals.Add(src_mesh.normals[b]);
+                        vertex_collection[b].normals.Add(src_mesh.normals[a]);
                         add_new = false;
                         break;
                     }
@@ -116,7 +117,6 @@ public class OutlineMeshPreparator : MonoBehaviour
             dst_mesh.name = $"(opr) {src_mesh.name}";
             
             GetComponent<SkinnedMeshRenderer>().sharedMesh = dst_mesh;
-
         }
         else //Non-skinned mesh renderer
         {
@@ -137,7 +137,7 @@ public class OutlineMeshPreparator : MonoBehaviour
                         m_weldThreshold) //Add to existing vertex entry
                     {
                         vertex_collection[b].indices.Add(a);
-                        vertex_collection[b].normals.Add(src_mesh.normals[b]);
+                        vertex_collection[b].normals.Add(src_mesh.normals[a]);
                         add_new = false;
                         break;
                     }
@@ -185,6 +185,8 @@ public class OutlineMeshPreparator : MonoBehaviour
 
             GetComponent<MeshFilter>().sharedMesh = dst_mesh;
         }
+
+        transform.position = m_srcMeshObject.transform.position;
     }
 
     private class VertexData
