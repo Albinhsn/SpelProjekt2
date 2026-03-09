@@ -6,6 +6,7 @@ using UnityEngine.Events;
 
 namespace Interaction
 {
+    [RequireComponent(typeof(Collider))]
     public class Interactable : MonoBehaviour
     {
         [SerializeField] protected InstanceSet m_interactableSet;
