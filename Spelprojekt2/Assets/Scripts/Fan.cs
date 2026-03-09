@@ -38,6 +38,10 @@ public class Fan : MonoBehaviour
         {
             TurnOn();
         }
+        else
+        {
+            m_soundInstance.setParameterByName("looping", 0.0f);
+        }
     }
 
     void OnDestroy()
