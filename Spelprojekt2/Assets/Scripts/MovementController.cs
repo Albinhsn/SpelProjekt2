@@ -54,6 +54,19 @@ public class MovementController : MonoBehaviour
         }
     }
 
+    private void SetAnimTrigger(string key)
+    {
+        if(m_animationParameters.ContainsKey(key))
+        {
+            m_animator.SetTrigger(m_animationParameters[key]);
+        }
+        else
+        {
+            Debug.Log($"Tried to set {key} but couldn't find it");
+        }
+
+    }
+
     private void SetAnimBool(string key, bool value)
     {
         if(m_animationParameters.ContainsKey(key))
@@ -124,17 +137,13 @@ public class MovementController : MonoBehaviour
     {
         if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
         {
-            SetAnimBool("jumped", true);
+            SetAnimTrigger("jumped");
             SetAnimBool("isGrounded", false);
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
             jumpCooldown = 0.5f;
             m_footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
-        }
-        else
-        {
-            SetAnimBool("jumped", false);
         }
     }
 
