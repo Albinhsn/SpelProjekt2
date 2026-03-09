@@ -37,6 +37,7 @@ public class MovementController : MonoBehaviour
     private Transform m_cameraTransform;
 
     private Dictionary<string, int> m_animationParameters;
+    private Dictionary<string, bool> m_animationParamState;
 
     private float jumpCooldown = 0;
 
@@ -47,10 +48,12 @@ public class MovementController : MonoBehaviour
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
 
         m_animationParameters = new();
+        m_animationParamState = new();
         for(int i = 0; m_animator != null && i < m_animator.parameters.Length; i++)
         {
             var param = m_animator.parameters[i];
             m_animationParameters[param.name] = param.nameHash;
+            m_animationParamState[param.name] = false;
         }
     }
 
@@ -60,24 +63,15 @@ public class MovementController : MonoBehaviour
         {
             m_animator.SetTrigger(m_animationParameters[key]);
         }
-        else
-        {
-            Debug.Log($"Tried to set {key} but couldn't find it");
-        }
-
     }
 
     private void SetAnimBool(string key, bool value)
     {
-        if(m_animationParameters.ContainsKey(key))
+        if(m_animationParameters.ContainsKey(key) && m_animationParamState[key] != value)
         {
             m_animator.SetBool(m_animationParameters[key], value);
+            m_animationParamState[key] = value;
         }
-        else
-        {
-            Debug.Log($"Tried to set {key} but couldn't find it");
-        }
-
     }
 
     private void Start()
