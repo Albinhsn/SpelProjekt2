@@ -1,11 +1,13 @@
 using UnityEngine;
 using AudioKit.FMOD;
+using FMODUnity;
 
 public class Fan : MonoBehaviour
 {
     [Header("Audio")]
-    [SerializeField] private AudioAction m_onActiveSound;
-    [SerializeField] private AudioAction m_onDeactiveSound;
+    [SerializeField] private AudioCueSO m_soundCue;
+
+    private FMOD.Studio.EventInstance m_soundInstance;
 
     [Header("Lift Settings")]
     [SerializeField] float m_windStrength = 15f;
@@ -25,6 +27,19 @@ public class Fan : MonoBehaviour
     private float m_colliderHeight;
     private CapsuleCollider m_collider;
     private bool m_soundIsPlaying;
+
+    void Start()
+    {
+        m_soundInstance = RuntimeManager.CreateInstance(m_soundCue.evt);
+        m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(this.transform.position));
+
+    }
+
+    void OnDestroy()
+    {
+        m_soundInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+        m_soundInstance.release();
+    }
 
     public void TurnOff()
     {
@@ -147,13 +162,13 @@ public class Fan : MonoBehaviour
     void PlaySound()
     {
         m_soundIsPlaying = true;
-        m_onActiveSound.Run(this.transform.position);
+        m_soundInstance.start();
     }
 
     void StopSound()
     {
         m_soundIsPlaying = false;
-        m_onDeactiveSound.Run(this.transform.position);
+        m_soundInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
     }
 
     void Update()

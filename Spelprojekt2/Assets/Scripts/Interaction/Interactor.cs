@@ -127,8 +127,8 @@ namespace Interaction
                 {
                     continue;
                 }
-
                 obj.m_indicatorKind = IndicatorKind.Target;
+
                 
 
                 if (obj_radial_distance < sel_distance)

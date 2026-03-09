@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &104367395 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7035203898554509674, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+  m_PrefabInstance: {fileID: 1422162345}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &120430141
 Mesh:
   m_ObjectHideFlags: 0
@@ -11611,6 +11616,11 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -11729,11 +11739,6 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
 --- !u!108 &847616480
 Light:
   m_ObjectHideFlags: 0
@@ -14953,6 +14958,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1495296816}
     m_Modifications:
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: IncrementPosition
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 104367395}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Transform, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 802697536933158284, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.18167965
@@ -14988,6 +15021,18 @@ PrefabInstance:
     - target: {fileID: 1021770652222232353, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
       propertyPath: m_LocalPosition.z
       value: -0.00000017881393
+      objectReference: {fileID: 0}
+    - target: {fileID: 1066113603582164244, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_Size.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1066113603582164244, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_Size.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1066113603582164244, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_Size.z
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2944865099101485738, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
       propertyPath: m_LocalScale.x
@@ -15093,7 +15138,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Elevator Variant
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2358919877649878389, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1626471350279465040, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
     m_AddedGameObjects: []
