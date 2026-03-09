@@ -408,11 +408,8 @@ public class UIManager : MonoBehaviour
                     title_style.font = font;
 
                     title_style.active = title_style.normal;
-                    title_style.normal.textColor = new Color(
-                            245.0f / 255.0f,
-                            40.0f / 255.0f, 
-                            145.0f / 255.0f,
-                            0.8f);
+                    title_style.normal.textColor = Color.white;
+
                     title_style.active = title_style.normal;
                     title_style.hover  = title_style.normal;
 
