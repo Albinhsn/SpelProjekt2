@@ -13,12 +13,14 @@ public class PlayerTransformHandler : MonoBehaviour
     private PlayerCamera m_camera; 
     private Rigidbody m_parentRb; 
     private Color m_originalColor;
+    private MovementController m_movementController;
     
     void Awake() 
     { 
         m_originalColor = m_meshRenderer != null ? m_meshRenderer.material.color : new Color(1,1,1,1);
         m_camera = FindFirstObjectByType<PlayerCamera>(); 
         m_parentRb = transform.parent.GetComponent<Rigidbody>(); 
+        m_movementController = GetComponentInParent<MovementController>();
     
     } 
     void FixedUpdate() 
@@ -28,14 +30,26 @@ public class PlayerTransformHandler : MonoBehaviour
         Vector2 input = InputManager.ReadMovementValue(); 
         Vector3 dir = forward * input.y + right * input.x; 
         
-        if(m_parentRb.linearVelocity.magnitude > 0.1f && input != Vector2.zero) 
-        { 
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(dir.normalized, Vector3.up), m_transformRotationSpeed); 
-        } 
-        else if(forward != Vector3.zero)
-        { 
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(forward.normalized, Vector3.up), m_transformRotationSpeed); 
-        } 
+        if(!m_movementController.m_isJumping)
+        {
+            if(m_parentRb.linearVelocity.magnitude > 0.1f && input != Vector2.zero) 
+            { 
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(dir.normalized, Vector3.up), m_transformRotationSpeed); 
+            } 
+            else if(forward != Vector3.zero)
+            { 
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(forward.normalized, Vector3.up), m_transformRotationSpeed); 
+            } 
+        }
+        else 
+        {
+            Vector3 xzVelocity = new Vector3(m_parentRb.linearVelocity.x,0,m_parentRb.linearVelocity.z);
+            if(xzVelocity.magnitude > .01f)
+            {
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(xzVelocity.normalized, Vector3.up), m_transformRotationSpeed); 
+            }
+        }
+        
         
         HandleTransparancy();
     } 
