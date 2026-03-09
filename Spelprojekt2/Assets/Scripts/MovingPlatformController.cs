@@ -136,14 +136,8 @@ public class MovingPlatformController : MonoBehaviour
 		}
 	}
 
-	//Controls
-	public void MoveToIndex(int index, Transform activator_transform)
+	public void MoveToIndex(int index)
 	{
-        SfxDirector.PlayCue2(m_onPlatformStartMoveCue, activator_transform.position);
-        m_soundInstance = RuntimeManager.CreateInstance(m_onPlatformMoveCue.evt);
-        m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(m_platform.transform.position));
-        m_soundInstance.setParameterByName("looping", 1);
-        m_soundInstance.start();
 
 		Assert.IsTrue(index < m_targetCount);
 
@@ -156,6 +150,19 @@ public class MovingPlatformController : MonoBehaviour
 		m_platform.UpdateReference(m_movementDirection * m_speed);
 		
 	}
+
+	//Controls
+	public void MoveToIndex(int index, Transform activator_transform)
+	{
+        SfxDirector.PlayCue2(m_onPlatformStartMoveCue, activator_transform.position);
+        m_soundInstance = RuntimeManager.CreateInstance(m_onPlatformMoveCue.evt);
+        m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(m_platform.transform.position));
+        m_soundInstance.setParameterByName("looping", 1);
+        m_soundInstance.start();
+
+        MoveToIndex(index);
+	}
+
 	public void IncrementPosition(Transform source)
 	{
 		if (moving) return;
