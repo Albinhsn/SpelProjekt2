@@ -1,19 +1,24 @@
 using UnityEngine;
 using AudioKit.FMOD;
+using FMODUnity;
 
 public class Fan : MonoBehaviour
 {
     [Header("Audio")]
-    [SerializeField] private AudioAction m_onActiveSound;
-    [SerializeField] private AudioAction m_onDeactiveSound;
+    [SerializeField] private AudioCueSO m_soundCue;
+
+    private FMOD.Studio.EventInstance m_soundInstance;
 
     [Header("Lift Settings")]
     [SerializeField] float m_windStrength = 15f;
     [SerializeField] float m_maxHeight = 10f;
+    [SerializeField] float m_xzPullStrength = 10f;
 
     [Header("Top Bob Settings")]
     [SerializeField] float m_bobAmplitude = 0.5f;
     [SerializeField] float m_bobSpeed = 2f;
+
+    [SerializeField] private ParticleSystem m_particleSystem;
 
     [Header("Start active")]
     [SerializeField]
@@ -23,10 +28,27 @@ public class Fan : MonoBehaviour
     private CapsuleCollider m_collider;
     private bool m_soundIsPlaying;
 
+    void Start()
+    {
+        m_soundInstance = RuntimeManager.CreateInstance(m_soundCue.evt);
+        m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(this.transform.position));
+
+    }
+
+    void OnDestroy()
+    {
+        m_soundInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+        m_soundInstance.release();
+    }
+
     public void TurnOff()
     {
         m_isActive = false;
         StopSound();
+        if(m_particleSystem != null)
+        {
+            m_particleSystem.Stop();
+        }
     }
 
     public void TurnOn()
@@ -37,6 +59,10 @@ public class Fan : MonoBehaviour
         if(filter != null)
         {
             should_play_sound = filter.m_kind != FilterManager.m_activeFilter;
+        }
+        if(m_particleSystem != null)
+        {
+            m_particleSystem.Play();
         }
 
         if(should_play_sound)
@@ -113,9 +139,9 @@ public class Fan : MonoBehaviour
 
             Vector2 xzDistance = XZDistanceToCenter(other.transform);
             rb.linearVelocity = new Vector3(
-                -xzDistance.x,
+                -xzDistance.x * m_xzPullStrength,
                 rb.linearVelocity.y,
-                -xzDistance.y
+                -xzDistance.y * m_xzPullStrength
             );
         }
     }
@@ -136,13 +162,13 @@ public class Fan : MonoBehaviour
     void PlaySound()
     {
         m_soundIsPlaying = true;
-        m_onActiveSound.Run(this.transform.position);
+        m_soundInstance.start();
     }
 
     void StopSound()
     {
         m_soundIsPlaying = false;
-        m_onDeactiveSound.Run(this.transform.position);
+        m_soundInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
     }
 
     void Update()

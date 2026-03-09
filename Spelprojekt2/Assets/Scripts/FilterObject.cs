@@ -1,6 +1,7 @@
 using Interaction;
 using UnityEngine;
 using UnityEngine.Rendering;
+using System.Collections.Generic;
 
 public enum FilterColor
 {
@@ -24,6 +25,9 @@ public class FilterObject : MonoBehaviour
 {
     public FilterKind m_kind;
 
+    [SerializeField]
+    private bool m_dontChangeRBKinematic;
+
     public bool Activated => m_activated;
     private bool m_activated;
     private MeshRenderer m_renderer;
@@ -33,6 +37,10 @@ public class FilterObject : MonoBehaviour
 
     private Material m_deactivatedMaterial;
     private Material m_activatedMaterial;
+
+    private HashSet<GameObject> m_collidingObjects;
+
+    private LayerMask m_originalLayer;
 
 
     public static int TagIsFilter(string tag)
@@ -54,6 +62,7 @@ public class FilterObject : MonoBehaviour
             Debug.LogError("FilterKind should never be set to None, needs to be primary or secondary");
         }
 
+        m_collidingObjects = new();
         m_renderer = GetComponent<MeshRenderer>();
         m_collider = GetComponent<Collider>();
         m_rb       = GetComponent<Rigidbody>();
@@ -67,6 +76,7 @@ public class FilterObject : MonoBehaviour
         {
             ChangeMaterialColor(fm.m_filterColorData, fm.m_filterMaterialData);   
         }
+        m_originalLayer = this.gameObject.layer;
     }
 
     public void ChangeMaterialColor(FilterColorData filterColorData, FilterMaterialData material_data)
@@ -84,6 +94,22 @@ public class FilterObject : MonoBehaviour
 
     }
 
+    void OnCollisionEnter(Collision other)
+    {
+        if(!m_activated)
+        {
+            m_collidingObjects.Add(other.gameObject);
+        }
+    }
+
+    void OnCollisionExit(Collision other)
+    {
+        if(!m_activated)
+        {
+            m_collidingObjects.Remove(other.gameObject);
+        }
+    }
+
     public void Activate()
     {
         m_renderer.material = m_activatedMaterial;
@@ -98,12 +124,32 @@ public class FilterObject : MonoBehaviour
             m_collider.isTrigger = true;
         }
 
-        if(m_rb != null)
+        if(m_rb != null && !m_dontChangeRBKinematic)
         {
             m_rb.isKinematic = true;
         }
+
+        this.gameObject.layer = LayerMask.NameToLayer("Filtered");
+
         
-        m_interactableComponent?.SetIsInteractable(true);
+        m_interactableComponent?.SetIsInteractable(false);
+
+        // NOTE(ah): We do this because there is a chance that if two objects are colliding
+        // and we change one to being filtered even though the collider is trigger and the rb
+        // is kinematic the object we're colliding with (say a box resting on top of a filtered box)
+        // won't wake up by itself afterwards. So we need to store the objects to force the behavior
+        foreach(var obj in m_collidingObjects)
+        {
+            if(obj != null)
+            {
+                Rigidbody rb = obj.GetComponent<Rigidbody>();
+                if(rb != null)
+                {
+                    rb.WakeUp();
+                }
+            }
+        }
+        m_collidingObjects.Clear();
     }
 
     public void Deactivate()
@@ -115,11 +161,13 @@ public class FilterObject : MonoBehaviour
             m_collider.isTrigger = false;
         }
 
-        if(m_rb != null)
+        if(m_rb != null && !m_dontChangeRBKinematic)
         {
             m_rb.isKinematic = false;
         }
+        this.gameObject.layer = m_originalLayer;
         
-        m_interactableComponent?.SetIsInteractable(false);
+        m_interactableComponent?.SetIsInteractable(true);
+        m_interactableComponent?.ForceCancelInteraction();
     }
 }

@@ -9,6 +9,9 @@ public class SoundOnCollision : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-        m_action.Run(this.transform.position);
+        if(other.impulse.sqrMagnitude > 0)
+        {
+            m_action.Run(this.transform.position);
+        }
     }
 }

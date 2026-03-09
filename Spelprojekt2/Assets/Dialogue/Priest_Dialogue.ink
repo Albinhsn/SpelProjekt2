@@ -29,11 +29,6 @@ That would be the good-for-nothing Nitwit I presume. She's the only one who woul
 Very well. What do you want to know?
             -> choice
             = choice
-            + [Glitches.]
-            ~info = true
-            What are they? #speaker=Alea
-            They are tears in our reality. Best to avoid them. # speaker=Priest
-            -> choice
             + [USER.]
             Who is the USER? # speaker=Alea
             You're truly not one of ours. The USER is our one and only God. # speaker=Priest
@@ -42,13 +37,13 @@ Very well. What do you want to know?
             -> choice
             * [Move on.]
             I need to know above all else: # speaker=Alea
-            How do I remove the glitches blocking my path forward to the <color="purple">Bearing?</color>
+            How do I get to the <color="purple">Bearing?</color>
             You would go to our sacred ground? A fool's journey for someone like you. # speaker=Priest
             Why is that? I don't really understand what's so strange about me. # speaker=Alea
-            Have you looked at yourself? You're clearly different, you <i>look</i> out of place. # speaker=Priest
+            Have you looked at yourself? But I suppose it's not something you have considered. # speaker=Priest
             But I shouldn't be pointing out the obvious, outsider.
             If you wish to go to the <color="purple">Bearing</color> then so be it.
-            Go to the roof, if you're a chosen then access the terminal there. It will help you.
+            Go to the roof, if you're a chosen then you will be able to move forward, through the door.
             Thank you. # speaker=Alea
             Don't, I wont accept it. # speaker=Priest
             ->DONE

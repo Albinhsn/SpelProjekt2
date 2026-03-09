@@ -36,16 +36,12 @@ public sealed class FilterToMusicParams : MonoBehaviour
         filterManager = FindFirstObjectByType<FilterManager>();
         if (!driver) driver = FindFirstObjectByType<AudioParameterDriver>();
         ResolveKindsFromGameData();
-    }
 
-    private void OnEnable()
-    {
         if (filterManager) filterManager.m_filterChanged.AddListener(OnFilterChanged);
-        ResolveKindsFromGameData();
         ApplyFromState();
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         if (filterManager) filterManager.m_filterChanged.RemoveListener(OnFilterChanged);
     }
@@ -53,6 +49,7 @@ public sealed class FilterToMusicParams : MonoBehaviour
     private void OnFilterChanged(FilterKind kind, bool activating)
     {
         ResolveKindsFromGameData();
+
 
         if (!activating)
         {
@@ -76,6 +73,7 @@ public sealed class FilterToMusicParams : MonoBehaviour
             Set(redKey, offValue, turningOn: false);
             Set(blueKey, offValue, turningOn: false);
         }
+
     }
 
     private void ApplyFromState()

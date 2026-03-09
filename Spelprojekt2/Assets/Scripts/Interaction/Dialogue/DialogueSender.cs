@@ -13,8 +13,9 @@ namespace Interaction.Dialogue
         [SerializeField] private TextAsset m_inkData;
         [SerializeField] private DialogueRelay m_dlsRelay;
         [Tooltip("Index 0 is default while interacting")][SerializeField] private CinemachineCamera[] m_cameraOverrides;
+        [SerializeField] private float m_typeOutDelay = 0.055f;
+        [SerializeField] private char m_typeIndicator = '_';
         private Story m_story;
-        private bool m_interacting;
         [CanBeNull] private Interactor m_activeInteractor;
         [CanBeNull] private InkAssetRegistry m_assetRegistry = null;
 
@@ -42,15 +43,16 @@ namespace Interaction.Dialogue
             
             if (!m_story.canContinue)
             {
-                interactor.CancelInteract();
+                interactor.FinishInteraction();
                 return;
             }
             m_activeInteractor = interactor;
             SetActiveCamera(0);
+
+            DialoguePacket packet = new DialoguePacket(m_story, m_typeOutDelay, m_typeIndicator);
             
-            m_interacting = true;
             m_story.Continue();
-            m_dlsRelay.Initiate(m_story, this);
+            m_dlsRelay.Initiate(packet, this);
         }
         
         private void UpdateDialogue()
@@ -76,7 +78,6 @@ namespace Interaction.Dialogue
                     }
                     break;
                 case -2:
-                    m_interacting = false;
                     break;
                 default:
                     m_story.ChooseChoiceIndex(selection);
@@ -97,8 +98,7 @@ namespace Interaction.Dialogue
             GlobalInkVariableManager.SyncUp(m_story);
             m_dlsRelay.ExitDialogue();
             SetActiveCamera(-1);
-            m_interacting = false;
-            m_activeInteractor.CancelInteract();
+            m_activeInteractor.FinishInteraction();
             m_activeInteractor = null;
             m_story.ResetState();
         }

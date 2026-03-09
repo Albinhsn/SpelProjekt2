@@ -2,10 +2,16 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
 using System.Collections.Generic;
+using AudioKit.FMOD;
 
 
 public class InteractiveButton : MonoBehaviour
 {
+    [Header("Sound")]
+    [SerializeField]
+    private string m_onClickSoundEvent;
+
+    [Header("Events")]
     [SerializeField]
     private UnityEvent m_onClick;
     [SerializeField]
@@ -14,7 +20,7 @@ public class InteractiveButton : MonoBehaviour
     private List<GameObject> m_collidingObjects;
 
 
-    void Awake()
+    void Start()
     {
         m_collidingObjects = new();
         FilterManager fm = FindFirstObjectByType<FilterManager>();
@@ -70,6 +76,17 @@ public class InteractiveButton : MonoBehaviour
         }
     }
 
+    private void Click()
+    {
+        m_onClick?.Invoke();
+        AudioEventHub.I?.PlayOneShot(m_onClickSoundEvent, this.transform.position);
+    }
+
+    private void Release()
+    {
+        m_onRelease?.Invoke();
+    }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -82,7 +99,7 @@ public class InteractiveButton : MonoBehaviour
 
         if(is_valid_object && IsNoObjectOnTheButton(FilterManager.m_activeFilter))
         {
-            m_onClick?.Invoke();
+            Click();
         }
         m_collidingObjects.Add(other.gameObject);
     }
@@ -101,7 +118,7 @@ public class InteractiveButton : MonoBehaviour
             m_collidingObjects = m_collidingObjects.Where(x => x != other.gameObject).ToList();
             if(IsNoObjectOnTheButton(FilterManager.m_activeFilter))
             {
-                m_onRelease?.Invoke();
+                Release();
             }
         }
     }

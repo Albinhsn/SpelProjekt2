@@ -5,25 +5,74 @@ using System.Collections.Generic;
 public class DynamicRigidbody : MonoBehaviour
 {
     private Collider m_col;
+    private Rigidbody m_rb;
+    private bool m_shouldDestroy;
+    private Mesh m_mesh;
     // HACK(ah): I feel disgusted with myself doing this but i don't know a better solution
     [HideInInspector] public HashSet<GameObject> m_collidingWithSet;
 
     void Awake()
     {
+        this.m_rb = GetComponent<Rigidbody>();
+        this.m_col = GetComponent<Collider>();
+        this.m_collidingWithSet = new();
+        this.m_mesh = GetComponent<Mesh>();
+    }
+
+    void Start()
+    {
         FilterManager manager = FindFirstObjectByType<FilterManager>();
         manager.m_filterChanged.AddListener(OnFilterChange);
-        this.m_col = GetComponent<Collider>();
-
-        this.m_collidingWithSet = new();
     }
 
 
     void OnFilterChange(FilterKind kind, bool active)
     {
-        if(kind != FilterManager.m_activeFilter || !active)
+        if(this.m_collidingWithSet != null && this.m_collidingWithSet.Count > 0)
         {
-            DestroyOnCollision();
+            if(!active)
+            {
+                m_shouldDestroy = true;
+            }
+            else
+            {
+                // Shouldn't destroy if you're the newly active filter (assuming it's not none)
+                FilterObject filter = GetComponent<FilterObject>();
+                bool is_newly_filtered = filter != null && kind == filter.m_kind;
+
+                if(!is_newly_filtered)
+                {
+                    m_shouldDestroy = !(this.m_collidingWithSet == null || this.m_collidingWithSet.Count == 0);
+                }
+
+                if(m_shouldDestroy)
+                {
+
+                    foreach(GameObject obj in m_collidingWithSet)
+                    {
+                        FilterObject filter_obj = obj.GetComponent<FilterObject>();
+                        if(filter_obj != null)
+                        {
+                            m_shouldDestroy = filter_obj.m_kind != kind;
+                        }
+
+                        if(m_shouldDestroy)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            m_rb.WakeUp();
         }
+
+    }
+
+    public void Destroy()
+    {
+        Material material = GetComponent<MeshRenderer>().material;
+        ParticleManager.PlayParticleEffect(transform.position, transform.rotation, m_mesh, material, transform.localScale);
+        Destroy(this.gameObject);
     }
 
     public void DestroyOnCollision()
@@ -31,9 +80,7 @@ public class DynamicRigidbody : MonoBehaviour
         if(this.m_collidingWithSet == null) return;
         if(this.m_collidingWithSet.Count > 0)
         {
-            Material material = GetComponent<MeshRenderer>().material;
-            ParticleManager.PlayParticleEffect(transform.position, transform.rotation, Vector3.one, material);
-            Destroy(this.gameObject);
+            Destroy();
         }
         else
         {
@@ -98,6 +145,17 @@ public class DynamicRigidbody : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        this.m_collidingWithSet.Remove(other.gameObject);
+        if(this.m_collidingWithSet != null)
+        {
+            this.m_collidingWithSet.Remove(other.gameObject);
+        }
+    }
+
+    void LateUpdate()
+    {
+        if(m_shouldDestroy)
+        {
+            Destroy();
+        }
     }
 }

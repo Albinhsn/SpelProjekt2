@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6281125445952770457}
   - component: {fileID: 4744178648027739420}
   - component: {fileID: 3844175859547909368}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Dialogue trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30,9 +30,9 @@ Transform:
   m_GameObject: {fileID: 1188959944526972866}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.6761827, z: 0, w: 0.73673403}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3297309, y: 2.3933918, z: 1.3297309}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: -0.02, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8581536919769360342}
   m_Father: {fileID: 3176023773755229823}
@@ -44,7 +44,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1188959944526972866}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 7925510706294417818, guid: f3c45eaf73509004d9cbc8d4d3441c4f, type: 3}
 --- !u!23 &8126816258559949540
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3c004d986d1352f4e98a5994fd265ff4, type: 2}
+  - {fileID: -7791486788655378091, guid: f3c45eaf73509004d9cbc8d4d3441c4f, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -126,6 +126,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -141,6 +143,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -183,7 +188,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6109835060219811870}
   - component: {fileID: 5692167333085530553}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Camera 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -259,7 +264,7 @@ GameObject:
   - component: {fileID: 8581536919769360342}
   - component: {fileID: 7293867385628007459}
   - component: {fileID: 6126484030925789093}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Indicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -275,8 +280,8 @@ Transform:
   m_GameObject: {fileID: 7107478376365640774}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.6761827, z: -0, w: 0.73673403}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.099116, y: 1.099116, z: 1.099116}
+  m_LocalPosition: {x: 0, y: 0.772, z: 0}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 7215846987663437686}
@@ -343,7 +348,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3176023773755229823}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sample dialogue trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +383,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9000824873845308480}
   - component: {fileID: 8862058946110933786}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DefaultCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}

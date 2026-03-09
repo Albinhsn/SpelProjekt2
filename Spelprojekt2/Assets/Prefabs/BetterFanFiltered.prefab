@@ -468,32 +468,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5fe9477c42c77e4cb56b3b34921882f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_onActiveSound:
-    type: 2
-    eventId: Fan
-    vcaName: 
-    vcaValue: 0
-    parameter: {fileID: 0}
-    parameterName: 
-    parameterValue: 0
-    snapshot: 
-    snapshotEnable: 0
-    fade: 0
-  m_onDeactiveSound:
-    type: 3
-    eventId: Fan
-    vcaName: 
-    vcaValue: 0
-    parameter: {fileID: 0}
-    parameterName: 
-    parameterValue: 0
-    snapshot: 
-    snapshotEnable: 0
-    fade: 0
+  m_soundCue: {fileID: 11400000, guid: 10579348e9f7b6de89492b2a4e0add8f, type: 2}
   m_windStrength: 1
   m_maxHeight: 10
+  m_xzPullStrength: 10
   m_bobAmplitude: 0.5
   m_bobSpeed: 3
+  m_particleSystem: {fileID: 0}
+  m_isActive: 0
 --- !u!1 &1635809334556335408
 GameObject:
   m_ObjectHideFlags: 0
@@ -6463,6 +6445,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_kind: 0
+  m_dontChangeRBKinematic: 0
 --- !u!1 &2498460605326150929
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,83 +10,154 @@ namespace Interaction
 {
     public class Interactor : MonoBehaviour
     {
-        [SerializeField] private InstanceSet m_interactableSet;
+        [SerializeField] private InstanceSet[] m_interactableSets;
         [SerializeField] private Transform m_targetOrigin;
         [SerializeField] private float m_range;
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
-        
-        [SerializeField] private InputActionReference m_interactAction;
-        [SerializeField] private UnityEvent<bool> m_deactivateWhileInteracting;
 
-        [CanBeNull] private Interactable m_selected = null;
-        private bool m_interacting = false;
+        [SerializeField] private LayerMask m_blockLineOfSight;
+
+        [ItemCanBeNull] private Interactable[] m_selected;
+        private int m_interacting = -1; //Interaction type. -1=not interacting
+
+        public Vector3 aimDirection => m_targetOrigin.forward;
+
+        public Vector3 position => m_targetOrigin.position;
+
+        private void Awake()
+        {
+            m_selected = new Interactable[m_interactableSets.Length];
+        }
+
+        void Start()
+        {
+            PickupItemIndicatorManager.SetSourceTransform(m_targetOrigin);
+        }
 
         private void Update()
         {
-            if(m_interacting) return;
-            SearchFrustum();
-
-            if (m_selected is not null && m_interactAction.action.WasPressedThisFrame())
+            switch (m_interacting)
             {
-                Interact(m_selected);
+                case 0:
+                    if(InputManager.Interact()) CancelInteractions();
+                    break;
+                case 1:
+                    if(InputManager.PickedUpItem()) CancelInteractions();
+                    break;
+                default:
+                    for (int a = 0; a < m_interactableSets.Length; a++)
+                    {
+                        SearchFrustum(a);
+                    }
+                    if (m_selected[0] is not null && InputManager.Interact())
+                    {
+                        Interact(m_selected[0], 0);
+                    }
+                    else if (m_selected[1] is not null && InputManager.PickedUpItem())
+                    {
+                        Interact(m_selected[1], 1);
+                    }
+                    break;
             }
         }
 
-        public void Interact(Interactable interactable)
+        public void Interact(Interactable interactable, int set_index)
         {
-            if(m_interacting) return;
-            
             if (interactable.requireUninteract)
             {
-                m_interacting = true;
-                m_deactivateWhileInteracting.Invoke(false);
+                m_interacting = set_index;
                 interactable.SetHighlighted(false);
+            }
+
+            if (!interactable.canControlWhileInteracting)
+            {
                 InputManager.DisablePlayerInput();
             }
+
+            m_selected[set_index] = interactable;
             interactable.Interact(this);
         }
 
-        public void CancelInteract()
+
+        public void CancelInteractions()//Cancel interaction input
         {
-            Assert.IsTrue(m_interacting, "cancelInteract called on non-interacting interactor");
-            m_interacting = false;
-            m_deactivateWhileInteracting.Invoke(true);
-            InputManager.EnablePlayerInput();
+            if(m_interacting == -1) return;
+            
+            if (m_selected[m_interacting].TryCancelInteraction())
+            {
+                InputManager.EnablePlayerInput();
+           
+                m_selected[m_interacting] = null;
+                m_interacting = -1;
+            }
         }
 
-        private void SearchFrustum()
+        public void FinishInteraction()//Interaction finished callback from interactable
         {
+            Assert.IsTrue(m_interacting != -1, "FinishInteraction called on non-interacting interactor");
+            InputManager.EnablePlayerInput();
+            
+            m_selected[m_interacting] = null;
+            m_interacting = -1;
+        }
+
+        private void SearchFrustum(int set_index)
+        {
+            
             Interactable sel = null;
             float sel_distance = float.MaxValue;
             
-            foreach (Interactable obj in m_interactableSet.GetEnumerable())
+            foreach (Interactable obj in m_interactableSets[set_index].GetEnumerable())
             {
+                obj.m_indicatorKind = IndicatorKind.None;
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
-                float obj_linear_distance = Vector3.Dot(obj_relative_position, transform.forward);
+                float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
                 
                 if(obj_linear_distance < 0 || obj_linear_distance > m_range) continue; //Out of range
 
-                float obj_radial_distance = (obj_relative_position - transform.forward * obj_linear_distance).magnitude;
+
+                float obj_radial_distance = (obj_relative_position - aimDirection * obj_linear_distance).magnitude;
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
 
-                if (obj_radial_distance < sel_distance)//May be subject to change, test if this, linear or combination feels better
+                RaycastHit hit;
+                Physics.Raycast(m_targetOrigin.transform.position, obj_relative_position.normalized, out hit, Mathf.Infinity, m_blockLineOfSight);
+
+                if(hit.collider.gameObject != obj.gameObject)
                 {
+                    continue;
+                }
+                obj.m_indicatorKind = IndicatorKind.Target;
+
+                
+
+                if (obj_radial_distance < sel_distance)
+                {
+                    if(sel != null)
+                    {
+                        sel.m_indicatorKind = IndicatorKind.Target;
+                    }
+                    obj.m_indicatorKind = IndicatorKind.ClosestTarget;
                     sel = obj;
                     sel_distance = obj_radial_distance;
                 }
             }
 
-            if (m_selected is not null && sel != m_selected)
+            if (m_selected[set_index] is not null && sel != m_selected[set_index])
             {
-                m_selected.SetHighlighted(false);
+                m_selected[set_index].SetHighlighted(false);
             }
-            m_selected = sel;
-            m_selected?.SetHighlighted(true);
+            m_selected[set_index] = sel;
+            m_selected[set_index]?.SetHighlighted(true);
+
+            foreach (Interactable obj in m_interactableSets[set_index].GetEnumerable())
+            {
+                obj.SendIndicatorRequest();
+            }
         }
         
 
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
             const int CONE_VERT_COUNT = 16;
             Gizmos.color = Color.yellow;
@@ -144,6 +215,8 @@ namespace Interaction
             }
             
             Gizmos.DrawLineList(cone_verts);
+            
+            Gizmos.DrawLine(position, position + aimDirection * m_range);
         }
     }
 }

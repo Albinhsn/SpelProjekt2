@@ -3,11 +3,20 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using AudioKit.FMOD;
 
 public class FilterManager : MonoBehaviour
 {
+
+    public static Color[] FilterColorColors = {
+        Color.red,
+        Color.green,
+        Color.blue,
+        Color.yellow
+    };
+
     private int[] m_collidingWithCount;
+    private AudioCueSO m_filterChangeCue;
 
     [SerializeField]
     public UnityEvent<FilterKind, bool> m_filterChanged;
@@ -33,6 +42,8 @@ public class FilterManager : MonoBehaviour
     {
         m_filterMaterialData = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
         m_filterColorData    = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
+        m_filterChangeCue    = Resources.Load("Audio/AC_FilterChange") as AudioCueSO;
+        m_filterChanged = new();
 
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
 
@@ -83,17 +94,14 @@ public class FilterManager : MonoBehaviour
         m_collidingWithCount[(int)kind]--;
     }
 
+    // NOTE(ah): Assumes it's possible to actually change filters!
     public void ChangeFilter(FilterKind new_filter)
     {
-        // NOTE(ah): Assumes it's possible to do!
 
-        // ah: broadcast event
-        // HACK(ah): Currently player at least relies on this happening before 
-        // activating/deactivating objects. Because both rely on setting 
-        // _isKinematic_ to either true/false. So correct behaviour is 
-        // to set it to true (which activating does afterwards)
         bool activating       = m_activeFilter != new_filter;
-        this.m_filterChanged?.Invoke(new_filter, activating);
+
+        // ah: Play filter change sound
+        SfxDirector.PlayCue2(m_filterChangeCue, this.transform.position);
 
         // ah: activate objects
         FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
@@ -115,22 +123,19 @@ public class FilterManager : MonoBehaviour
         // ah: Change active index
         if(activating)
         {
-            if(m_activeFilter != FilterKind.None)
+            for(int j = 0; j < objects.Length; j++)
             {
-                for(int j = 0; j < objects.Length; j++)
+                if(objects[j].m_kind == m_activeFilter)
                 {
-                    if(objects[j].m_kind == m_activeFilter)
-                    {
-                        objects[j].Deactivate();
-                    }
+                    objects[j].Deactivate();
                 }
             }
-            m_activeFilter = new_filter;
         }
-        else
-        {
-            m_activeFilter = FilterKind.None;
-        }
+
+        // ah: broadcast event
+        this.m_filterChanged?.Invoke(new_filter, activating);
+
+        m_activeFilter = activating ? new_filter : FilterKind.None;
 
     }
 

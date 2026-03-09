@@ -33,6 +33,5 @@ public class SceneDataEditor : Editor
         }
 
         serializedObj.ApplyModifiedProperties();
-        EditorUtility.SetDirty(obj);
     }
 }

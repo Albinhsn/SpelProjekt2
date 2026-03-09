@@ -13,14 +13,47 @@ MonoBehaviour:
   m_Name: EventRegistry
   m_EditorClassIdentifier: 
   events:
-  - id: MainMusic
+  - id: Fan
     evt:
       Guid:
-        Data1: 1636199939
-        Data2: 1295459759
-        Data3: -2036209249
-        Data4: 561428599
-      Path: event:/Music/MainMusic
+        Data1: -1151399471
+        Data2: 1235317405
+        Data3: 1058982075
+        Data4: -1153248731
+      Path: event:/Audio/SFX/OBJ/Obj_FanLoop
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: BoxDrop
+    evt:
+      Guid:
+        Data1: 1117311569
+        Data2: 1173137954
+        Data3: -112305521
+        Data4: 697811712
+      Path: event:/Audio/SFX/Interactables/Int_BoxDrop
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: Vind
+    evt:
+      Guid:
+        Data1: -1705133759
+        Data2: 1284002305
+        Data3: 1539569542
+        Data4: -844234171
+      Path: event:/Audio/AMB/AMB_Wind
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: Button
+    evt:
+      Guid:
+        Data1: -284315911
+        Data2: 1187799154
+        Data3: 1874114974
+        Data4: -717546134
+      Path: event:/Audio/SFX/Interactables/(WIP)Int_ButtonPress
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
@@ -46,25 +79,69 @@ MonoBehaviour:
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
-  - id: Fan
+  - id: MainMusic
     evt:
       Guid:
-        Data1: -1151399471
-        Data2: 1235317405
-        Data3: 1058982075
-        Data4: -1153248731
-      Path: event:/Audio/SFX/OBJ/Obj_FanLoop
+        Data1: 1636199939
+        Data2: 1295459759
+        Data3: -2036209249
+        Data4: 561428599
+      Path: event:/Music/Main Music/MainMusic
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
-  - id: BoxDrop
+  - id: W1Low
     evt:
       Guid:
-        Data1: 1117311569
-        Data2: 1173137954
-        Data3: -112305521
-        Data4: 697811712
-      Path: event:/Audio/SFX/Interactables/Int_BoxDrop
+        Data1: 966926191
+        Data2: 1181782530
+        Data3: 1672275884
+        Data4: -685921746
+      Path: event:/Music/Main Music/Low
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: W1Mid
+    evt:
+      Guid:
+        Data1: 1497692414
+        Data2: 1226046891
+        Data3: 1533689774
+        Data4: -2026467435
+      Path: event:/Music/Main Music/Mid
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: W1High
+    evt:
+      Guid:
+        Data1: 285017597
+        Data2: 1262136302
+        Data3: -755701864
+        Data4: -278652304
+      Path: event:/Music/Main Music/High
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: BearingMusic
+    evt:
+      Guid:
+        Data1: 108911283
+        Data2: 1104845842
+        Data3: -364794945
+        Data4: 1611752119
+      Path: event:/Music/Bearing
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 0
+  - id: RuinMusic
+    evt:
+      Guid:
+        Data1: -1919800349
+        Data2: 1198181168
+        Data3: -473365081
+        Data4: 1318448679
+      Path: event:/Music/Ruin
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
@@ -79,3 +156,25 @@ MonoBehaviour:
     createInstanceOnStart: 0
     startOnBoot: 0
     preloadSampleData: 0
+  - id: dsSpeakingSound
+    evt:
+      Guid:
+        Data1: 1531224711
+        Data2: 1281532160
+        Data3: 1407564682
+        Data4: -952974660
+      Path: event:/Audio/SFX/UI/NPC_Talk
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 1
+  - id: ElevatorButton
+    evt:
+      Guid:
+        Data1: -1926219201
+        Data2: 1182486800
+        Data3: 1690866568
+        Data4: -1776284938
+      Path: event:/Audio/SFX/Interactables/Int_ElevatorButton
+    createInstanceOnStart: 0
+    startOnBoot: 0
+    preloadSampleData: 1
