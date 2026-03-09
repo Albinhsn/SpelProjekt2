@@ -119,7 +119,8 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    void Update()
+    void
+    TryJump()
     {
         if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
         {
@@ -135,6 +136,11 @@ public class MovementController : MonoBehaviour
         {
             SetAnimBool("jumped", false);
         }
+    }
+
+    void Update()
+    {
+        TryJump();
 
         m_rb.position += m_referenceVector * Time.deltaTime;
         m_cameraTransform.position += m_referenceVector * Time.deltaTime;
@@ -159,6 +165,8 @@ public class MovementController : MonoBehaviour
         Vector3 right   = Rejection(m_playerCamera.m_playerRight, new Vector3(0, 1, 0));
         Vector2 input   = InputManager.ReadMovementValue();
         Vector3 dir     = forward * input.y + right * input.x;
+
+        TryJump();
 
         // Normalize direction
         if(dir.sqrMagnitude > 0)
