@@ -3,12 +3,13 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
 using FMODUnity;
 using FMOD.Studio;
 using AudioKit.FMOD;
 using static LinAlg.LinAlg;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(Animator))]
 public class MovementController : MonoBehaviour
 {
 
@@ -33,13 +34,38 @@ public class MovementController : MonoBehaviour
     private Vector3 m_referenceVector = Vector3.zero;
     private Transform m_cameraTransform;
 
+    private Animator m_animator;
+    private Dictionary<string, int> m_animationParameters;
+
     private float jumpCooldown = 0;
 
     void Awake()
     {
         m_rb = GetComponent<Rigidbody>();
+        m_animator = GetComponent<Animator>();
         m_playerCamera = GetComponentInChildren<PlayerCamera>();
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
+
+        m_animationParameters = new();
+        Debug.Log($"Found {m_animator.parameters.Length} parameters");
+        for(int i = 0; i < m_animator.parameters.Length; i++)
+        {
+            var param = m_animator.parameters[i];
+            m_animationParameters[param.name] = param.nameHash;
+        }
+    }
+
+    private void SetAnimBool(string key, bool value)
+    {
+        if(m_animationParameters.ContainsKey(key))
+        {
+            m_animator.SetBool(m_animationParameters[key], value);
+        }
+        else
+        {
+            Debug.Log($"Tried to set {key} but couldn't find it");
+        }
+
     }
 
     private void Start()
@@ -63,6 +89,7 @@ public class MovementController : MonoBehaviour
         if(!other.isTrigger)
         {
             m_isJumping = false;
+            SetAnimBool("isGrounded", true);
         }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
@@ -77,6 +104,7 @@ public class MovementController : MonoBehaviour
         if(!other.isTrigger)
         {
             m_isJumping = true;
+            SetAnimBool("isGrounded", false);
         }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
@@ -88,6 +116,7 @@ public class MovementController : MonoBehaviour
         if(!other.isTrigger)
         {
             m_isJumping = false;
+            SetAnimBool("isGrounded", true);
         }
     }
 
@@ -95,11 +124,16 @@ public class MovementController : MonoBehaviour
     {
         if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
         {
+            SetAnimBool("jumped", true);
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
             jumpCooldown = 0.5f;
             m_footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        }
+        else
+        {
+            SetAnimBool("jumped", false);
         }
 
         m_rb.position += m_referenceVector * Time.deltaTime;
@@ -134,7 +168,12 @@ public class MovementController : MonoBehaviour
             if(!m_isJumping)
             {
                 PlayFootstepSound();
+                SetAnimBool("running", true);
             }
+        }
+        else if(!m_isJumping)
+        {
+            SetAnimBool("running", false);
         }
 
         // Apply movement
