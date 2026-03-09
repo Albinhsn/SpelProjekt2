@@ -135,6 +135,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 630f22dc4e314ad2bd546b6ce7562223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_onPlatformStartMoveCue: {fileID: 0}
+  m_onPlatformMoveCue: {fileID: 0}
   m_targetCount: 4
   m_speed: 5
   m_startIndex: 0
@@ -187,6 +189,8 @@ GameObject:
   - component: {fileID: 5299560683116207650}
   - component: {fileID: 3770104178173781275}
   - component: {fileID: 7299631573466494776}
+  - component: {fileID: 6997852303668873414}
+  - component: {fileID: 7696903442485172699}
   m_Layer: 7
   m_Name: Elevator button (1)
   m_TagString: Untagged
@@ -295,6 +299,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 6997852303668873414}
+        m_TargetAssemblyTypeName: PlaySound, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_onInteractionCancelled:
     m_PersistentCalls:
       m_Calls: []
@@ -313,6 +329,41 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_indicatorKind: 0
+--- !u!114 &6997852303668873414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2791961304578375138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 534f513d5fd719ace98173ab5196cd1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_soundCue: {fileID: 11400000, guid: d5892bdca677a437f9f1d6a0c6b85f21, type: 2}
+--- !u!65 &7696903442485172699
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2791961304578375138}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.99999994, y: 0.99999994, z: 0.99999994}
+  m_Center: {x: 0, y: 0, z: -0.00000047683716}
 --- !u!1 &2813123355794138683
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,6 +407,7 @@ GameObject:
   - component: {fileID: 7365686887546468275}
   - component: {fileID: 2602949141387663146}
   - component: {fileID: 6568258434749712583}
+  - component: {fileID: 5759522487600847239}
   m_Layer: 7
   m_Name: Elevator button
   m_TagString: Untagged
@@ -482,6 +534,28 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_indicatorKind: 0
+--- !u!65 &5759522487600847239
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2916136150683733889}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0000001, y: 0.99999994, z: 1.0000001}
+  m_Center: {x: 0.0000019073486, y: -0.00000047683716, z: 0.0000019073486}
 --- !u!1 &4778354435325321250
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
 using FMODUnity;
 using FMOD.Studio;
 using AudioKit.FMOD;
@@ -20,6 +21,8 @@ public class MovementController : MonoBehaviour
     private FMOD.Studio.EventInstance m_footstepInstance;
 
     [Header("Movement")]
+    [SerializeField] private Animator m_animator;
+
     [SerializeField, Tooltip("The movement speed of the player")]
     private float m_speed;
 
@@ -33,6 +36,8 @@ public class MovementController : MonoBehaviour
     private Vector3 m_referenceVector = Vector3.zero;
     private Transform m_cameraTransform;
 
+    private Dictionary<string, int> m_animationParameters;
+
     private float jumpCooldown = 0;
 
     void Awake()
@@ -40,6 +45,39 @@ public class MovementController : MonoBehaviour
         m_rb = GetComponent<Rigidbody>();
         m_playerCamera = GetComponentInChildren<PlayerCamera>();
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
+
+        m_animationParameters = new();
+        for(int i = 0; m_animator != null && i < m_animator.parameters.Length; i++)
+        {
+            var param = m_animator.parameters[i];
+            m_animationParameters[param.name] = param.nameHash;
+        }
+    }
+
+    private void SetAnimTrigger(string key)
+    {
+        if(m_animationParameters.ContainsKey(key))
+        {
+            m_animator.SetTrigger(m_animationParameters[key]);
+        }
+        else
+        {
+            Debug.Log($"Tried to set {key} but couldn't find it");
+        }
+
+    }
+
+    private void SetAnimBool(string key, bool value)
+    {
+        if(m_animationParameters.ContainsKey(key))
+        {
+            m_animator.SetBool(m_animationParameters[key], value);
+        }
+        else
+        {
+            Debug.Log($"Tried to set {key} but couldn't find it");
+        }
+
     }
 
     private void Start()
@@ -63,6 +101,7 @@ public class MovementController : MonoBehaviour
         if(!other.isTrigger)
         {
             m_isJumping = false;
+            SetAnimBool("isGrounded", true);
         }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
@@ -77,6 +116,7 @@ public class MovementController : MonoBehaviour
         if(!other.isTrigger)
         {
             m_isJumping = true;
+            SetAnimBool("isGrounded", false);
         }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
@@ -88,19 +128,28 @@ public class MovementController : MonoBehaviour
         if(!other.isTrigger)
         {
             m_isJumping = false;
+            SetAnimBool("isGrounded", true);
         }
     }
 
-    void Update()
+    void
+    TryJump()
     {
         if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
         {
+            SetAnimTrigger("jumped");
+            SetAnimBool("isGrounded", false);
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
             jumpCooldown = 0.5f;
             m_footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         }
+    }
+
+    void Update()
+    {
+        TryJump();
 
         m_rb.position += m_referenceVector * Time.deltaTime;
         m_cameraTransform.position += m_referenceVector * Time.deltaTime;
@@ -126,6 +175,8 @@ public class MovementController : MonoBehaviour
         Vector2 input   = InputManager.ReadMovementValue();
         Vector3 dir     = forward * input.y + right * input.x;
 
+        TryJump();
+
         // Normalize direction
         if(dir.sqrMagnitude > 0)
         {
@@ -134,7 +185,12 @@ public class MovementController : MonoBehaviour
             if(!m_isJumping)
             {
                 PlayFootstepSound();
+                SetAnimBool("running", true);
             }
+        }
+        else if(!m_isJumping)
+        {
+            SetAnimBool("running", false);
         }
 
         // Apply movement
