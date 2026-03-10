@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-[ExecuteAlways]
 public class OutlineMeshPreparator : MonoBehaviour
 {
     [SerializeField] private GameObject m_srcMeshObject;
