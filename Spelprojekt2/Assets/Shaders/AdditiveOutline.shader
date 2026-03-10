@@ -21,6 +21,7 @@ Shader "Custom/AdditiveOutline"
         {
             Cull Front
             Zwrite Off
+            ZTest Less
             Blend SrcAlpha OneMinusSrcAlpha
             
             HLSLPROGRAM
