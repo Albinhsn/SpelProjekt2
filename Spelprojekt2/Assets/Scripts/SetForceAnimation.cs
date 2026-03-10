@@ -37,7 +37,6 @@ public class SetForceAnimation : MonoBehaviour
         {
             m_animator.SetBool(m_key, true);
             m_currentState = true;
-            Debug.Log("True");
         }
 
     }
@@ -48,7 +47,6 @@ public class SetForceAnimation : MonoBehaviour
         {
             m_animator.SetBool(m_key, false);
             m_currentState = false;
-            Debug.Log("False");
         }
     }
 }
