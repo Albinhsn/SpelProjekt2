@@ -21,17 +21,20 @@ public sealed class LevelManager
     LevelManager()
     {
         m_glitchAudio = Resources.Load<AudioCueSO>("Audio/AC_Glitch");
+        m_duckSnapshot = Resources.Load<AudioCueSO>("Audio/AC_Duck");
     }
 
     private LevelData m_currentLevel;
     private LevelData m_nextLevel;
 
     private AudioCueSO m_glitchAudio;
+    private AudioCueSO m_duckSnapshot;
     private EventInstance m_soundInstance;
 
     private SceneLoader m_sceneLoader;
 
     private Player m_player;
+
 
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
@@ -62,6 +65,15 @@ public sealed class LevelManager
         {
             Debug.LogWarning("Already transitioning to a new level, cannot transition to another one until the current transition is finished");
             return;
+        }
+
+        // Set duck snapshot
+        {
+            var I = AudioSystem.I;
+            if(I != null)
+            {
+                I.SetSnapshot(Instance.m_duckSnapshot.evt.Path, true, 0);
+            }
         }
 
 
@@ -133,6 +145,7 @@ public sealed class LevelManager
             }
         }
 
+
         Instance.m_isGlitchingDone = false;
         Instance.m_scenesLoaded = false;
         Instance.m_currentLevel = Instance.m_nextLevel;
@@ -144,6 +157,15 @@ public sealed class LevelManager
         if(audio != null)
         {
             audio.ApplyActions();
+        }
+
+        // Set duck snapshot
+        {
+            var I = AudioSystem.I;
+            if(I != null)
+            {
+                I.SetSnapshot(Instance.m_duckSnapshot.evt.Path, false, 0);
+            }
         }
 
         // ah: Change sky
