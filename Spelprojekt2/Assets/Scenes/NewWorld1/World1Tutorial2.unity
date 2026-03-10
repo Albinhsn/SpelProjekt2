@@ -2255,6 +2255,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2153053342487592154, guid: 3761aadeabeef4d4eb64ddca933ce4ee, type: 3}
   m_PrefabInstance: {fileID: 920584320}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &946928013 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3623836340811142890, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+  m_PrefabInstance: {fileID: 1937935947}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1184320307
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2418,7 +2423,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 39801844757407020, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
   m_PrefabInstance: {fileID: 1937935947}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 946928013}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 394752d4e68dea540a187a4c18ba68c9, type: 3}
@@ -3713,8 +3718,28 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2242167143403470113, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: onTrigger.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2242167143403470113, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: onTrigger.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2242167143403470113, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: onTrigger.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 946928013}
+    - target: {fileID: 2242167143403470113, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: onTrigger.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2242167143403470113, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: onTrigger.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Despawn
+      objectReference: {fileID: 0}
+    - target: {fileID: 2242167143403470113, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: onTrigger.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: Spawner, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2807992412320786207, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_Size.x
