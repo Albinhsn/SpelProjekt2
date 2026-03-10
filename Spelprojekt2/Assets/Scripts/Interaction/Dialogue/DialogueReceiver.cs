@@ -381,7 +381,8 @@ namespace Interaction.Dialogue
                     switch (tags[a].Substring(0, value_index))
                     {
                         case "speaker":
-                            m_prefix = value + ": ";
+                            if (value == "") m_prefix = "";
+                            else m_prefix = value + ": ";
                             break;
                     }
                 }
