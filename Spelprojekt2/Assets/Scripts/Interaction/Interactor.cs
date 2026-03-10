@@ -12,6 +12,7 @@ namespace Interaction
     {
         [SerializeField] private InstanceSet[] m_interactableSets;
         [SerializeField] private Transform m_targetOrigin;
+        [SerializeField] private Transform m_indicatorOrigin;
         [SerializeField] private float m_range;
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
@@ -32,7 +33,7 @@ namespace Interaction
 
         void Start()
         {
-            PickupItemIndicatorManager.SetSourceTransform(m_targetOrigin);
+            PickupItemIndicatorManager.SetSourceTransform(m_indicatorOrigin == null ? m_targetOrigin : m_indicatorOrigin);
         }
 
         private void Update()
