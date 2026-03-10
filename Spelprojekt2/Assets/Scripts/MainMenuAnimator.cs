@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ActivateFilteredObjectsInSceneOnTimer : MonoBehaviour
+public class MainMenuAnimator : MonoBehaviour
 {
     [SerializeField] private float m_loopTime;
     [SerializeField] private float m_spawnFirstCubeTime;
