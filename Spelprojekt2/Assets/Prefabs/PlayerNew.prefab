@@ -255,6 +255,36 @@ MonoBehaviour:
   m_range: 3
   m_coneBaseRad: 0.7
   m_coneFactor: 0.3
+  m_onStartInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4185848331453190068}
+        m_TargetAssemblyTypeName: SetForceAnimation, Assembly-CSharp
+        m_MethodName: SetTrue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onFinishInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4185848331453190068}
+        m_TargetAssemblyTypeName: SetForceAnimation, Assembly-CSharp
+        m_MethodName: SetFalse
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_blockLineOfSight:
     serializedVersion: 2
     m_Bits: 1015
@@ -487,6 +517,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 290323168213860369}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4185848331453190068}
   m_SourcePrefab: {fileID: 100100000, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
 --- !u!4 &344640177536807587 stripped
 Transform:
@@ -536,6 +569,19 @@ MonoBehaviour:
   m_transmarencyStartDistance: 2
   m_fullTransparencyDistance: 1
   m_meshRenderer: {fileID: 8286073781149597346}
+--- !u!114 &4185848331453190068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1539980446894750868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0d53b420a4990770b7203f8253b33bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_animator: {fileID: 5528532181942976239}
 --- !u!4 &2167582317642851886 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}

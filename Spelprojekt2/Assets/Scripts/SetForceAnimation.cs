@@ -9,7 +9,7 @@ public class SetForceAnimation : MonoBehaviour
 
     void Awake()
     {
-        bool m_valid = false;
+        m_valid = false;
         for(int i = 0; m_animator != null && i < m_animator.parameters.Length; i++)
         {
             var param = m_animator.parameters[i];
