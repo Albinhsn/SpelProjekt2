@@ -37,15 +37,16 @@ public class Spawner : MonoBehaviour
             FilterObject filter_object = m_object.GetComponent<FilterObject>();
             if(filter_object != null)
             {
-                result = filter_object.m_kind != FilterManager.m_activeFilter;
+                result = !filter_object.activated;
             }
 
         }
         return result;
     }
 
-    public void Spawn()
+    public GameObject Spawn()
     {
+        GameObject result = null;
         if(CanSpawn())
         {
             Despawn();
@@ -63,7 +64,9 @@ public class Spawner : MonoBehaviour
             {
                 gravity_flip.ResetGravity();
             }
+            result = this.m_object;
         }
+        return result;
     }
 
     public void Despawn()

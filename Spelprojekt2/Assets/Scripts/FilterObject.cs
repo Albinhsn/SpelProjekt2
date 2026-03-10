@@ -30,6 +30,7 @@ public class FilterObject : MonoBehaviour
 
     public bool Activated => m_activated;
     private bool m_activated;
+    public bool activated => m_activated;
     private MeshRenderer m_renderer;
     private Collider m_collider;
     private Rigidbody m_rb;

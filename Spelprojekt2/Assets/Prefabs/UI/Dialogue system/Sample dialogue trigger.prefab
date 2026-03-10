@@ -44,7 +44,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1188959944526972866}
-  m_Mesh: {fileID: 7925510706294417818, guid: f3c45eaf73509004d9cbc8d4d3441c4f, type: 3}
+  m_Mesh: {fileID: 1541774479822886650, guid: cdff541ff6a10f542adc1e46ff2967dc, type: 3}
 --- !u!23 &8126816258559949540
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7791486788655378091, guid: f3c45eaf73509004d9cbc8d4d3441c4f, type: 3}
+  - {fileID: 2100000, guid: e6c9ee603b7f68b48978fba3ed206fa7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -265,6 +265,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3176023773755229823}
+  - component: {fileID: 1240537283758100924}
   m_Layer: 7
   m_Name: Sample dialogue trigger
   m_TagString: Untagged
@@ -290,6 +291,21 @@ Transform:
   - {fileID: 6109835060219811870}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1240537283758100924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7517352466795121039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60eefdb2fc2143d2ba7aabc6c8abd66f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_assets:
+  - m_name: sample
+    m_inkAsset: {fileID: 4900000, guid: f14c199cda7fe5f47abf41f680390118, type: 3}
 --- !u!1 &8158287449651384306
 GameObject:
   m_ObjectHideFlags: 0

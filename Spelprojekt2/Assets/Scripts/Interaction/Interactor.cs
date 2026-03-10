@@ -12,9 +12,13 @@ namespace Interaction
     {
         [SerializeField] private InstanceSet[] m_interactableSets;
         [SerializeField] private Transform m_targetOrigin;
+        [SerializeField] private Transform m_indicatorOrigin;
         [SerializeField] private float m_range;
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
+
+        [SerializeField] private UnityEvent m_onStartInteraction;
+        [SerializeField] private UnityEvent m_onFinishInteraction;
 
         [SerializeField] private LayerMask m_blockLineOfSight;
 
@@ -32,7 +36,7 @@ namespace Interaction
 
         void Start()
         {
-            PickupItemIndicatorManager.SetSourceTransform(m_targetOrigin);
+            PickupItemIndicatorManager.SetSourceTransform(m_indicatorOrigin == null ? m_targetOrigin : m_indicatorOrigin);
         }
 
         private void Update()
@@ -75,6 +79,8 @@ namespace Interaction
                 InputManager.DisablePlayerInput();
             }
 
+            m_onStartInteraction?.Invoke();
+
             m_selected[set_index] = interactable;
             interactable.Interact(this);
         }
@@ -90,6 +96,7 @@ namespace Interaction
            
                 m_selected[m_interacting] = null;
                 m_interacting = -1;
+                m_onFinishInteraction?.Invoke();
             }
         }
 
@@ -100,6 +107,7 @@ namespace Interaction
             
             m_selected[m_interacting] = null;
             m_interacting = -1;
+            m_onFinishInteraction?.Invoke();
         }
 
         private void SearchFrustum(int set_index)

@@ -23,20 +23,21 @@ public class MovementController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private Animator m_animator;
 
-    [SerializeField, Tooltip("The movement speed of the player")]
-    private float m_speed;
+    [SerializeField, Tooltip("The movement speed of the player")]private float m_speed;
+    [SerializeField] private float m_inAirSpeed;
 
     [SerializeField,Tooltip("The force applied in y axis when the player jumps")] 
     private float m_jumpForce = 5.0f;
     [SerializeField,Range(0.0f, 1.0f), Tooltip("The higher the value, the smoother the acceleration/deceleration(0 = instant, 1 = no movement)")]
     private float m_smoothAccelerationFactor = 0.1f;
     private Rigidbody m_rb;
-    private bool m_isJumping;
+    [HideInInspector] public bool m_isJumping;
     private PlayerCamera m_playerCamera;
     private Vector3 m_referenceVector = Vector3.zero;
     private Transform m_cameraTransform;
 
     private Dictionary<string, int> m_animationParameters;
+    private Dictionary<string, bool> m_animationParamState;
 
     private float jumpCooldown = 0;
 
@@ -47,24 +48,30 @@ public class MovementController : MonoBehaviour
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
 
         m_animationParameters = new();
+        m_animationParamState = new();
         for(int i = 0; m_animator != null && i < m_animator.parameters.Length; i++)
         {
             var param = m_animator.parameters[i];
             m_animationParameters[param.name] = param.nameHash;
+            m_animationParamState[param.name] = false;
+        }
+    }
+
+    private void SetAnimTrigger(string key)
+    {
+        if(m_animationParameters.ContainsKey(key))
+        {
+            m_animator.SetTrigger(m_animationParameters[key]);
         }
     }
 
     private void SetAnimBool(string key, bool value)
     {
-        if(m_animationParameters.ContainsKey(key))
+        if(m_animationParameters.ContainsKey(key) && m_animationParamState[key] != value)
         {
             m_animator.SetBool(m_animationParameters[key], value);
+            m_animationParamState[key] = value;
         }
-        else
-        {
-            Debug.Log($"Tried to set {key} but couldn't find it");
-        }
-
     }
 
     private void Start()
@@ -119,11 +126,12 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    void Update()
+    void
+    TryJump()
     {
         if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
         {
-            SetAnimBool("jumped", true);
+            SetAnimTrigger("jumped");
             SetAnimBool("isGrounded", false);
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
@@ -131,10 +139,11 @@ public class MovementController : MonoBehaviour
             jumpCooldown = 0.5f;
             m_footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         }
-        else
-        {
-            SetAnimBool("jumped", false);
-        }
+    }
+
+    void Update()
+    {
+        TryJump();
 
         m_rb.position += m_referenceVector * Time.deltaTime;
         m_cameraTransform.position += m_referenceVector * Time.deltaTime;
@@ -160,6 +169,8 @@ public class MovementController : MonoBehaviour
         Vector2 input   = InputManager.ReadMovementValue();
         Vector3 dir     = forward * input.y + right * input.x;
 
+        TryJump();
+
         // Normalize direction
         if(dir.sqrMagnitude > 0)
         {
@@ -177,11 +188,29 @@ public class MovementController : MonoBehaviour
         }
 
         // Apply movement
-        m_rb.linearVelocity = Vector3.Lerp(new Vector3(
+        if(!m_isJumping)
+        {
+           m_rb.linearVelocity = Vector3.Lerp(new Vector3(
             dir.x * m_speed, //Input
             m_rb.linearVelocity.y,
             dir.z * m_speed
-        ), m_rb.linearVelocity, m_smoothAccelerationFactor); //Acceleration
+            ), m_rb.linearVelocity, m_smoothAccelerationFactor); //Acceleration
+        }
+        else
+        {
+            m_rb.linearVelocity += new Vector3(
+            dir.x * m_inAirSpeed, //Input
+            0,
+            dir.z *  m_inAirSpeed
+            ); //Acceleration
+            Vector3 xzVelocity = new Vector3(m_rb.linearVelocity.x,0,m_rb.linearVelocity.z);
+
+            if(xzVelocity.magnitude > m_speed)
+            {
+                xzVelocity = xzVelocity.normalized * m_speed;
+                m_rb.linearVelocity = new Vector3(xzVelocity.x,m_rb.linearVelocity.y,xzVelocity.z);
+            }
+        }   
     }
 
     private void UpdateReferenceVector(Vector3 reference)
