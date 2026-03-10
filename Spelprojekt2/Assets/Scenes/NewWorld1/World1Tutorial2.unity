@@ -331,17 +331,17 @@ MonoBehaviour:
   onTrigger:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1350480658}
-        m_TargetAssemblyTypeName: Spawner, Assembly-CSharp
-        m_MethodName: Spawn
-        m_Mode: 1
+      - m_Target: {fileID: 946928013}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!1 &536862454
 GameObject:
@@ -3764,6 +3764,10 @@ PrefabInstance:
     - target: {fileID: 2835735204440131006, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_LocalPosition.z
       value: 6.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623836340811142890, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7351131675288225255, guid: c4f2687d12285774d9f5e07dc5c1731c, type: 3}
       propertyPath: m_ID.Array.size
