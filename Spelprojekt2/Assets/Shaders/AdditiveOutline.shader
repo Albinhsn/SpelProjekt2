@@ -9,6 +9,13 @@ Shader "Custom/AdditiveOutline"
     {
         Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Transparent" "Queue"="Transparent" }
         LOD 100
+        
+        Stencil
+        {
+            Ref 2 //Replace if other shader uses stencil buffers
+            Comp NotEqual //I have no idea why this works, it should be Comp Equal to ensure it only writes when fragment in buffer equals 0
+            Pass Replace //Write 1 to the stencil buffer if it (ensure it will not write again)
+        }
 
         Pass
         {

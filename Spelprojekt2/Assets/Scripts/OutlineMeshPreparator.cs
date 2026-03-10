@@ -27,13 +27,18 @@ public class OutlineMeshPreparator : MonoBehaviour
             Debug.LogError("Outline mesh source object does not contain a MeshRenderer or SkinnedMeshRenderer", m_srcMeshObject);
             return;
         }
-        
-        CalculateMesh();
+
+        if (m_recalculate)
+        {
+            m_recalculate = false;
+            //CalculateMesh();
+        }
     }
 
     private void Awake()
     {
-        CalculateMesh();
+        Debug.LogWarning("OutlineMeshPreparator crashes unity if object is too complex. Do not use");
+        //CalculateMesh();
     }
 
     private void CalculateMesh()
@@ -56,8 +61,7 @@ public class OutlineMeshPreparator : MonoBehaviour
                 bool add_new = true;
                 for (int b = 0; b < vertex_collection.Count; b++)
                 {
-                    if (Vector3.Distance(vertex_collection[b].position, src_mesh.vertices[a]) <=
-                        m_weldThreshold) //Add to existing vertex entry
+                    if (Vector3.Distance(vertex_collection[b].position, src_mesh.vertices[a]) <= m_weldThreshold) //Add to existing vertex entry
                     {
                         vertex_collection[b].indices.Add(a);
                         vertex_collection[b].normals.Add(src_mesh.normals[a]);
