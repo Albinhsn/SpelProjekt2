@@ -7,12 +7,21 @@ public class LevelTransitioner : MonoBehaviour
 
     private bool m_transitioned;
 
-    void OnTriggerEnter(Collider other)
+    public void Transition()
     {
-        if(other.tag == "Player" && !m_transitioned)
+        if(!m_transitioned)
         {
             LevelManager.TransitionToSceneAsync(m_levelToTransitionTo);
             m_transitioned = true;
+        }
+
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Player")
+        {
+            Transition();
         }
     }
 }
