@@ -15,8 +15,11 @@ public class EmissionColorFromFilter : MonoBehaviour
     void Start()
     {
         SkinnedMeshRenderer renderer = GetComponent<SkinnedMeshRenderer>();
-        m_emissionMaterial = renderer.material;
         m_rend = renderer;
+        if(m_rend != null)
+        {
+            m_emissionMaterial = renderer.material;
+        }
 
 
         m_filterMaterialData = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
@@ -36,23 +39,26 @@ public class EmissionColorFromFilter : MonoBehaviour
 
     void UpdateFilter(FilterKind filter, bool active)
     {
-        if(!active)
+        if(m_rend != null)
         {
-            m_emissionMaterial.DisableKeyword("_EMISSION");
-            m_emissionMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-            m_emissionMaterial.SetColor("_EmissiveColor", m_defaultColor);
-        }
-        else
-        {
-            m_emissionMaterial.EnableKeyword("_EMISSION");
+            if(!active)
+            {
+                m_emissionMaterial.DisableKeyword("_EMISSION");
+                m_emissionMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+                m_emissionMaterial.SetColor("_EmissiveColor", m_defaultColor);
+            }
+            else
+            {
+                m_emissionMaterial.EnableKeyword("_EMISSION");
 
-            FilterColor filter_color = m_filterColorData.m_Colors[(int)filter];
-            Color color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
+                FilterColor filter_color = m_filterColorData.m_Colors[(int)filter];
+                Color color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
 
-            m_emissionMaterial.SetColor("_EmissiveColor", color * m_emissiveIntensity);
-            DynamicGI.UpdateEnvironment();
+                m_emissionMaterial.SetColor("_EmissiveColor", color * m_emissiveIntensity);
+                DynamicGI.UpdateEnvironment();
+            }
+            RendererExtensions.UpdateGIMaterials(m_rend);
         }
-        RendererExtensions.UpdateGIMaterials(m_rend);
     }
 
 
