@@ -486,10 +486,14 @@ public class UIManager : MonoBehaviour
                     float sensitivity     = m_sensitivity.m_currentSensitivity;
 
                     float s = (m_sensitivity.m_currentSensitivity - m_sensitivity.m_minSensitivity) / (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity);
-                    s       = VolumeSlider("Sensitivity", s);
+                    float new_sensitivity = VolumeSlider("Sensitivity", s);
 
-                    m_sensitivity.m_currentSensitivity = Mathf.Clamp(s * (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity), 
-                            m_sensitivity.m_minSensitivity, m_sensitivity.m_maxSensitivity);
+                    if(Mathf.Abs(s - new_sensitivity) > 0.00001f)
+                    {
+                        m_sensitivity.m_currentSensitivity = Mathf.Clamp(new_sensitivity * (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity), 
+                                m_sensitivity.m_minSensitivity, m_sensitivity.m_maxSensitivity);
+                    }
+
                     
                 }
 
