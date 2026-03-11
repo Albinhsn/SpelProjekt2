@@ -25,6 +25,17 @@ namespace Interaction
 		    }
 	    }
 
+	    private void OnTriggerStay(Collider other)
+	    {
+		    if(!m_active) return;
+		    Interactor interactor = other.GetComponentInChildren<Interactor>();
+		    if (interactor is not null)
+		    {
+			    interactor.CancelInteractions();
+			    interactor.Interact(this, 0);
+		    }
+	    }
+
 	    public override void Interact(Interactor interactor)
 	    {
 		    base.Interact(interactor);
