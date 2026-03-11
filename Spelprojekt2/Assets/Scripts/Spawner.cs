@@ -11,11 +11,12 @@ public class Spawner : MonoBehaviour
     [SerializeField]
     private bool m_spawnOnActivation;
 
+    [SerializeField]
     public GameObject m_object;
     
     public void Awake()
     {
-        if(!m_spawnOnActivation)
+        if(!m_spawnOnActivation && m_object == null)
         {
             Spawn();
         }

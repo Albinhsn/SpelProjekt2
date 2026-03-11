@@ -34,6 +34,9 @@ public class UIManager : MonoBehaviour
     private LevelsData m_MainMenuLevelData;
 
     [SerializeField]
+    private LevelData m_creditsLevelData;
+
+    [SerializeField]
     private Player m_playerPrefab;
 
     [SerializeField]
@@ -387,7 +390,7 @@ public class UIManager : MonoBehaviour
         LevelManager.m_onTransitionEnd -= SetupScene;
     }
 
-    void SetupMainMenu()
+    public static void SetupMainMenu()
     {
         EnterState(UIState.MainMenu);
         LevelManager.m_onTransitionEnd -= SetupMainMenu;
@@ -445,6 +448,12 @@ public class UIManager : MonoBehaviour
                 if(MenuBtn("Settings", btn_index++))
                 {
                     EnterState(UIState.Settings);
+                }
+
+                if(MenuBtn("Credits", btn_index++))
+                {
+                    EnterState(UIState.None);
+                    LevelManager.TransitionToSceneAsync(m_creditsLevelData);
                 }
 
 

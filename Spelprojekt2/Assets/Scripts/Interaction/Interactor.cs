@@ -17,7 +17,7 @@ namespace Interaction
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
 
-        [SerializeField] private UnityEvent m_onStartInteraction;
+        [SerializeField] private UnityEvent m_onStartInteraction1;
         [SerializeField] private UnityEvent m_onFinishInteraction;
 
         [SerializeField] private LayerMask m_blockLineOfSight;
@@ -61,6 +61,7 @@ namespace Interaction
                     else if (m_selected[1] is not null && InputManager.PickedUpItem())
                     {
                         Interact(m_selected[1], 1);
+                        m_onStartInteraction1?.Invoke();
                     }
                     break;
             }
@@ -79,7 +80,6 @@ namespace Interaction
                 InputManager.DisablePlayerInput();
             }
 
-            m_onStartInteraction?.Invoke();
 
             m_selected[set_index] = interactable;
             interactable.Interact(this);
@@ -93,9 +93,12 @@ namespace Interaction
             if (m_selected[m_interacting].TryCancelInteraction())
             {
                 InputManager.EnablePlayerInput();
-           
-                m_selected[m_interacting] = null;
-                m_interacting = -1;
+
+                if (m_interacting != -1)
+                {
+                    m_selected[m_interacting] = null;
+                    m_interacting = -1;
+                }
                 m_onFinishInteraction?.Invoke();
             }
         }
@@ -105,8 +108,11 @@ namespace Interaction
             Assert.IsTrue(m_interacting != -1, "FinishInteraction called on non-interacting interactor");
             InputManager.EnablePlayerInput();
             
-            m_selected[m_interacting] = null;
-            m_interacting = -1;
+            if (m_interacting != -1)
+            {
+                m_selected[m_interacting] = null;
+                m_interacting = -1;
+            }
             m_onFinishInteraction?.Invoke();
         }
 

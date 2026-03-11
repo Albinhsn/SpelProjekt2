@@ -85,8 +85,7 @@ public class EndCreditsManager : MonoBehaviour
     [SerializeField] private float m_sceneChangeDelayAfterCredits = 0.5f;
     [SerializeField] private bool m_useUnscaledTime = true;
 
-    [Header("Next Scene")]
-    [SerializeField] private string m_nextSceneName = "MainMenu";
+    [SerializeField] private LevelData m_nextLevel;
 
     private bool m_isFinishing;
     private RectTransform m_textRect;
@@ -126,7 +125,7 @@ public class EndCreditsManager : MonoBehaviour
         SetCanvasAlphaImmediate(0f);
     }
 
-    private void Start()
+    public void StartCredits()
     {
         StartCoroutine(PlaySequence());
     }
@@ -566,17 +565,9 @@ public class EndCreditsManager : MonoBehaviour
 
         m_isFinishing = true;
 
-        string sceneName = string.IsNullOrWhiteSpace(m_nextSceneName)
-            ? string.Empty
-            : m_nextSceneName.Trim();
+        LevelManager.m_onTransitionEnd += UIManager.SetupMainMenu;
+        LevelManager.TransitionToSceneAsync(m_nextLevel, 1.0f);
 
-        if (string.IsNullOrEmpty(sceneName))
-        {
-            Debug.LogWarning("[EndCreditsManager] No next scene name set.");
-            return;
-        }
-
-        SceneManager.LoadScene(sceneName);
     }
 }
 
@@ -747,7 +738,7 @@ internal sealed class EndCreditsManagerEditor : UnityEditor.Editor
 
         UnityEditor.EditorGUILayout.Space();
         DrawHeader("Next Scene");
-        Draw("m_nextSceneName");
+        Draw("m_nextLevel", true);
 
         serializedObject.ApplyModifiedProperties();
     }
