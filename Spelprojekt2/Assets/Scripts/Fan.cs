@@ -12,7 +12,8 @@ public class Fan : MonoBehaviour
     [Header("Lift Settings")]
     [SerializeField] float m_windStrength = 15f;
     [SerializeField] float m_maxHeight = 10f;
-    [SerializeField] float m_xzPullStrength = 10f;
+    [SerializeField] float m_itemxzPullStrength = 10f;
+    [SerializeField] float m_playerxzPullStrength = 1f;
 
     [Header("Top Bob Settings")]
     [SerializeField] float m_bobAmplitude = 0.5f;
@@ -145,13 +146,14 @@ public class Fan : MonoBehaviour
                     Time.deltaTime * 5f
                 ));
             }
-
-
+            float pullStrength;
+            if(other.gameObject.tag == "Player") pullStrength = m_playerxzPullStrength;
+            else pullStrength = m_itemxzPullStrength;
             Vector2 xzDistance = XZDistanceToCenter(other.transform);
             rb.linearVelocity = new Vector3(
-                -xzDistance.x * m_xzPullStrength,
+                -xzDistance.x * pullStrength,
                 rb.linearVelocity.y,
-                -xzDistance.y * m_xzPullStrength
+                -xzDistance.y * pullStrength
             );
         }
     }
