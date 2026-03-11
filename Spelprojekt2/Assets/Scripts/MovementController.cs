@@ -170,7 +170,7 @@ public class MovementController : MonoBehaviour
         Vector2 input   = InputManager.ReadMovementValue();
         Vector3 dir     = forward * input.y + right * input.x;
 
-        TryJump();
+        // TryJump();
 
         // Normalize direction
         if(dir.sqrMagnitude > 0)
