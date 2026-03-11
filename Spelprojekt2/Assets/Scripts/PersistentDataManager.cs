@@ -581,6 +581,10 @@ public sealed class PersistentDataManager
                 }
             }
         }
+        else
+        {
+            Debug.LogError($"Tried to deserialize but file at {path} didn't exist");
+        }
         return result;
     }
 
@@ -600,9 +604,11 @@ public sealed class PersistentDataManager
             {
                 // ah: Find the target scene path
                 string target_scene = SceneUtility.GetScenePathByBuildIndex(play.m_sceneIndex);
+                Debug.Log($"Found target scene {target_scene}");
 
 
                 // ah: See if the target scene path exists within levels 
+                bool found = false;
                 for(int i = 0; i < levels.m_levels.Length; i++)
                 {
                     LevelData level = levels.m_levels[i];
@@ -611,15 +617,16 @@ public sealed class PersistentDataManager
                     // that should never be the case
                     string scene_path = level.m_scenePath + level.m_sceneName + ".unity";
 
+
                     if(string.Equals(target_scene, scene_path, StringComparison.OrdinalIgnoreCase))
                     {
                         result = level;
+                        found = true;
                         break;
                     }
 
 
                     // ah: check versus subscenes
-                    bool found = false;
                     for(int j = 0; j < level.m_scene.m_subscenes.Length; j++)
                     {
                         Subscene subscene = level.m_scene.m_subscenes[j];
@@ -638,7 +645,19 @@ public sealed class PersistentDataManager
                         break;
                     }
                 }
+                if(!found)
+                {
+                    Debug.LogError("Couldn't find the target scene");
+                }
             }
+            else
+            {
+                Debug.LogError("Tried to deserialize with no valid PLAY");
+            }
+        }
+        else
+        {
+            Debug.LogError("Tried to deserialize with no valid gamestate");
         }
         return result;
     }
@@ -838,7 +857,10 @@ public sealed class PersistentDataManager
                     chunk.m_spawners   = new();
                     scene_chunks[scene_guid] = chunk;
                 }
-                scene_chunks[scene_guid].m_spawners.Add(new(obj.m_id, child.transform.position, child.transform.rotation));
+                if(child != null)
+                {
+                    scene_chunks[scene_guid].m_spawners.Add(new(obj.m_id, child.transform.position, child.transform.rotation));
+                }
             }
 
             // ah: gravity flipped
@@ -905,6 +927,7 @@ public sealed class PersistentDataManager
         m_gameState.m_play.m_spawnP     = LevelCheckpointManager.m_currentSpawnPointPosition;
         m_gameState.m_play.m_spawnR     = LevelCheckpointManager.m_currentSpawnPointRotation;
         m_gameState.m_play.m_sceneIndex = LevelCheckpointManager.m_sceneBuildIndex;
+
 
         // ah: serialize STRY to GameState
         m_gameState.m_story.m_exists  = true;
