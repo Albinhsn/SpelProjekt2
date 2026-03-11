@@ -2858,14 +2858,14 @@ PrefabInstance:
     - target: {fileID: 559439241073754179, guid: 6290c7b7720b833ee87002510950ea87, type: 3}
       propertyPath: m_levelToTransitionTo.m_scene
       value: 
-      objectReference: {fileID: 11400000, guid: 7df50ad65064a3841a53f3ffe82446b8, type: 2}
+      objectReference: {fileID: 11400000, guid: 46467ac0887af9bd6ae6ed5ce1388c5a, type: 2}
     - target: {fileID: 559439241073754179, guid: 6290c7b7720b833ee87002510950ea87, type: 3}
       propertyPath: m_levelToTransitionTo.m_sceneName
-      value: World1Root
+      value: EndCredits
       objectReference: {fileID: 0}
     - target: {fileID: 559439241073754179, guid: 6290c7b7720b833ee87002510950ea87, type: 3}
       propertyPath: m_levelToTransitionTo.m_scenePath
-      value: Assets/Scenes/NewWorld1/
+      value: Assets/Scenes/
       objectReference: {fileID: 0}
     - target: {fileID: 4526767107208197579, guid: 6290c7b7720b833ee87002510950ea87, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2973,6 +2973,9 @@ MonoBehaviour:
   - {fileID: 1206032646}
   m_typeOutDelay: 0.055
   m_typeIndicator: 95
+  m_onDialogueFinished:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &6705826591419315727
 Transform:
   m_ObjectHideFlags: 0
