@@ -20,6 +20,7 @@ public class EmissionColorFromFilter : MonoBehaviour
         {
             m_emissionMaterial = renderer.material;
             m_emissionMaterial.EnableKeyword("_EMISSION");
+            UpdateFilter(FilterKind.None, false);
         }
 
 
@@ -53,8 +54,8 @@ public class EmissionColorFromFilter : MonoBehaviour
                 Color color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
 
                 m_emissionMaterial.SetColor("_EmissiveColor", color * m_emissiveIntensity);
-                DynamicGI.UpdateEnvironment();
             }
+            DynamicGI.UpdateEnvironment();
             RendererExtensions.UpdateGIMaterials(m_rend);
         }
     }
