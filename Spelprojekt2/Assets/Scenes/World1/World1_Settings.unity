@@ -145,7 +145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: startActions.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: actions.Array.data[4].fade
@@ -204,6 +204,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[3].type
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: endActions.Array.data[0].eventId
       value: MainMusic
       objectReference: {fileID: 0}
@@ -213,11 +217,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: startActions.Array.data[1].eventId
-      value: music_red
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: startActions.Array.data[2].eventId
-      value: music_blue
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: actions.Array.data[2].parameterName
@@ -226,6 +230,18 @@ PrefabInstance:
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: actions.Array.data[5].parameterName
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[1].parameterName
+      value: music_red
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[2].parameterName
+      value: music_blue
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[3].parameterName
+      value: W1Music
       objectReference: {fileID: 0}
     - target: {fileID: 8694868728491342582, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: m_LocalPosition.x
