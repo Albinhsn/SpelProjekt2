@@ -188,6 +188,17 @@ public sealed class LevelManager
                 Debug.Log($"Failed to release glitch sound in transition because {ok}");
             }
         }
+
+        // ah: enable credits
+        {
+            EndCreditsManager credits = UnityEngine.Object.FindFirstObjectByType<EndCreditsManager>();
+            if(credits != null)
+            {
+                credits.StartCredits();
+            }
+
+
+        }
     }
 
     static void SetGlitchBoolTrue()
