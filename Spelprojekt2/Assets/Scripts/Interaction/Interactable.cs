@@ -67,6 +67,7 @@ namespace Interaction
             if (m_activeInteractor is not null)
             {
                 m_onInteractionCancelled.Invoke(m_activeInteractor);
+                m_activeInteractor.FinishInteraction();
             }
             m_activeInteractor = null;
             return true;

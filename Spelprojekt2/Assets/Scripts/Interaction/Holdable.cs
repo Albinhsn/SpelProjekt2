@@ -85,10 +85,9 @@ namespace Interaction
         public override bool TryCancelInteraction()
         {
             m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
-            m_activeInteractor = null;
             m_isHeld = false;
-            base.TryCancelInteraction();
             m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+            base.TryCancelInteraction();
             // gameObject.layer = m_startLayer;            
 
             return true;
@@ -96,7 +95,9 @@ namespace Interaction
 
         public override void ForceCancelInteraction()
         {
-            TryCancelInteraction();
+            m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
+            m_isHeld = false;
+            m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
             base.ForceCancelInteraction();
         }
 
@@ -150,7 +151,7 @@ namespace Interaction
                 Vector3 dir = m_activeInteractor.transform.position - transform.position;
                 if(dir.magnitude > m_itemDistanceFromPlayer * 3f)
                 {
-                    TryCancelInteraction();
+                    ForceCancelInteraction();
                 }
             }
         }
