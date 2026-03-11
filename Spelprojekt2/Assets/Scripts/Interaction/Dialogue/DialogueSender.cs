@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Interaction.Dialogue
@@ -15,6 +16,8 @@ namespace Interaction.Dialogue
         [Tooltip("Index 0 is default while interacting")][SerializeField] private CinemachineCamera[] m_cameraOverrides;
         [SerializeField] private float m_typeOutDelay = 0.055f;
         [SerializeField] private char m_typeIndicator = '_';
+        [SerializeField] private UnityEvent m_onDialogueFinished;
+        
         private Story m_story;
         [CanBeNull] private Interactor m_activeInteractor;
         [CanBeNull] private InkAssetRegistry m_assetRegistry = null;
@@ -101,6 +104,7 @@ namespace Interaction.Dialogue
             m_activeInteractor.FinishInteraction();
             m_activeInteractor = null;
             m_story.ResetState();
+            m_onDialogueFinished.Invoke();
         }
         
         private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
