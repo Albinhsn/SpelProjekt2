@@ -31,7 +31,7 @@ Very well. What do you want to know?
             = choice
             + [USER.]
             Who is the USER? # speaker=Alea
-                The USER is our one and only God. # speaker=Priest
+                The USER is our God. # speaker=Priest
                 He is the creator and has sole authority of our world and it's people.
                 I am – or was rather – His messenger. I have been spreading His teachings to the other localites. 
             -> choice
@@ -56,14 +56,14 @@ Very well. What do you want to know?
             One more qeustion: How do I get to the <color="purple">Bearing?</color> # speaker=Alea
             The sacred ground? What would someone like you need to do there? # speaker=Priest
             Someone like me? I don't understand what everybody finds so strange about me. # speaker=Alea
-            Have you looked at yourself? You're bipedal and your features are so round, its unnerving. # speaker=Priest
-            If you had asked before all this happened I probably wouldn't even have bothered answering but... I just can't be bothered anymore. 
+            Have you looked at yourself? You're bipedal and your features are so...round, its unnerving. # speaker=Priest
+            If you had asked before all this happened I probably wouldn't even have helped you, but... <i>sigh</i> I just can't be bothered anymore. 
             If you wish to go to the <color="purple">Bearing</color> then <color="yellow">Go to the roof</color>, if you're lucky and he wants to talk then you will be able to move forward.
             Thank you and... I'm sorry for the loss of your people. # speaker=Alea
             Yeah, yeah, just go already. Oh and... <i>may he guide your path</i>, and all that. # speaker=Priest
             ->DONE
 = stitch3
-Why? I don't understand...
+Why? I don't understand... # speaker=Priest
     + [Hi again.]
         <i>Sigh</i> Hi. What do you want?
         ++ [I'm Alea. Someone told me to find you;] They said you could explain what's happening around here. # speaker=Alea
