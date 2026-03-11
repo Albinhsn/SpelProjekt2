@@ -12,7 +12,7 @@ public class LoadMainMenu : MonoBehaviour
         AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
         if(audio != null)
         {
-            audio.ApplyActions();
+            audio.ApplyStartActions();
         }
         Destroy(this.gameObject);
     }
