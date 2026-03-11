@@ -23,8 +23,9 @@ public class MovementController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private Animator m_animator;
 
-    [SerializeField, Tooltip("The movement speed of the player")]private float m_speed;
-    [SerializeField] private float m_inAirSpeed;
+    [SerializeField, Tooltip("The movement speed of the player while walking")]private float m_walkSpeed;
+    [SerializeField, Tooltip("The movement speed of the player while sprinting")] private float m_sprintSpeed;
+    [SerializeField, Tooltip("The movement influence the player has while in the air")] private float m_inAirSpeed;
 
     [SerializeField,Tooltip("The force applied in y axis when the player jumps")] 
     private float m_jumpForce = 5.0f;
@@ -179,21 +180,32 @@ public class MovementController : MonoBehaviour
             if(!m_isJumping)
             {
                 PlayFootstepSound();
-                SetAnimBool("running", true);
+                SetAnimBool("walk", true);
             }
         }
         else if(!m_isJumping)
         {
-            SetAnimBool("running", false);
+            SetAnimBool("walk", false);
         }
 
+        float speed;
+        if(InputManager.Sprinting())
+        {
+            speed = m_sprintSpeed;
+            SetAnimBool("Sprinting", true);
+        }
+        else
+        {
+            speed = m_walkSpeed;
+            SetAnimBool("Sprinting", false);
+        }
         // Apply movement
         if(!m_isJumping)
         {
            m_rb.linearVelocity = Vector3.Lerp(new Vector3(
-            dir.x * m_speed, //Input
+            dir.x * speed, //Input
             m_rb.linearVelocity.y,
-            dir.z * m_speed
+            dir.z * speed
             ), m_rb.linearVelocity, m_smoothAccelerationFactor); //Acceleration
         }
         else
@@ -205,9 +217,9 @@ public class MovementController : MonoBehaviour
             ); //Acceleration
             Vector3 xzVelocity = new Vector3(m_rb.linearVelocity.x,0,m_rb.linearVelocity.z);
 
-            if(xzVelocity.magnitude > m_speed)
+            if(xzVelocity.magnitude > speed)
             {
-                xzVelocity = xzVelocity.normalized * m_speed;
+                xzVelocity = xzVelocity.normalized * speed;
                 m_rb.linearVelocity = new Vector3(xzVelocity.x,m_rb.linearVelocity.y,xzVelocity.z);
             }
         }   
