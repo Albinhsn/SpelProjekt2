@@ -63,6 +63,10 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private AudioCueSO m_onButtonHoverCue;
 
+    [SerializeField]
+    private SensitivityData m_sensitivity;
+
+
     private UIState m_state;
 
     // TODO(ah): Do something stack based over this nonsense
@@ -467,6 +471,18 @@ public class UIManager : MonoBehaviour
             case UIState.Settings:
             {
                 AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 2.5f);
+
+                // Sensitivity
+                {
+                    float sensitivity     = m_sensitivity.m_currentSensitivity;
+
+                    float s = (m_sensitivity.m_currentSensitivity - m_sensitivity.m_minSensitivity) / (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity);
+                    s       = VolumeSlider("Sensitivity", s);
+
+                    m_sensitivity.m_currentSensitivity = Mathf.Clamp(s * (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity), 
+                            m_sensitivity.m_minSensitivity, m_sensitivity.m_maxSensitivity);
+                    
+                }
 
                 // Volume slider
                 {
