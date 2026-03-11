@@ -1,8 +1,12 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Collider))]
 public class DynamicRBBarrier : MonoBehaviour
 {
+
+    [SerializeField]
+    private UnityEvent m_onDynamicRigidbodyGotDestroyed;
 
     void OnTriggerEnter(Collider other)
     {
@@ -10,6 +14,7 @@ public class DynamicRBBarrier : MonoBehaviour
 
         if(d_rb != null)
         {
+            m_onDynamicRigidbodyGotDestroyed?.Invoke();
             d_rb.Destroy();
         }
 
