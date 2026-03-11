@@ -180,24 +180,24 @@ public class MovementController : MonoBehaviour
             if(!m_isJumping)
             {
                 PlayFootstepSound();
-                // SetAnimBool("walk", true);
+                SetAnimBool("walk", true);
             }
         }
         else if(!m_isJumping)
         {
-            // SetAnimBool("walk", false);
+            SetAnimBool("walk", false);
         }
 
         float speed;
         if(InputManager.Sprinting())
         {
             speed = m_sprintSpeed;
-            // SetAnimBool("Sprinting", true);
+            SetAnimBool("sprinting", true);
         }
         else
         {
             speed = m_walkSpeed;
-            //SetAnimBool("Sprinting", false);
+            SetAnimBool("sprinting", false);
         }
         // Apply movement
         if(!m_isJumping)
