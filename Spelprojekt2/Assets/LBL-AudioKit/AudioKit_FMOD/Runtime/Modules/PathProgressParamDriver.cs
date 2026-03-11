@@ -34,13 +34,22 @@ namespace AudioKit.FMOD
         private float vel;
         private float current;
 
+        private void TryToFindPlayer()
+        {
+            if (player == null)
+            {
+                Player go = FindFirstObjectByType<Player>();
+                if (go != null)
+                {
+                    player = go.transform;
+                } 
+            }
+
+        }
+
         private void Start()
         {
-            if (player == null && !string.IsNullOrEmpty(playerTag))
-            {
-                var go = GameObject.FindGameObjectWithTag(playerTag);
-                if (go != null) player = go.transform;
-            }
+            TryToFindPlayer();
             paramName = parameter.Resolve(AudioResources.ParamLibrary);
         }
 
@@ -60,6 +69,7 @@ namespace AudioKit.FMOD
 
         private void Update()
         {
+            TryToFindPlayer();
             if (updateInFixed) return;
             Tick(Time.deltaTime);
         }

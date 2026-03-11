@@ -51,10 +51,14 @@ namespace AudioKit.FMOD
 
                     case AudioActionType.SetGlobalParam:
                     {
+                        if (sys == null) break;
+
                         var pName = (a.parameter != null && a.parameter.IsValid) ? a.parameter.fmodName : a.parameterName;
                         pName = AudioParamUtil.Resolve(pName);
-                        if (string.IsNullOrEmpty(pName)) break;
-                        sys?.SetGlobalParam(pName, a.parameterValue);
+                        if (!string.IsNullOrEmpty(pName))
+                        {
+                            sys.SetGlobalParam(pName, a.parameterValue);
+                        } 
                         break;
                     }
 
