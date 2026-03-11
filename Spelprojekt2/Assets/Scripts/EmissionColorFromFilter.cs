@@ -1,18 +1,20 @@
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer))]
 public class EmissionColorFromFilter : MonoBehaviour
 {
+    [SerializeField]
+    private Color m_defaultColor;
+
     [SerializeField]
     private float m_emissiveIntensity = 1.0f;
     private Material m_emissionMaterial;
     private FilterColorData m_filterColorData;
     private FilterMaterialData m_filterMaterialData;
-    private MeshRenderer m_rend;
+    private SkinnedMeshRenderer m_rend;
 
     void Start()
     {
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        SkinnedMeshRenderer renderer = GetComponent<SkinnedMeshRenderer>();
         m_emissionMaterial = renderer.material;
         m_rend = renderer;
 
@@ -38,7 +40,7 @@ public class EmissionColorFromFilter : MonoBehaviour
         {
             m_emissionMaterial.DisableKeyword("_EMISSION");
             m_emissionMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-            m_emissionMaterial.SetColor("_EmissiveColor", Color.black);
+            m_emissionMaterial.SetColor("_EmissiveColor", m_defaultColor);
         }
         else
         {
