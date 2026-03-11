@@ -6,7 +6,8 @@ using UnityEngine.UIElements;
 public class PlayerCamera : MonoBehaviour
 {
     [Header("Orbit")]
-    [SerializeField] private float m_mouseSensitivity = 15f;
+    [SerializeField] private SensitivityData m_sensitivity;
+    [SerializeField] private float m_mouseSensitivity => m_sensitivity.m_currentSensitivity;
     [SerializeField] private float m_pitchAngleClamp = 60f;
     [SerializeField] private float m_rotationSmoothTime = 0.05f;
     [Header("Third Person")]

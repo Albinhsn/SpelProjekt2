@@ -3290,7 +3290,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 4
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3412,8 +3412,60 @@ PrefabInstance:
       value: PlayerNew
       objectReference: {fileID: 0}
     - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
-      propertyPath: m_blockLineOfSight.m_Bits
-      value: 1015
+      propertyPath: m_onStartInteraction.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onFinishInteraction.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onStartInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onFinishInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onStartInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1733521829}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onFinishInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1733521829}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onStartInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onFinishInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onStartInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetTrue
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onFinishInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetFalse
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onStartInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: SetForceAnimation, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onFinishInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: SetForceAnimation, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onStartInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3186778787230541432, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_onFinishInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3981205012873849256, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
       propertyPath: m_mouseSensitivity
@@ -3423,8 +3475,34 @@ PrefabInstance:
     - {fileID: 7448908755222038539, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1539980446894750868, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1733521829}
   m_SourcePrefab: {fileID: 100100000, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+--- !u!95 &1733521827 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5528532181942976239, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+  m_PrefabInstance: {fileID: 1733521826}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1733521828 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1539980446894750868, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+  m_PrefabInstance: {fileID: 1733521826}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1733521829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733521828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0d53b420a4990770b7203f8253b33bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_animator: {fileID: 1733521827}
 --- !u!43 &1738505080
 Mesh:
   m_ObjectHideFlags: 0

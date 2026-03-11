@@ -21,14 +21,14 @@ public sealed class LevelManager
     LevelManager()
     {
         m_glitchAudio = Resources.Load<AudioCueSO>("Audio/AC_Glitch");
-        m_duckSnapshot = Resources.Load<AudioCueSO>("Audio/AC_Duck");
+        m_duckSnapshot = "MusicDuck";
     }
 
     private LevelData m_currentLevel;
     private LevelData m_nextLevel;
 
     private AudioCueSO m_glitchAudio;
-    private AudioCueSO m_duckSnapshot;
+    private string m_duckSnapshot;
     private EventInstance m_soundInstance;
 
     private SceneLoader m_sceneLoader;
@@ -72,7 +72,7 @@ public sealed class LevelManager
             var I = AudioSystem.I;
             if(I != null)
             {
-                I.SetSnapshot(Instance.m_duckSnapshot.evt.Path, true, 0);
+                I.SetSnapshot(Instance.m_duckSnapshot, true, 0);
             }
         }
 
@@ -170,7 +170,7 @@ public sealed class LevelManager
             var I = AudioSystem.I;
             if(I != null)
             {
-                I.SetSnapshot(Instance.m_duckSnapshot.evt.Path, false, 0);
+                I.SetSnapshot(Instance.m_duckSnapshot, false, 0);
             }
         }
 
@@ -193,6 +193,17 @@ public sealed class LevelManager
             {
                 Debug.Log($"Failed to release glitch sound in transition because {ok}");
             }
+        }
+
+        // ah: enable credits
+        {
+            EndCreditsManager credits = UnityEngine.Object.FindFirstObjectByType<EndCreditsManager>();
+            if(credits != null)
+            {
+                credits.StartCredits();
+            }
+
+
         }
     }
 

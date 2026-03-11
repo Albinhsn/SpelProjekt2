@@ -34,6 +34,9 @@ public class UIManager : MonoBehaviour
     private LevelsData m_MainMenuLevelData;
 
     [SerializeField]
+    private LevelData m_creditsLevelData;
+
+    [SerializeField]
     private Player m_playerPrefab;
 
     [SerializeField]
@@ -62,6 +65,10 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private AudioCueSO m_onButtonHoverCue;
+
+    [SerializeField]
+    private SensitivityData m_sensitivity;
+
 
     private UIState m_state;
 
@@ -383,7 +390,7 @@ public class UIManager : MonoBehaviour
         LevelManager.m_onTransitionEnd -= SetupScene;
     }
 
-    void SetupMainMenu()
+    public static void SetupMainMenu()
     {
         EnterState(UIState.MainMenu);
         LevelManager.m_onTransitionEnd -= SetupMainMenu;
@@ -443,6 +450,12 @@ public class UIManager : MonoBehaviour
                     EnterState(UIState.Settings);
                 }
 
+                if(MenuBtn("Credits", btn_index++))
+                {
+                    EnterState(UIState.None);
+                    LevelManager.TransitionToSceneAsync(m_creditsLevelData);
+                }
+
 
                 if(MenuBtn("Delete save", btn_index++))
                 {
@@ -467,6 +480,18 @@ public class UIManager : MonoBehaviour
             case UIState.Settings:
             {
                 AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 2.5f);
+
+                // Sensitivity
+                {
+                    float sensitivity     = m_sensitivity.m_currentSensitivity;
+
+                    float s = (m_sensitivity.m_currentSensitivity - m_sensitivity.m_minSensitivity) / (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity);
+                    s       = VolumeSlider("Sensitivity", s);
+
+                    m_sensitivity.m_currentSensitivity = Mathf.Clamp(s * (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity), 
+                            m_sensitivity.m_minSensitivity, m_sensitivity.m_maxSensitivity);
+                    
+                }
 
                 // Volume slider
                 {

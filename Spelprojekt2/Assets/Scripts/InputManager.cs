@@ -93,7 +93,10 @@ public sealed class InputManager
     {
         return Instance.m_inputActions.Player.Jump.WasPressedThisFrame();
     }
-
+    public static bool Sprinting()
+    {
+        return Instance.m_inputActions.Player.Sprint.IsPressed();
+    }
     public static bool PickedUpItem()
     {
         return Instance.m_inputActions.Player.Pickup.WasPressedThisFrame();

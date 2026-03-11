@@ -54,7 +54,8 @@ MonoBehaviour:
   m_playerJumpSound: {fileID: 11400000, guid: 20351e68e394a1e4487db27c86a66e2a, type: 2}
   m_footstepSound: {fileID: 11400000, guid: a90337aafda62406abd9b84e5d5c1cec, type: 2}
   m_animator: {fileID: 5528532181942976239}
-  m_speed: 5
+  m_walkSpeed: 3
+  m_sprintSpeed: 5
   m_inAirSpeed: 0.1
   m_jumpForce: 5
   m_smoothAccelerationFactor: 0.1
@@ -251,9 +252,40 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   - {fileID: 11400000, guid: f6924d1f7265a9b49b1fa0fe6014aeed, type: 2}
   m_targetOrigin: {fileID: 6823077303963926624}
+  m_indicatorOrigin: {fileID: 344640177536807587}
   m_range: 3
   m_coneBaseRad: 0.7
   m_coneFactor: 0.3
+  m_onStartInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4185848331453190068}
+        m_TargetAssemblyTypeName: SetForceAnimation, Assembly-CSharp
+        m_MethodName: SetTrue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_onFinishInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4185848331453190068}
+        m_TargetAssemblyTypeName: SetForceAnimation, Assembly-CSharp
+        m_MethodName: SetFalse
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_blockLineOfSight:
     serializedVersion: 2
     m_Bits: 1015
@@ -377,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7a03994583805c46b0f48d6714e1a45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_mouseSensitivity: 60
+  m_sensitivity: {fileID: 11400000, guid: 0e158bdb7e5ae988c90f921f4a70f8f9, type: 2}
   m_pitchAngleClamp: 60
   m_rotationSmoothTime: 0.05
   m_thirdPersonCameraHeight: 0.5
@@ -462,6 +494,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1486053819927150745, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e3b80930f4cb52edabb5e5b35829dfe6, type: 2}
     - target: {fileID: 919132149155446097, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
       propertyPath: m_Name
       value: Player_Idle_ANI
@@ -482,7 +518,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 290323168213860369}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4185848331453190068}
   m_SourcePrefab: {fileID: 100100000, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
+--- !u!4 &344640177536807587 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2113909738647384934, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
+  m_PrefabInstance: {fileID: 1846042499218948549}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1539980446894750868 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}
@@ -526,6 +570,19 @@ MonoBehaviour:
   m_transmarencyStartDistance: 2
   m_fullTransparencyDistance: 1
   m_meshRenderer: {fileID: 8286073781149597346}
+--- !u!114 &4185848331453190068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1539980446894750868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0d53b420a4990770b7203f8253b33bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_animator: {fileID: 5528532181942976239}
 --- !u!4 &2167582317642851886 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bf52b27546c139a40abcd67f0ac969b0, type: 3}

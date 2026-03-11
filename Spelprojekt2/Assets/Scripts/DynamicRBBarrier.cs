@@ -13,7 +13,7 @@ public class DynamicRBBarrier : MonoBehaviour
             d_rb.Destroy();
         }
 
-        if(other.tag == "Player")
+        if(other.CompareTag("Player"))
         {
             FilterManager fm = FindFirstObjectByType<FilterManager>();
             fm.ChangeFilter(FilterKind.None);
