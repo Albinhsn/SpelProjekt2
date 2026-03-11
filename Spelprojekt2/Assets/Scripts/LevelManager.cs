@@ -76,6 +76,12 @@ public sealed class LevelManager
             }
         }
 
+        // ah: Apply end actions
+        AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
+        if(audio != null)
+        {
+            audio.ApplyEndActions();
+        }
 
         Instance.m_isGlitchingDone = false;
         Instance.m_scenesLoaded = false;
@@ -156,7 +162,7 @@ public sealed class LevelManager
         AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
         if(audio != null)
         {
-            audio.ApplyActions();
+            audio.ApplyStartActions();
         }
 
         // Set duck snapshot

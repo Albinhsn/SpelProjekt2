@@ -11,15 +11,16 @@ namespace AudioKit.FMOD
     public sealed class AudioSceneSettings : MonoBehaviour
     {
         [SerializeField] private bool runOnStart = true;
-        [SerializeField] private AudioAction[] actions = new AudioAction[0];
+        [SerializeField] private AudioAction[] startActions = new AudioAction[0];
+        [SerializeField] private AudioAction[] endActions = new AudioAction[0];
 
         private void Start()
         {
-            if (runOnStart) ApplyActions();
+            if (runOnStart) ApplyStartActions();
         }
 
         [ContextMenu("Kör Audio Actions")]
-        public void ApplyActions()
+        private void ApplyActions(AudioAction[] actions)
         {
             if (actions == null || actions.Length == 0) return;
 
@@ -71,6 +72,16 @@ namespace AudioKit.FMOD
                         break;
                 }
             }
+        }
+
+        public void ApplyStartActions()
+        {
+            ApplyActions(startActions);
+        }
+
+        public void ApplyEndActions()
+        {
+            ApplyActions(endActions);
         }
     }
 }

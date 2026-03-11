@@ -1091,27 +1091,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runOnStart: 0
-  actions:
-  - type: 3
-    eventId: TutorialMusic
-    vcaName: 
-    vcaValue: 0
-    parameter: {fileID: 0}
-    parameterName: 
-    parameterValue: 0
-    snapshot: 
-    snapshotEnable: 0
-    fade: 1
-  - type: 3
-    eventId: MainMusic
-    vcaName: 
-    vcaValue: 0
-    parameter: {fileID: 0}
-    parameterName: 
-    parameterValue: 0
-    snapshot: 
-    snapshotEnable: 0
-    fade: 1
+  startActions:
   - type: 2
     eventId: MenuMusic
     vcaName: 
@@ -1121,7 +1101,18 @@ MonoBehaviour:
     parameterValue: 0
     snapshot: 
     snapshotEnable: 0
-    fade: 1
+    fade: 0
+  endActions:
+  - type: 3
+    eventId: MenuMusic
+    vcaName: 
+    vcaValue: 0
+    parameter: {fileID: 0}
+    parameterName: 
+    parameterValue: 0
+    snapshot: 
+    snapshotEnable: 0
+    fade: 0
 --- !u!4 &1962436920
 Transform:
   m_ObjectHideFlags: 0
