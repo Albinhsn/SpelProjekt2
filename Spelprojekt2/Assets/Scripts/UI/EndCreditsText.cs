@@ -125,7 +125,7 @@ public class EndCreditsManager : MonoBehaviour
         SetCanvasAlphaImmediate(0f);
     }
 
-    private void Start()
+    public void StartCredits()
     {
         StartCoroutine(PlaySequence());
     }
