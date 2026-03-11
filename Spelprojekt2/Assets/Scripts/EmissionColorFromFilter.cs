@@ -19,6 +19,7 @@ public class EmissionColorFromFilter : MonoBehaviour
         if(m_rend != null)
         {
             m_emissionMaterial = renderer.material;
+            m_emissionMaterial.EnableKeyword("_EMISSION");
         }
 
 
@@ -43,13 +44,10 @@ public class EmissionColorFromFilter : MonoBehaviour
         {
             if(!active)
             {
-                m_emissionMaterial.DisableKeyword("_EMISSION");
-                m_emissionMaterial.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-                m_emissionMaterial.SetColor("_EmissiveColor", m_defaultColor);
+                m_emissionMaterial.SetColor("_EmissiveColor", m_defaultColor * m_emissiveIntensity);
             }
             else
             {
-                m_emissionMaterial.EnableKeyword("_EMISSION");
 
                 FilterColor filter_color = m_filterColorData.m_Colors[(int)filter];
                 Color color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
