@@ -14,7 +14,7 @@ VAR info = false
 = stitch1
 ~first = false
 <i>The man is mumbling to himself. Unaware of your presence.</i>
-... can't you just help us? This is your world; why would you just let it burn? # speaker=Priest?
+... can't you just help us? This is your world; why would you just let it burn? # speaker=Priest
     * [Eh... Hi?] Are you the Priest? # speaker=Alea
         Hmm? Oh yes, I am. Who are you? And why are you in my study? # speaker=Priest
         ** [I sort of stumbled in here.] #speaker=Alea

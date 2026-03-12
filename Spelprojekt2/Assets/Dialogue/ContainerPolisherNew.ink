@@ -15,7 +15,7 @@ It never ends. It never ends. It never ends. It never ends...
         <i>The banging stops</i> # speaker=
         No... # disallowSkip # delay=0.1 # speaker=Unknown
         I'm Alea, whats your name? # delay=default # speaker=Alea
-        I'm... the polisher. I polish the containers. 
+        I'm... the polisher. I polish the containers. # speaker=Polisher
         It is my duty to keep the containers shining, an assignment I've been doing ever since the start... # speaker=Polisher
         <i>The woman trails off</i> # speaker=
         ++ [And...]
