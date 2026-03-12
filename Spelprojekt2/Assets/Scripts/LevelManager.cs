@@ -93,13 +93,17 @@ public sealed class LevelManager
         {
             SetGlitchBoolTrue();
         }
-        else
+        else if(transition_time > 0)
         {
             GlitchTransitionManager.m_onTransitionEnd.AddListener(SetGlitchBoolTrue);
             if(!GlitchTransitionManager.StartTransition(transition_time, 0.0f))
             {
                 Debug.LogError("[LevelManager] A transition is already happening when we're trying to start a new one");
             }
+        }
+        else
+        {
+            Instance.m_isGlitchingDone = true;
         }
 
         // ah: unload current scene async

@@ -31,7 +31,7 @@ public class MainMenuAnimator : MonoBehaviour
         MeshFilter filter = obj.GetComponent<MeshFilter>();
         MeshRenderer renderer = obj.GetComponent<MeshRenderer>();
         ParticleManager.PlayParticleEffect(obj.transform.position, obj.transform.rotation,
-                filter.sharedMesh, renderer.sharedMaterial, obj.transform.localScale);
+                filter.sharedMesh, renderer.sharedMaterial, obj.transform.localScale, this.gameObject.scene);
     }
 
     void Update()

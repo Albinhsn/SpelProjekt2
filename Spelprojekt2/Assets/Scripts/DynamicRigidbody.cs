@@ -71,7 +71,7 @@ public class DynamicRigidbody : MonoBehaviour
     public void Destroy()
     {
         Material material = GetComponent<MeshRenderer>().material;
-        ParticleManager.PlayParticleEffect(transform.position, transform.rotation, m_mesh, material, transform.localScale);
+        ParticleManager.PlayParticleEffect(transform.position, transform.rotation, m_mesh, material, transform.localScale, this.gameObject.scene);
         Destroy(this.gameObject);
     }
 
