@@ -460,11 +460,6 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -583,6 +578,11 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
 --- !u!1 &1117760896
 GameObject:
   m_ObjectHideFlags: 0
@@ -662,9 +662,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_levels:
-    m_sceneName: 
-    m_scenePath: 
-    m_scene: {fileID: 0}
+    m_sceneName: tutorial_layoutScene 1
+    m_scenePath: Assets/Scenes/PrototypeLevels/Tutorial World/
+    m_scene: {fileID: 11400000, guid: 118d30f30276fd9cc842cf49d19f3f4b, type: 2}
 --- !u!4 &1188340047
 Transform:
   m_ObjectHideFlags: 0
