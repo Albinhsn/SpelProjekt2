@@ -38,7 +38,6 @@ public class Door : MonoBehaviour
     [SerializeField]
     private DoorDirection direction; 
 
-
     private Vector3 m_direction => direction == DoorDirection.Up ? new Vector3(0,1,0) : 
        direction == DoorDirection.Sideways ? new Vector3(1,0,0) : new Vector3(0,0,1);
 
@@ -50,6 +49,7 @@ public class Door : MonoBehaviour
 
     private Collider m_collider;
 
+
     void Awake()
     {
         m_closePosition = this.transform.position;
@@ -58,6 +58,7 @@ public class Door : MonoBehaviour
         m_isNotFiltered = IsNotFiltered();
 
         // Create sound instance and get id for freeze event
+        if(m_sound != null)
         {
             m_soundInstance = RuntimeManager.CreateInstance(m_sound.evt);
 
@@ -103,7 +104,10 @@ public class Door : MonoBehaviour
             }
         }
 
-        m_soundInstance.setParameterByID(m_freezeID, val);
+        if(m_sound != null)
+        {
+            m_soundInstance.setParameterByID(m_freezeID, val);
+        }
     }
 
     public void Open()

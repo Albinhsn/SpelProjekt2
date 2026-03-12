@@ -16,7 +16,6 @@ public class MovingPlatformController : MonoBehaviour
     private FMOD.Studio.EventInstance m_soundInstance;
 
 
-
     [Header("Platform settings")]
 	[SerializeField] private int m_targetCount = 2;
 	[Min(0)][SerializeField] private float m_speed = 1;
@@ -127,9 +126,11 @@ public class MovingPlatformController : MonoBehaviour
 				m_currentPosition = m_currentTarget;
 				m_platform.UpdateReference(Vector3.zero);
 
-                m_soundInstance.setParameterByName("looping", 0);
-                m_soundInstance.release();
-
+                if(m_onPlatformMoveCue != null)
+                {
+                    m_soundInstance.setParameterByName("looping", 0);
+                    m_soundInstance.release();
+                }
 			}
 
 			m_platform.rb.position += m_movementDirection * (m_speed * Time.deltaTime);//Move
@@ -138,41 +139,35 @@ public class MovingPlatformController : MonoBehaviour
 
 	public void MoveToIndex(int index)
 	{
-
 		Assert.IsTrue(index < m_targetCount);
 
 		if (index == m_currentTarget) return;
-
 
 		m_currentPosition = m_currentTarget;
 		m_currentTarget = index;
 		m_movementDirection = (m_targets[m_currentTarget].position - m_platform.transform.position).normalized;
 		m_platform.UpdateReference(m_movementDirection * m_speed);
+
+        if(m_onPlatformMoveCue != null)
+        {
+            m_soundInstance = RuntimeManager.CreateInstance(m_onPlatformMoveCue.evt);
+            m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(m_platform.transform.position));
+            m_soundInstance.setParameterByName("looping", 1);
+            m_soundInstance.start();
+        }
 		
 	}
 
-	//Controls
-	public void MoveToIndex(int index, Transform activator_transform)
-	{
-        SfxDirector.PlayCue2(m_onPlatformStartMoveCue, activator_transform.position);
-        m_soundInstance = RuntimeManager.CreateInstance(m_onPlatformMoveCue.evt);
-        m_soundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(m_platform.transform.position));
-        m_soundInstance.setParameterByName("looping", 1);
-        m_soundInstance.start();
-
-        MoveToIndex(index);
-	}
-
-	public void IncrementPosition(Transform source)
+	public void IncrementPosition()
 	{
 		if (moving) return;
-		MoveToIndex(m_currentPosition == m_targetCount - 1 ? 0 : m_currentPosition + 1, source);
+		MoveToIndex(m_currentPosition == m_targetCount - 1 ? 0 : m_currentPosition + 1);
 	}
 
-	public void DecrementPosition(Transform source)
+	public void DecrementPosition()
 	{
 		if (moving) return;
-		MoveToIndex(m_currentPosition == 0 ? m_targetCount - 1 : m_currentPosition - 1, source);
+		MoveToIndex(m_currentPosition == 0 ? m_targetCount - 1 : m_currentPosition - 1);
 	}
 	
 	
