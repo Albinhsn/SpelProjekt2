@@ -40,7 +40,8 @@ public class MovementController : MonoBehaviour
     private Dictionary<string, int> m_animationParameters;
     private Dictionary<string, bool> m_animationParamState;
 
-    private float jumpCooldown = 0;
+    private float m_jumpCooldown = 0;
+    private bool m_sprinting = false;
 
     void Awake()
     {
@@ -130,14 +131,14 @@ public class MovementController : MonoBehaviour
     void
     TryJump()
     {
-        if(InputManager.Jumped() && !m_isJumping && jumpCooldown <= 0)
+        if(InputManager.Jumped() && !m_isJumping && m_jumpCooldown <= 0)
         {
             SetAnimTrigger("jumped");
             SetAnimBool("isGrounded", false);
             m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
-            jumpCooldown = 0.5f;
+            m_jumpCooldown = 0.5f;
             m_footstepInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         }
     }
@@ -149,7 +150,12 @@ public class MovementController : MonoBehaviour
         m_rb.position += m_referenceVector * Time.deltaTime;
         m_cameraTransform.position += m_referenceVector * Time.deltaTime;
         
-        jumpCooldown -= Time.deltaTime;
+        m_jumpCooldown -= Time.deltaTime;
+
+        if(InputManager.Sprinting())
+        {
+            m_sprinting = true;
+        }
     }
 
     void PlayFootstepSound()
@@ -183,13 +189,14 @@ public class MovementController : MonoBehaviour
                 SetAnimBool("walk", true);
             }
         }
-        else if(!m_isJumping)
+        else
         {
             SetAnimBool("walk", false);
+            m_sprinting = false;
         }
 
         float speed;
-        if(InputManager.Sprinting())
+        if(m_sprinting)
         {
             speed = m_sprintSpeed;
             SetAnimBool("sprinting", true);
