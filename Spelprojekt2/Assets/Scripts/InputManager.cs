@@ -95,7 +95,7 @@ public sealed class InputManager
     }
     public static bool Sprinting()
     {
-        return Instance.m_inputActions.Player.Sprint.WasPressedThisFrame();
+        return Instance.m_inputActions.Player.Sprint.IsPressed();
     }
     public static bool PickedUpItem()
     {

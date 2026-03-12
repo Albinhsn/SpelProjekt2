@@ -41,7 +41,7 @@ public class MovementController : MonoBehaviour
     private Dictionary<string, bool> m_animationParamState;
 
     private float m_jumpCooldown = 0;
-    private bool m_sprinting = false;
+    // private bool m_sprinting = false;
 
     void Awake()
     {
@@ -152,10 +152,10 @@ public class MovementController : MonoBehaviour
         
         m_jumpCooldown -= Time.deltaTime;
 
-        if(InputManager.Sprinting())
-        {
-            m_sprinting = true;
-        }
+        // if(InputManager.Sprinting())
+        // {
+        //     m_sprinting = true;
+        // }
     }
 
     void PlayFootstepSound()
@@ -192,11 +192,11 @@ public class MovementController : MonoBehaviour
         else
         {
             SetAnimBool("walk", false);
-            m_sprinting = false;
+            // m_sprinting = false;
         }
 
         float speed;
-        if(m_sprinting)
+        if(InputManager.Sprinting())
         {
             speed = m_sprintSpeed;
             SetAnimBool("sprinting", true);
