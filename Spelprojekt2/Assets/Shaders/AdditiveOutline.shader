@@ -48,7 +48,7 @@ Shader "Custom/AdditiveOutline"
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.position + v.normal * _WSOutlineWidth);
+                o.vertex = UnityWorldToClipPos(mul(unity_ObjectToWorld, v.position) + UnityObjectToWorldDir(v.normal) * _WSOutlineWidth);
                 return o;
             }
 
