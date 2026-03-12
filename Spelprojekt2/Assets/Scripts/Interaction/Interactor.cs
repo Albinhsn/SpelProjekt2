@@ -137,13 +137,11 @@ namespace Interaction
                 RaycastHit hit;
                 Physics.Raycast(m_targetOrigin.transform.position, obj_relative_position.normalized, out hit, Mathf.Infinity, m_blockLineOfSight);
 
-                if(hit.collider.gameObject != obj.gameObject)
+                if(hit.collider == null || hit.collider.gameObject != obj.gameObject)
                 {
                     continue;
                 }
                 obj.m_indicatorKind = IndicatorKind.Target;
-
-                
 
                 if (obj_radial_distance < sel_distance)
                 {
