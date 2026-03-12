@@ -2,7 +2,6 @@
 
 # font=0
 
-USER interaction in the Bearing 1
 Alea.  # speaker=USER # camera=0
 USER. # speaker=Alea
 You have done a good job getting here. Finally, we can get this over with. # speaker=USER
@@ -24,11 +23,9 @@ I’ve had enough, what would you understand? You’ve only existed for, what, a
 An hour may be my entire existence, but I would like to think I’ve learnt a lot. # speaker=Alea
 And I want to live more than that.
 Then go. # speaker=USER
-[BLACK SCREEN, USE CAMERA CLOSE TO WALL?]
-<i>The Island rumbles, a shockwave of force nearly makes you topple. #speaker= #camera=3  
-Screams and sounds of crashing metal fill your senses.
-Looking back all you see, is the rubble of a recent construction site.</i>
-Learn what you <i>need</i> to. #speaker=USER  
-[ROLL CREDITS FOR DEMO]
+<i>The Island rumbles, a shockwave of force nearly makes you topple.</i> #speaker= #camera=3  
+<i>Screams and sounds of crashing metal fill your senses.</i>
+<i>Looking back all you see, is the rubble of a recent construction site.</i>
+Learn what you <i>need</i> to. #speaker=USER
 
 
