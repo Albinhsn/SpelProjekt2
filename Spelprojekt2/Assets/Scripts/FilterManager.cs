@@ -27,6 +27,9 @@ public class FilterManager : MonoBehaviour
     public FilterMaterialData m_filterMaterialData;
     public float m_filterEffectDistance = 30.0f;
 
+    private AudioCueSO m_filterOffCue;
+    private AudioCueSO m_filterOnCue;
+
     public void Unlock()
     {
         m_filterUnlocked = true;
@@ -42,7 +45,8 @@ public class FilterManager : MonoBehaviour
     {
         m_filterMaterialData = Resources.Load("StandardFilterMaterialData") as FilterMaterialData;
         m_filterColorData    = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
-        m_filterChangeCue    = Resources.Load("Audio/AC_FilterChange") as AudioCueSO;
+        m_filterOnCue        = Resources.Load("Audio/AC_FilterOn") as AudioCueSO;
+        m_filterOffCue       = Resources.Load("Audio/AC_FilterOff") as AudioCueSO;
         m_filterChanged = new();
 
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
@@ -120,8 +124,6 @@ public class FilterManager : MonoBehaviour
 
         bool activating       = m_activeFilter != new_filter;
 
-        // ah: Play filter change sound
-        SfxDirector.PlayCue2(m_filterChangeCue, this.transform.position);
 
         // ah: activate objects
         FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
@@ -151,6 +153,12 @@ public class FilterManager : MonoBehaviour
                 }
             }
         }
+
+        // ah: play sfx
+        {
+            SfxDirector.PlayCue2(activating ? m_filterOnCue : m_filterOffCue, this.transform.position);
+        }
+
 
         // ah: broadcast event
         this.m_filterChanged?.Invoke(new_filter, activating);
