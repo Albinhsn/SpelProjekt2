@@ -14,6 +14,7 @@ public class Fan : MonoBehaviour
     [SerializeField] float m_maxHeight = 10f;
     [SerializeField] float m_itemxzPullStrength = 10f;
     [SerializeField] float m_playerxzPullStrength = 1f;
+    [SerializeField] float m_colliderMaxHeightBuffer = 1f;
 
     [Header("Top Bob Settings")]
     [SerializeField] float m_bobAmplitude = 0.5f;
@@ -88,7 +89,7 @@ public class Fan : MonoBehaviour
     void OnValidate()
     {
         m_collider = GetComponent<CapsuleCollider>();
-        m_colliderHeight = m_maxHeight + 5f;
+        m_colliderHeight = m_maxHeight + m_colliderMaxHeightBuffer;
         m_collider.height = m_colliderHeight;
         m_collider.center = new Vector3(0f, m_colliderHeight / 2f, 0f);
     }
