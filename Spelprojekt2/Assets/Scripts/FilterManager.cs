@@ -57,10 +57,30 @@ public class FilterManager : MonoBehaviour
 
     public void ChangeFilterColor()
     {
-        FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
-        for(int j = 0; j < objects.Length; j++)
+        // ah: filter objects
         {
-            objects[j].ChangeMaterialColor(m_filterColorData, m_filterMaterialData);
+            FilterObject[] objects = FindObjectsByType<FilterObject>(FindObjectsSortMode.None);
+            for(int j = 0; j < objects.Length; j++)
+            {
+                objects[j].ChangeMaterialColor(m_filterColorData, m_filterMaterialData);
+            }
+        }
+        // change material to filtered kind
+        {
+            ChangeMaterialToFilteredKind[] objects = FindObjectsByType<ChangeMaterialToFilteredKind>(FindObjectsSortMode.None);
+            for(int j = 0; j < objects.Length; j++)
+            {
+                objects[j].ChangeMaterialColor(m_filterColorData, m_filterMaterialData);
+            }
+        }
+
+        // Emissive color from filter
+        {
+            EmissionColorFromFilter[] objects = FindObjectsByType<EmissionColorFromFilter>(FindObjectsSortMode.None);
+            for(int j = 0; j < objects.Length; j++)
+            {
+                objects[j].UpdateMaterialColor(m_activeFilter);
+            }
         }
 
         FilterDistanceChange distanceChangeObject = FindFirstObjectByType<FilterDistanceChange>();

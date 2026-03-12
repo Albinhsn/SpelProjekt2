@@ -94,6 +94,8 @@ public class UIManager : MonoBehaviour
     private int m_selectedIndex = 0;
     private bool m_useSelected;
 
+    private Texture2D m_whitePixel;
+
     public void HideCursor()
     {
         Cursor.visible = false;
@@ -163,6 +165,10 @@ public class UIManager : MonoBehaviour
             Destroy(this.gameObject);
             return;
         }
+
+        m_whitePixel = new Texture2D(1,1, TextureFormat.ARGB32, false);
+        m_whitePixel.SetPixel(0,0, new Color(0.8f, 0.8f, 0.8f, 1.0f));
+        m_whitePixel.Apply();
 
         LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
 
@@ -259,6 +265,10 @@ public class UIManager : MonoBehaviour
 
         GUIStyle slider_style = new GUIStyle(GUI.skin.horizontalSlider);
         slider_style.padding.top = (int)GetScreenScaledSize(-2);
+        slider_style.normal.background  = m_whitePixel;
+        slider_style.hover.background   = m_whitePixel;
+        slider_style.active.background  = m_whitePixel;
+        slider_style.focused.background = m_whitePixel;
 
         float result = GUILayout.HorizontalSlider(initial_value, 0, 1, slider_style, GUI.skin.horizontalScrollbarThumb, options);
 
@@ -453,7 +463,7 @@ public class UIManager : MonoBehaviour
                 if(MenuBtn("Credits", btn_index++))
                 {
                     EnterState(UIState.None);
-                    LevelManager.TransitionToSceneAsync(m_creditsLevelData);
+                    LevelManager.TransitionToSceneAsync(m_creditsLevelData, 0);
                 }
 
 

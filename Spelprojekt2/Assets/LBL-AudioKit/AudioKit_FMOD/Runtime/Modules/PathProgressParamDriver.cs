@@ -11,7 +11,6 @@ namespace AudioKit.FMOD
 
         [Header("Mål")]
         [SerializeField] private Transform player;
-        [SerializeField] private string playerTag = "Player";
 
         [Header("Punkter")]
         [Tooltip("Minst 2. Progress går från point[0] -> point[last]")]

@@ -39,6 +39,16 @@ public class EmissionColorFromFilter : MonoBehaviour
         }
     }
 
+    public void UpdateMaterialColor(FilterKind filter)
+    {
+        FilterColor filter_color = m_filterColorData.m_Colors[(int)filter];
+        Color color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
+
+        m_emissionMaterial.SetColor("_EmissiveColor", color * m_emissiveIntensity);
+        DynamicGI.UpdateEnvironment();
+        RendererExtensions.UpdateGIMaterials(m_rend);
+    }
+
     void UpdateFilter(FilterKind filter, bool active)
     {
         if(m_rend != null)
@@ -46,17 +56,13 @@ public class EmissionColorFromFilter : MonoBehaviour
             if(!active)
             {
                 m_emissionMaterial.SetColor("_EmissiveColor", m_defaultColor * m_emissiveIntensity);
+                DynamicGI.UpdateEnvironment();
+                RendererExtensions.UpdateGIMaterials(m_rend);
             }
             else
             {
-
-                FilterColor filter_color = m_filterColorData.m_Colors[(int)filter];
-                Color color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
-
-                m_emissionMaterial.SetColor("_EmissiveColor", color * m_emissiveIntensity);
+                UpdateMaterialColor(filter);
             }
-            DynamicGI.UpdateEnvironment();
-            RendererExtensions.UpdateGIMaterials(m_rend);
         }
     }
 

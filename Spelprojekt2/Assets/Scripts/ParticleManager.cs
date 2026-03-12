@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using AudioKit.FMOD;
 
 public class ParticleManager
@@ -19,11 +20,13 @@ public class ParticleManager
     private GameObject m_particleEffectPrefab;
     private AudioCueSO m_dissolveSound;
 
-    public static void PlayParticleEffect(Vector3 position, Quaternion rotation, Mesh objMesh, Material material, Vector3 scale)
+    public static void PlayParticleEffect(Vector3 position, Quaternion rotation, Mesh objMesh, Material material, Vector3 scale,
+            Scene scene)
     {
         Instance.m_particleEffectPrefab = Resources.Load<GameObject>("Prefabs/ParticleEffect");
 
         ParticleSystem ps = GameObject.Instantiate(Instance.m_particleEffectPrefab, position, rotation).GetComponent<ParticleSystem>();
+        SceneManager.MoveGameObjectToScene(ps.gameObject, scene);
         var shape = ps.shape;
         shape.shapeType = ParticleSystemShapeType.Box;
         shape.mesh = objMesh;

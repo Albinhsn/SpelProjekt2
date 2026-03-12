@@ -460,6 +460,11 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -578,11 +583,6 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
 --- !u!1 &1117760896
 GameObject:
   m_ObjectHideFlags: 0
@@ -1134,6 +1134,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 358372983514085806, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
+      propertyPath: m_sensitivity
+      value: 
+      objectReference: {fileID: 11400000, guid: 0e158bdb7e5ae988c90f921f4a70f8f9, type: 2}
     - target: {fileID: 4365943673824385308, guid: 319fb901d4bb9a8418d076f66f86a9b0, type: 3}
       propertyPath: m_LocalPosition.x
       value: -577.51624

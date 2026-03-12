@@ -913,10 +913,11 @@ public sealed class PersistentDataManager
 
         // ah: player
         Player player = UnityEngine.Object.FindFirstObjectByType<Player>();
-        if(player != null)
+        PlayerTransformHandler handler = UnityEngine.Object.FindFirstObjectByType<PlayerTransformHandler>();
+        if(player != null && handler != null)
         {
             m_gameState.m_play.m_playerP = player.transform.position;
-            m_gameState.m_play.m_playerP = player.transform.position;
+            m_gameState.m_play.m_playerR = handler.transform.rotation;
         }
         else
         {
