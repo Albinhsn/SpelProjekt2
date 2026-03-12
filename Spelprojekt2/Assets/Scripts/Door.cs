@@ -217,5 +217,11 @@ public class Door : MonoBehaviour
                 SetSoundEventParam(DoorSoundState.Freeze);
             }
         }
+        else
+        {
+            SetSoundEventParam(DoorSoundState.Freeze);
+            m_closing  = false;
+            m_opening  = false;
+        }
     }
 }
