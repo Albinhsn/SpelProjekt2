@@ -41,9 +41,16 @@ public class EmissionColorFromFilter : MonoBehaviour
 
     public void UpdateMaterialColor(FilterKind filter)
     {
-        FilterColor filter_color = m_filterColorData.m_Colors[(int)filter];
-        Color color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
-
+        Color color;
+        if(filter != FilterKind.None)
+        {
+            FilterColor filter_color = m_filterColorData.m_Colors[(int)filter];
+            color              = m_filterMaterialData.m_materials[(int)filter_color].m_deactivatedMaterial.color;
+        }
+        else
+        {
+            color = m_defaultColor;
+        }
         m_emissionMaterial.SetColor("_EmissiveColor", color * m_emissiveIntensity);
         DynamicGI.UpdateEnvironment();
         RendererExtensions.UpdateGIMaterials(m_rend);
