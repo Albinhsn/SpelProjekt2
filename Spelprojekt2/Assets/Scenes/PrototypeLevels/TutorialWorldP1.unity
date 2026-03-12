@@ -7403,6 +7403,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1455191707}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MoveToIndex
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 185798210080531432, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+      propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 802697536933158284, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.1
@@ -7563,6 +7587,17 @@ PrefabInstance:
       addedObject: {fileID: 1480407599}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+--- !u!114 &1455191707 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5250697197948085503, guid: 02d8f18221c897349a52dad8305b87e1, type: 3}
+  m_PrefabInstance: {fileID: 1455191706}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630f22dc4e314ad2bd546b6ce7562223, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &1477674906
 Mesh:
   m_ObjectHideFlags: 0
