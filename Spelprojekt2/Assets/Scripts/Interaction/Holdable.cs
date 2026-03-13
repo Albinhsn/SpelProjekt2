@@ -113,7 +113,8 @@ namespace Interaction
         {
             if (m_isHeld)
             {
-                Vector3 targetPos = m_activeInteractor.transform.position + m_activeInteractor.transform.forward * m_itemDistanceFromPlayer + new Vector3(0, m_itemFloatHeight, 0);
+                Vector3 upwardAimDir = new Vector3(m_activeInteractor.aimDirection.x, MathF.Max(0, m_activeInteractor.aimDirection.y), m_activeInteractor.aimDirection.z).normalized;
+                Vector3 targetPos = m_activeInteractor.position + upwardAimDir * m_itemDistanceFromPlayer;
                 Vector3 itemToPlayerDir = m_activeInteractor.transform.position - transform.position;
                 Vector2 itemToPlayerDirXZ = new Vector2(itemToPlayerDir.x, itemToPlayerDir.z).normalized;
                 Vector2 itemToPlayerDirXZNormal = new Vector2(-itemToPlayerDirXZ.y, itemToPlayerDirXZ.x);
