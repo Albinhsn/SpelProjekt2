@@ -243,6 +243,10 @@ public sealed class PersistentDataManager
                     {
                         value = (bool)kv.Value ? "true" : "false";
                     }
+                    else if(kv.Value is string)
+                    {
+                        value = (string)kv.Value;
+                    }
                     else
                     {
                         Debug.LogError($"Unable to serialize ink variable of this type {kv.Value.GetType().ToString()}");
