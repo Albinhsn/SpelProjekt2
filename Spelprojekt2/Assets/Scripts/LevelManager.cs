@@ -34,6 +34,8 @@ public sealed class LevelManager
     private SceneLoader m_sceneLoader;
 
     private Player m_player;
+    private PlayerTransformHandler m_playerTransformHandler;
+    private PlayerCamera m_playerCamera;
 
 
     private bool m_isTransitioning;
@@ -125,6 +127,8 @@ public sealed class LevelManager
             Instance.m_player = UnityEngine.Object.FindFirstObjectByType<Player>();
             if(Instance.m_player != null)
             {
+                Instance.m_playerTransformHandler = UnityEngine.Object.FindFirstObjectByType<PlayerTransformHandler>();
+                Instance.m_playerCamera           = UnityEngine.Object.FindFirstObjectByType<PlayerCamera>();
                 LevelCheckpointManager.m_allowChangeCheckpoint = false;
             }
         }
@@ -150,7 +154,7 @@ public sealed class LevelManager
             if(Instance.m_player != null)
             {
                 LevelCheckpointManager.SetFirstSpawnPoint();
-                LevelCheckpointManager.Respawn(Instance.m_player);
+                LevelCheckpointManager.Respawn(Instance.m_player, Instance.m_playerTransformHandler, Instance.m_playerCamera);
                 Instance.m_player.gameObject.SetActive(true);
             }
         }

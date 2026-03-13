@@ -50,13 +50,19 @@ public class PlayerCamera : MonoBehaviour
     Quaternion rotation;
     [HideInInspector] public Vector3 m_playerForward, m_playerRight;
 
-    private void Start()
+    private void Awake()
     {
         Vector3 angles = transform.eulerAngles;
         m_targetYaw = m_currentYaw = angles.y;
         m_targetPitch = m_currentPitch = angles.x;
         m_targetDistance = m_currentDistance = m_cameraDistanceFromPlayer;
     }
+
+    public void SetYaw(float yaw)
+    {
+        m_targetYaw = m_currentYaw = yaw;
+    }
+
     void Update()
     {
         HandleShoulderSwitch();
