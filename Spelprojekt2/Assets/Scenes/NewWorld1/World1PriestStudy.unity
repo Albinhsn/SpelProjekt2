@@ -969,32 +969,36 @@ PrefabInstance:
     m_TransformParent: {fileID: 309474059}
     m_Modifications:
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.96
+      value: -4.54
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.85
+      value: 1.51
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.48
+      value: -6.45
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9000441
+      value: 0.92387956
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.43579888
+      value: 0.38268343
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1002,7 +1006,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -51.672
+      value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 1640055805595545944, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -1010,15 +1014,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2760138924542990293, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_Size.x
-      value: 0.9963749
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2760138924542990293, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
+      propertyPath: m_Size.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2760138924542990293, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
+      propertyPath: m_Size.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2760138924542990293, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_Center.x
-      value: -1.0018096
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2760138924542990293, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_Center.z
-      value: 0.000000075167335
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6216396972889488984, guid: 4833c6f3b8431af0b85cafeb99fba7c8, type: 3}
       propertyPath: m_Name
@@ -9905,6 +9917,11 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -10023,11 +10040,6 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
 --- !u!108 &1680012007
 Light:
   m_ObjectHideFlags: 0

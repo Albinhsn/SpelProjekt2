@@ -7,18 +7,24 @@ public sealed class LevelCheckpointManager
     public static Quaternion m_currentSpawnPointRotation;
     public static int m_sceneBuildIndex;
 
-    public static void Respawn(Player player)
+    public static void Respawn(Player player, PlayerTransformHandler handler, PlayerCamera camera)
     {
         if(player != null)
         {
-            player.transform.position = m_currentSpawnPointPosition;
-            player.transform.rotation = m_currentSpawnPointRotation;
+            player.transform.position      = m_currentSpawnPointPosition;
+            handler.transform.rotation     = m_currentSpawnPointRotation;
+
+            InputManager.SetAimDirection(handler.transform.forward, handler.transform.right);
+            camera.SetYaw(handler.transform.rotation.eulerAngles.y);
         }
     }
 
     public static void Respawn()
     {
-        Respawn(Object.FindFirstObjectByType<Player>());
+        var player  = Object.FindFirstObjectByType<Player>();
+        var handler = Object.FindFirstObjectByType<PlayerTransformHandler>();
+        var camera  = Object.FindFirstObjectByType<PlayerCamera>();
+        Respawn(player, handler, camera);
     }
 
     public static void SetFirstSpawnPoint()
