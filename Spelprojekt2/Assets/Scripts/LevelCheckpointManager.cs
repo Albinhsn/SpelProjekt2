@@ -13,8 +13,6 @@ public sealed class LevelCheckpointManager
         {
             player.transform.position      = m_currentSpawnPointPosition;
             handler.transform.rotation     = m_currentSpawnPointRotation;
-
-            InputManager.SetAimDirection(handler.transform.forward, handler.transform.right);
             camera.SetYaw(handler.transform.rotation.eulerAngles.y);
         }
     }
