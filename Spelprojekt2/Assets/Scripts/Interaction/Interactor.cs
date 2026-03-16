@@ -17,6 +17,8 @@ namespace Interaction
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
 
+        [SerializeField] private Collider m_mainCollider;
+
         [SerializeField] private UnityEvent m_onStartInteraction1;
         [SerializeField] private UnityEvent m_onFinishInteraction;
 
@@ -28,6 +30,10 @@ namespace Interaction
         public Vector3 aimDirection => InputManager.GetForwardAimDir();
 
         public Vector3 position => m_targetOrigin.position;
+
+        public LayerMask blockLineOfSight => m_blockLineOfSight;
+
+        public Collider mainCollider => m_mainCollider;
 
         private void Awake()
         {
