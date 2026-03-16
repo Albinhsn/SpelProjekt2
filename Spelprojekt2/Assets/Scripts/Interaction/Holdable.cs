@@ -19,10 +19,13 @@ namespace Interaction
         [SerializeField] private float m_maxVelocity = 10;
         [SerializeField] private float m_acceleration = 30;
         [SerializeField] private float m_deceleration = 20;
-        private float m_antiOscillationThreshold = 0.1f;
         [SerializeField] private float m_capsuleHeight = 1.5f;
         [SerializeField] private float m_holdRangeCorrectionStrength = 3;
+        
+        private float m_antiOscillationThreshold = 0.1f;
         private float m_forwardLinearArc = 0.1f;
+        private float m_holdCancelTime = 1.5f;
+        
         private float m_boundingRadius;
         
         private float m_currentVelocity;
@@ -77,6 +80,7 @@ namespace Interaction
         }
 
         private CollisionDetectionMode m_savedCollissionDetectionMode;
+        private bool m_savedGravity;
         public override void Interact(Interactor interactor)
         {
             base.Interact(interactor);
@@ -86,6 +90,9 @@ namespace Interaction
             m_rb.constraints |= RigidbodyConstraints.FreezeRotation;
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
             m_playerRb = interactor.mainCollider.attachedRigidbody;
+
+            m_savedGravity = m_rb.useGravity;
+            m_rb.useGravity = false;
         }
 
         public override bool TryCancelInteraction()
@@ -94,7 +101,7 @@ namespace Interaction
             m_isHeld = false;
             m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
             base.TryCancelInteraction();
-
+            m_rb.useGravity = m_savedGravity;
             return true;
         }
 
@@ -103,6 +110,7 @@ namespace Interaction
             m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
             m_isHeld = false;
             m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+            m_rb.useGravity = m_savedGravity;
             base.ForceCancelInteraction();
         }
 
@@ -113,32 +121,47 @@ namespace Interaction
                 PickupItemIndicatorManager.Request(this.transform.position, IndicatorKind.Held);
             }
         }
-        
+
+        private float m_remainingHoldCancelTime;
         private void FixedUpdate()
         {
             if (m_isHeld)
             {
+                //Auto drop logic
+                if (m_distanceToInteractor > m_holdDistance * 2)
+                {
+                    ForceCancelInteraction();
+                    return;
+                }
+
+                Physics.Raycast(m_activeInteractor.position, m_localPosition, out RaycastHit hit_info, m_localPosition.magnitude, m_activeInteractor.blockLineOfSight);
+                if (hit_info.transform != transform)
+                {
+                    m_remainingHoldCancelTime -= Time.fixedDeltaTime;
+                    if (m_remainingHoldCancelTime < 0)
+                    {
+                        ForceCancelInteraction();
+                        return;
+                    }
+                }
+                else m_remainingHoldCancelTime = m_holdCancelTime;
+                
+                
                 //Update velocity
                 m_currentVelocity = m_targetDistance > m_decThreshold ? MathF.Min(m_maxVelocity, m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) : MathF.Max(0, m_currentVelocity - m_deceleration * Time.fixedDeltaTime);
                 
-                if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc && m_targetDistance < m_distanceToInteractor) //linear movement in forward cone
-                {
-                    m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                    if (m_targetDistance < m_antiOscillationThreshold) m_rb.linearVelocity *= m_targetDistance / m_antiOscillationThreshold;
-                }
-                else
-                {
+                Vector3 selected_direction = (
+                    Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
+                        MathF.Min(1, //Spherical v linear movement T, clamp to max 1
+                            MathF.Max(MathF.Min(1, Vector3.Dot(m_localPosition.normalized, m_upwardAimDirection)), //Linearize in front of player
+                                MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
+                                ))))
+                ).normalized;
                     
-                    Vector3 selected_direction = (
-                            Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
-                                  MathF.Min(1, //Spherical v linear movement T, clamp to max 1
-                                  MathF.Max((m_forwardAngleCorrespondence - (1 - m_forwardLinearArc)) / m_forwardLinearArc, //Linear movement cone 
-                                  MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
-                                  ))))
-                    ).normalized;
-                    
-                    m_rb.linearVelocity = m_playerRb.linearVelocity + selected_direction * m_currentVelocity;//Velocity scale
-                }
+                m_rb.linearVelocity = selected_direction * m_currentVelocity;//Velocity scale
+                
+                if (m_targetDistance < m_antiOscillationThreshold) m_rb.linearVelocity *= m_targetDistance / m_antiOscillationThreshold;
+                //m_rb.linearVelocity += m_playerRb.linearVelocity * MathF.Min(1, 1 + Vector3.Dot(m_rb.linearVelocity.normalized, m_playerRb.linearVelocity.normalized));
                 
                 //Emergency player collision avoidance (flight prevention)
                 float inner_collision_emergency_distance = (m_activeInteractor.mainCollider.ClosestPoint(transform.position) - transform.position).magnitude - m_boundingRadius + 0.1f;
@@ -148,20 +171,18 @@ namespace Interaction
                     m_rb.linearVelocity += (new Vector3(normalized_position.x, 0, normalized_position.z) * -inner_collision_emergency_distance) / Time.fixedDeltaTime;
                 }
                 
-                //TODO: drop item if distance too great or it is behind wall
             }
         }
 
-        private Vector3 m_debugPoint;
 
         private void OnDrawGizmos()
         {
             if(!m_isHeld) return;
             
             Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(m_debugPoint, m_antiOscillationThreshold); //Object target
+            Gizmos.DrawSphere(m_targetPosition, m_antiOscillationThreshold); //Object target
             
-            Gizmos.color = Color.red;
+            /*Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(m_activeInteractor.position, m_holdDistance); //Min distance on interactor
             Gizmos.DrawWireSphere(m_activeInteractor.position + Vector3.down * m_capsuleHeight, m_holdDistance); //Interactor capsule lower part
             Gizmos.DrawLine(m_activeInteractor.position + new Vector3(m_holdDistance, 0, 0), m_activeInteractor.position + new Vector3(m_holdDistance, -m_capsuleHeight, 0));//interactor capsule side lines
@@ -179,7 +200,7 @@ namespace Interaction
             
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(m_activeInteractor.position, m_linearMovementThreshold); //Linear movement threshold
-
+            */
             
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(transform.position, transform.position + m_linearTargetDirection); //Linear direction
@@ -188,16 +209,7 @@ namespace Interaction
 
             
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, transform.position + (
-                Vector3.Slerp(
-                    Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
-                        MathF.Min(1, //Spherical v linear movement T
-                            MathF.Max(m_forwardAngleCorrespondence / (1 - m_forwardLinearArc), //Linear movement cone 
-                                MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
-                                )))),
-                    -m_interactorDirection, //Hold range correction
-                    MathF.Max(0, MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)))//Hold range correction T
-            ).normalized);  //Active direction
+            Gizmos.DrawLine(transform.position, transform.position + m_rb.linearVelocity.normalized);//Active direction
             
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, m_boundingRadius);

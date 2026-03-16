@@ -134,7 +134,7 @@ namespace Interaction
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
                 float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
                 
-                if(obj_linear_distance < 0 || obj_linear_distance > m_range) continue; //Out of range
+                if(obj_linear_distance < 0 || obj_relative_position.magnitude > m_range) continue; //Out of range
 
 
                 float obj_radial_distance = (obj_relative_position - aimDirection * obj_linear_distance).magnitude;
