@@ -1,14 +1,13 @@
 #font=0
 It's all darkness. # Speaker=You
 Then, I'm released into the unknown.
-...
 What's going on?
 -> choice
 === choice ===
- + [Identity.]
+ * [Identity.]
  I look metallic and constructed. My face feels itchy. # Speaker=You
  -> choice
- + [Purpose.]
+ * [Purpose.]
  I was born, or, eh. Built for a reason, probably. Not really sure what for. # Speaker=You
  -> choice
  * [Move on.]

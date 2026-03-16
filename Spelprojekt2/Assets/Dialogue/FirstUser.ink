@@ -9,12 +9,12 @@ Get to the <color="purple">Bearing</color>. You will get further instructions th
 Wait! Can't you... Nevermind. #speaker=Alea #camera=0 # anim=disappear:bool=true;
 -> choice
 === choice ===
- + [The <color="purple">Bearing</color>.]
+ * [The <color="purple">Bearing</color>.]
  The island looks as if it's upside down, in comparison to the other ones.
  -> choice
- + [The USER.]
+ * [The USER.]
  A strange thing or person, a guiding light maybe?
  -> choice
  * [Move on.]
- There's a door ahead of me, must be the way forward.
+ There's a door ahead of me, it must be the way forward.
     -> END
