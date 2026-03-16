@@ -47,6 +47,7 @@ public class MovementController : MonoBehaviour
     {
         m_rb = GetComponent<Rigidbody>();
         m_playerCamera = GetComponentInChildren<PlayerCamera>();
+
         m_footstepInstance = RuntimeManager.CreateInstance(m_footstepSound.evt);
 
         m_animationParameters = new();
@@ -79,6 +80,12 @@ public class MovementController : MonoBehaviour
     private void Start()
     {
         m_cameraTransform = Camera.main.transform;
+    }
+
+    void OnEnable()
+    {
+        Awake();
+        Start();
     }
 
     private void OnDestroy()
@@ -135,7 +142,8 @@ public class MovementController : MonoBehaviour
         {
             SetAnimTrigger("jumped");
             SetAnimBool("isGrounded", false);
-            m_rb.linearVelocity += new Vector3(0, m_jumpForce, 0);
+            var vel = m_rb.linearVelocity;
+            m_rb.linearVelocity = new Vector3(vel.x, m_jumpForce, vel.z);
             m_isJumping = true;
             SfxDirector.PlayCue2(m_playerJumpSound, this.transform.position);
             m_jumpCooldown = 0.5f;
