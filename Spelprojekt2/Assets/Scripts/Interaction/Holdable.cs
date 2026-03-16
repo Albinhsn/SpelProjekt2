@@ -19,7 +19,7 @@ namespace Interaction
         [SerializeField] private float m_maxVelocity = 10;
         [SerializeField] private float m_acceleration = 30;
         [SerializeField] private float m_deceleration = 20;
-        [SerializeField] private float m_snapThreshold = 0.05f;
+        private float m_antiOscillationThreshold = 0.1f;
         [SerializeField] private float m_capsuleHeight = 1.5f;
         [SerializeField] private float m_holdRangeCorrectionStrength = 3;
         private float m_forwardLinearArc = 0.1f;
@@ -27,7 +27,8 @@ namespace Interaction
         
         private float m_currentVelocity;
 
-        private Vector3 m_upwardAimDirection => new Vector3(m_activeInteractor.aimDirection.x, MathF.Max(0, m_activeInteractor.aimDirection.y), m_activeInteractor.aimDirection.z).normalized;
+        private Vector3 m_horizontalAimDirection => new Vector3(m_activeInteractor.aimDirection.x, 0, m_activeInteractor.aimDirection.z).normalized;
+        private Vector3 m_upwardAimDirection => m_activeInteractor.aimDirection.y > 0 ? m_activeInteractor.aimDirection : m_horizontalAimDirection;
         private Vector3 m_targetPosition => m_activeInteractor.position + m_upwardAimDirection * m_holdDistance;
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
@@ -40,7 +41,7 @@ namespace Interaction
         private float m_outerDistance => m_distanceToInteractor - m_holdDistance;
         private float m_decThreshold => MathF.Pow(m_rb.linearVelocity.magnitude, 2) / (2 * m_deceleration);
         private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - Vector3.Dot(m_interactorDirection, m_linearTargetDirection) * m_interactorDirection).normalized;
-        private float m_forwardAngleCorrespondence => Vector3.Dot(m_activeInteractor.aimDirection, (transform.position - m_activeInteractor.position).normalized);
+        private float m_forwardAngleCorrespondence => Vector3.Dot(m_upwardAimDirection, (transform.position - m_activeInteractor.position).normalized);
 
         private Vector3 m_holdRangeCorrection => new Vector3(-m_interactorDirection.x, MathF.Max(-m_interactorDirection.y, 0), -m_interactorDirection.z);
 
@@ -119,23 +120,16 @@ namespace Interaction
             {
                 //Update velocity
                 m_currentVelocity = m_targetDistance > m_decThreshold ? MathF.Min(m_maxVelocity, m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) : MathF.Max(0, m_currentVelocity - m_deceleration * Time.fixedDeltaTime);
-
-                if (m_targetDistance < m_snapThreshold + (m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) * Time.fixedDeltaTime)//Snap, ignore deceleration
-                {
-                    m_currentVelocity = m_targetDistance / Time.fixedDeltaTime;
-                    m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
-                    return;
-                }
                 
                 if (m_forwardAngleCorrespondence > 1 - m_forwardLinearArc && m_targetDistance < m_distanceToInteractor) //linear movement in forward cone
                 {
                     m_rb.linearVelocity = m_linearTargetDirection * m_currentVelocity;
+                    if (m_targetDistance < m_antiOscillationThreshold) m_rb.linearVelocity *= m_targetDistance / m_antiOscillationThreshold;
                 }
                 else
                 {
                     
                     Vector3 selected_direction = (
-                        
                             Vector3.Slerp(m_sphericalTargetDirection, m_linearTargetDirection, //Desired direction
                                   MathF.Min(1, //Spherical v linear movement T, clamp to max 1
                                   MathF.Max((m_forwardAngleCorrespondence - (1 - m_forwardLinearArc)) / m_forwardLinearArc, //Linear movement cone 
@@ -144,17 +138,16 @@ namespace Interaction
                     ).normalized;
                     
                     m_rb.linearVelocity = m_playerRb.linearVelocity + selected_direction * m_currentVelocity;//Velocity scale
-                    
-                    //Emergency player collision avoidance (flight prevention)
-                    float inner_collision_emergency_distance = (m_activeInteractor.mainCollider.ClosestPoint(transform.position) - transform.position).magnitude - m_boundingRadius + 0.1f;
-                    if (inner_collision_emergency_distance < 0) //Object will collide. Emergency
-                    {
-                        Vector3 normalized_position = (transform.position - m_activeInteractor.transform.position);
-                        m_rb.linearVelocity += (new Vector3(normalized_position.x, 0, normalized_position.z) * -inner_collision_emergency_distance) / Time.fixedDeltaTime;
-                    }
                 }
                 
-                //TODO: fix oscillation
+                //Emergency player collision avoidance (flight prevention)
+                float inner_collision_emergency_distance = (m_activeInteractor.mainCollider.ClosestPoint(transform.position) - transform.position).magnitude - m_boundingRadius + 0.1f;
+                if (inner_collision_emergency_distance < 0) //Object will collide. Emergency
+                {
+                    Vector3 normalized_position = (transform.position - m_activeInteractor.transform.position);
+                    m_rb.linearVelocity += (new Vector3(normalized_position.x, 0, normalized_position.z) * -inner_collision_emergency_distance) / Time.fixedDeltaTime;
+                }
+                
                 //TODO: drop item if distance too great or it is behind wall
             }
         }
@@ -166,7 +159,7 @@ namespace Interaction
             if(!m_isHeld) return;
             
             Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(m_debugPoint, m_snapThreshold); //Object target
+            Gizmos.DrawSphere(m_debugPoint, m_antiOscillationThreshold); //Object target
             
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(m_activeInteractor.position, m_holdDistance); //Min distance on interactor
