@@ -23,7 +23,7 @@ namespace Interaction
         [SerializeField] private float m_capsuleHeight = 1.5f;
         [SerializeField] private float m_holdRangeCorrectionStrength = 3;
         private float m_forwardLinearArc = 0.1f;
-        private float m_maxBoundsSize;
+        private float m_boundingRadius;
         
         private float m_currentVelocity;
 
@@ -32,11 +32,11 @@ namespace Interaction
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;
-        private Vector3 m_closestLocalPoint => transform.position - m_activeInteractor.position; //m_rb.ClosestPointOnBounds(m_activeInteractor.position) - m_activeInteractor.position;
+        private Vector3 m_localPosition => transform.position - m_activeInteractor.position; //m_rb.ClosestPointOnBounds(m_activeInteractor.position) - m_activeInteractor.position;
 
-        private float m_distanceToInteractor => -m_capsuleHeight < m_closestLocalPoint.y && m_closestLocalPoint.y < 0
+        private float m_distanceToInteractor => m_localPosition.magnitude - m_boundingRadius; /*-m_capsuleHeight < m_closestLocalPoint.y && m_closestLocalPoint.y < 0
             ? new Vector2(m_closestLocalPoint.x, m_closestLocalPoint.z).magnitude
-            : MathF.Min(m_closestLocalPoint.magnitude, (m_closestLocalPoint + new Vector3(0, -m_capsuleHeight, 0)).magnitude); 
+            : MathF.Min(m_closestLocalPoint.magnitude, (m_closestLocalPoint + new Vector3(0, -m_capsuleHeight, 0)).magnitude - m_boundingRadius); */
         private float m_outerDistance => m_distanceToInteractor - m_holdDistance;
         private float m_decThreshold => MathF.Pow(m_rb.linearVelocity.magnitude, 2) / (2 * m_deceleration);
         private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - Vector3.Dot(m_interactorDirection, m_linearTargetDirection) * m_interactorDirection).normalized;
@@ -52,7 +52,7 @@ namespace Interaction
         private void Awake()
         {
             m_rb = GetComponent<Rigidbody>();
-            m_maxBoundsSize = GetComponent<Collider>().bounds.extents.magnitude;
+            m_boundingRadius = GetComponent<Collider>().bounds.extents.magnitude;
         }
 
         protected override void VirtOnDisable()
@@ -119,7 +119,7 @@ namespace Interaction
             {
                 //Update velocity
                 m_currentVelocity = m_targetDistance > m_decThreshold ? MathF.Min(m_maxVelocity, m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) : MathF.Max(0, m_currentVelocity - m_deceleration * Time.fixedDeltaTime);
-                
+
                 if (m_targetDistance < m_snapThreshold + (m_rb.linearVelocity.magnitude + m_acceleration * Time.fixedDeltaTime) * Time.fixedDeltaTime)//Snap, ignore deceleration
                 {
                     m_currentVelocity = m_targetDistance / Time.fixedDeltaTime;
@@ -142,39 +142,19 @@ namespace Interaction
                                   MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
                                   ))))
                     ).normalized;
-
-                    if (Physics.Raycast(transform.position, selected_direction, out RaycastHit hit_info, m_maxBoundsSize + m_currentVelocity * Time.fixedDeltaTime, 1, QueryTriggerInteraction.Ignore))
-                    {
-                        Debug.Log("override");
-                        Physics.Raycast(m_activeInteractor.position, m_upwardAimDirection, out hit_info, m_holdDistance + m_maxBoundsSize, 1, QueryTriggerInteraction.Ignore);
-                        m_debugPoint = hit_info.point;
-                        selected_direction = (hit_info.point - m_upwardAimDirection * m_maxBoundsSize - transform.position).normalized;
-                        if (m_activeInteractor.mainCollider.Raycast(new Ray(transform.position, selected_direction), out hit_info, m_maxBoundsSize + m_currentVelocity * Time.fixedDeltaTime))
-                        {
-                            m_rb.linearVelocity = m_playerRb.linearVelocity;
-                            return;
-                        } 
-                    }
-                    else
-                    {
-                        Debug.Log("no override");
-                        m_debugPoint = Vector3.zero;
-                        selected_direction = Vector3.Slerp(selected_direction,
-                            m_holdRangeCorrection, //Hold range correction
-                            MathF.Max(0,
-                                MathF.Min(1, (0 - m_outerDistance) / m_holdDistance * m_holdRangeCorrectionStrength)));//Hold range correction T
-                    }
-
-                    
-                    
-                    
-                    
                     
                     m_rb.linearVelocity = m_playerRb.linearVelocity + selected_direction * m_currentVelocity;//Velocity scale
+                    
+                    //Emergency player collision avoidance (flight prevention)
+                    float inner_collision_emergency_distance = (m_activeInteractor.mainCollider.ClosestPoint(transform.position) - transform.position).magnitude - m_boundingRadius + 0.1f;
+                    if (inner_collision_emergency_distance < 0) //Object will collide. Emergency
+                    {
+                        Vector3 normalized_position = (transform.position - m_activeInteractor.transform.position);
+                        m_rb.linearVelocity += (new Vector3(normalized_position.x, 0, normalized_position.z) * -inner_collision_emergency_distance) / Time.fixedDeltaTime;
+                    }
                 }
                 
                 //TODO: fix oscillation
-                
                 //TODO: drop item if distance too great or it is behind wall
             }
         }
@@ -227,7 +207,7 @@ namespace Interaction
             ).normalized);  //Active direction
             
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(transform.position, m_maxBoundsSize);
+            Gizmos.DrawWireSphere(transform.position, m_boundingRadius);
         }
 
         private void OnDrawGizmosSelected()
