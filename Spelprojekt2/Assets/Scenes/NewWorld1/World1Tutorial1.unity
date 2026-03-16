@@ -3867,7 +3867,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2253925736644725056, guid: ce62df89fdb52aec4be30852928647f8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1436541447}
   m_SourcePrefab: {fileID: 100100000, guid: ce62df89fdb52aec4be30852928647f8, type: 3}
 --- !u!1 &1436541435 stripped
 GameObject:
@@ -3879,6 +3882,81 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1401929043023844294, guid: ce62df89fdb52aec4be30852928647f8, type: 3}
   m_PrefabInstance: {fileID: 1436541434}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1436541447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1436541435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea4d78419bc4c0a86773ce25fe6db3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
+  m_active: 1
+  m_requireUninteract: 0
+  m_canControlWhileInteracting: 1
+  m_cancelable: 0
+  m_onInteraction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 552296940}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1058154573}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1436541435}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
+  m_toggleHighlighted:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1001 &1479434048
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4329,6 +4407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c458f0b4aad3e744b761c963b6bfdee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_rb: {fileID: 0}
   m_sound: {fileID: 11400000, guid: 05546555bc352c1c1a21c88e7dfd7c1e, type: 2}
   m_timeToOpen: 0.5
   m_timeToClose: 2
