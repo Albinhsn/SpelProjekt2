@@ -4035,7 +4035,7 @@ Transform:
   m_GameObject: {fileID: 2030684586}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.93, y: 1.0699999, z: -6.1000004}
+  m_LocalPosition: {x: 19.39, y: 1.0699999, z: -6.1000004}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4581,6 +4581,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1818879261}
     m_Modifications:
     - target: {fileID: 2026675022765024960, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
+      propertyPath: m_rb
+      value: 
+      objectReference: {fileID: 6224979476636488575}
+    - target: {fileID: 2026675022765024960, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
       propertyPath: direction
       value: 1
       objectReference: {fileID: 0}
@@ -4590,7 +4594,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8546580550810992665, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8546580550810992665, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4637,14 +4641,17 @@ PrefabInstance:
     - {fileID: 2805690770478438720, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9156516168922310326, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6224979476636488575}
   m_SourcePrefab: {fileID: 100100000, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
 --- !u!114 &6224979476636488572 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2026675022765024960, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
   m_PrefabInstance: {fileID: 6224979476636488571}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 6224979476636488574}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c458f0b4aad3e744b761c963b6bfdee, type: 3}
@@ -4655,6 +4662,38 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8546580550810992665, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
   m_PrefabInstance: {fileID: 6224979476636488571}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6224979476636488574 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9156516168922310326, guid: c667ec5694a6d6b408787c0123ced1ea, type: 3}
+  m_PrefabInstance: {fileID: 6224979476636488571}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &6224979476636488575
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6224979476636488574}
+  serializedVersion: 4
+  m_Mass: 10000
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &8547164234676687122
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4663,6 +4702,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 566079364037982841, guid: 69c37fe80a7483f4baf4d4aaaefeaa29, type: 3}
+      propertyPath: m_filterColorData
+      value: 
+      objectReference: {fileID: 11400000, guid: b2050325f0994ae4c9b1efd955313b89, type: 2}
+    - target: {fileID: 566079364037982841, guid: 69c37fe80a7483f4baf4d4aaaefeaa29, type: 3}
+      propertyPath: m_filterMaterialData
+      value: 
+      objectReference: {fileID: 11400000, guid: 417f678dc355c3746b483235ece9fadb, type: 2}
     - target: {fileID: 566079364037982841, guid: 69c37fe80a7483f4baf4d4aaaefeaa29, type: 3}
       propertyPath: m_filterChanged.m_PersistentCalls.m_Calls.Array.size
       value: 1
