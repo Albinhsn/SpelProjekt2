@@ -16,8 +16,8 @@ namespace Interaction
         
         [SerializeField] private float m_holdDistance = 2.25f;
         [SerializeField] private float m_linearMovementThreshold = 4;
-        [SerializeField] private float m_maxVelocity = 10;
-        [SerializeField] private float m_acceleration = 30;
+        private float m_maxVelocity = 15;
+        private float m_acceleration = 10;
         [SerializeField] private float m_deceleration = 20;
         [SerializeField] private float m_capsuleHeight = 1.5f;
         [SerializeField] private float m_holdRangeCorrectionStrength = 3;
@@ -41,11 +41,26 @@ namespace Interaction
                 {//Real target position would be behind wall, override to raycast hit point
                     if ((hit.point - m_activeInteractor.mainCollider.ClosestPoint(hit.point)).magnitude > m_boundingRadius + 0.1f)
                     {//If object fits between player and wall
-                        return m_activeInteractor.position + m_upwardAimDirection * (hit.distance - m_boundingRadius - 0.05f);
+                        return hit.point + hit.normal * (m_boundingRadius + 0.05f);
                     }
                 }
                 return m_activeInteractor.position + m_upwardAimDirection * m_holdDistance;
             }
+        }
+
+        private bool GetNonCollidingTargetPosition(Vector3 desired_direction, out Vector3 target_position)
+        {
+            if (Physics.Raycast(transform.position, desired_direction, out RaycastHit hit,
+                    m_boundingRadius + m_currentVelocity * Time.fixedDeltaTime, 1, QueryTriggerInteraction.Ignore))
+            {//Real target position would be behind wall, override to raycast hit point
+                if ((hit.point - m_activeInteractor.mainCollider.ClosestPoint(hit.point)).magnitude > m_boundingRadius + 0.1f)
+                {//If object fits between player and wall
+                    target_position = hit.point + hit.normal * (m_boundingRadius + 0.05f);
+                    return true;
+                }
+            }
+            target_position = m_targetPosition;
+            return false;
         }
 
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
@@ -61,6 +76,16 @@ namespace Interaction
         private Vector3 m_sphericalTargetDirection => (m_linearTargetDirection - Vector3.Dot(m_interactorDirection, m_linearTargetDirection) * m_interactorDirection).normalized;
         private float m_forwardAngleCorrespondence => Vector3.Dot(m_upwardAimDirection, (transform.position - m_activeInteractor.position).normalized);
 
+        private Vector3 GetLinearDirectionToArbitraryTarget(Vector3 target)
+        {
+            return (target - transform.position).normalized;
+        }
+        private Vector3 GetSphericalDirectionToArbitraryTarget(Vector3 target)
+        {
+            Vector3 linear_direction = GetLinearDirectionToArbitraryTarget(target);
+            return (linear_direction - Vector3.Dot(m_interactorDirection, linear_direction) * m_interactorDirection).normalized;
+        }
+        
         private Vector3 m_holdRangeCorrection => new Vector3(-m_interactorDirection.x, MathF.Max(-m_interactorDirection.y, 0), -m_interactorDirection.z);
 
 
@@ -108,6 +133,8 @@ namespace Interaction
 
             m_savedGravity = m_rb.useGravity;
             m_rb.useGravity = false;
+            
+            m_previousDirection = Vector3.zero;
         }
 
         public override bool TryCancelInteraction()
@@ -137,6 +164,7 @@ namespace Interaction
             }
         }
 
+        private Vector3 m_previousDirection;
         private float m_remainingHoldCancelTime;
         private void FixedUpdate()
         {
@@ -149,7 +177,7 @@ namespace Interaction
                     return;
                 }
 
-                Physics.Raycast(m_activeInteractor.position, m_localPosition, out RaycastHit hit_info, m_localPosition.magnitude, m_activeInteractor.blockLineOfSight);
+                Physics.Raycast(m_activeInteractor.position, m_localPosition, out RaycastHit hit_info, m_localPosition.magnitude, m_activeInteractor.blockLineOfSight, QueryTriggerInteraction.Ignore);
                 if (hit_info.transform != transform)
                 {
                     m_remainingHoldCancelTime -= Time.fixedDeltaTime;
@@ -172,7 +200,30 @@ namespace Interaction
                                 MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
                                 ))))
                 ).normalized;
-                    
+
+
+                if (Physics.Raycast(transform.position, selected_direction, out RaycastHit hit,
+                        m_currentVelocity * Time.fixedDeltaTime + m_boundingRadius, 1, QueryTriggerInteraction.Ignore))
+                {//Wall avoidance
+                    selected_direction = (selected_direction - (-hit.normal * Vector3.Dot(selected_direction, -hit.normal))).normalized;
+                }
+                m_debugPoint = m_targetPosition;
+                /*if (GetNonCollidingTargetPosition(selected_direction, out Vector3 adjusted_target_position) || GetNonCollidingTargetPosition(m_previousDirection, out adjusted_target_position))
+                {
+                    Vector3 linear_direction = GetLinearDirectionToArbitraryTarget(adjusted_target_position);
+                    Vector3 spherical_direction = GetSphericalDirectionToArbitraryTarget(adjusted_target_position);
+                    selected_direction = (
+                        Vector3.Slerp(spherical_direction, linear_direction, //Desired direction
+                            MathF.Min(1, //Spherical v linear movement T, clamp to max 1
+                                MathF.Max(MathF.Min(1, Vector3.Dot(m_localPosition.normalized, (adjusted_target_position - m_activeInteractor.position).normalized)), //Linearize inside target cone
+                                    MathF.Max(0, m_outerDistance / m_linearMovementThreshold //Linear movement outside of spherical movement range
+                                    ))))
+                    ).normalized;
+                    m_debugPoint = adjusted_target_position;
+                }*/
+
+                m_previousDirection = selected_direction;
+                
                 m_rb.linearVelocity = selected_direction * m_currentVelocity;//Velocity scale
                 
                 if (m_targetDistance < m_antiOscillationThreshold) m_rb.linearVelocity *= m_targetDistance / m_antiOscillationThreshold;
@@ -185,17 +236,41 @@ namespace Interaction
                     Vector3 normalized_position = (transform.position - m_activeInteractor.transform.position);
                     m_rb.linearVelocity += (new Vector3(normalized_position.x, 0, normalized_position.z) * -inner_collision_emergency_distance) / Time.fixedDeltaTime;
                 }
+                else if (inner_collision_emergency_distance < 0.05f && Vector3.Dot(selected_direction, m_interactorDirection) > -0.1f) //Stop if collision is imminent
+                {
+                    m_rb.linearVelocity = Vector3.zero;
+                }
                 
             }
         }
 
+        private void OnCollisionEnter(Collision other)
+        {
+            if (m_isHeld && (m_activeInteractor.mainCollider.ClosestPoint(transform.position) - transform.position).magnitude - m_boundingRadius > 0.25f)
+            {
+                ContactPoint hit = other.GetContact(0);
+                transform.position += ((transform.position - hit.point).normalized + m_previousDirection) * 0.05f;
+                //transform.position += hit.normal * 0.05f;
+            }
+        }
 
+        private void OnCollisionStay(Collision other)
+        {
+            if (m_isHeld && (m_activeInteractor.mainCollider.ClosestPoint(transform.position) - transform.position).magnitude - m_boundingRadius > 0.25f)
+            {
+                ContactPoint hit = other.GetContact(0);
+                transform.position += ((transform.position - hit.point).normalized + m_previousDirection) * 0.05f;
+                //transform.position += hit.normal * 0.05f;
+            }
+        }
+
+        private Vector3 m_debugPoint;
         private void OnDrawGizmos()
         {
             if(!m_isHeld) return;
             
             Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(m_targetPosition, m_antiOscillationThreshold); //Object target
+            Gizmos.DrawSphere(m_debugPoint, m_antiOscillationThreshold); //Object target
             
             /*Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(m_activeInteractor.position, m_holdDistance); //Min distance on interactor

@@ -141,7 +141,7 @@ namespace Interaction
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
 
                 RaycastHit hit;
-                Physics.Raycast(m_targetOrigin.transform.position, obj_relative_position.normalized, out hit, Mathf.Infinity, m_blockLineOfSight);
+                Physics.Raycast(m_targetOrigin.transform.position, obj_relative_position.normalized, out hit, Mathf.Infinity, m_blockLineOfSight, QueryTriggerInteraction.Ignore);
 
                 if(hit.collider == null || hit.collider.gameObject != obj.gameObject)
                 {
