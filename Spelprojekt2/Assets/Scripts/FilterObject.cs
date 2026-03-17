@@ -134,6 +134,7 @@ public class FilterObject : MonoBehaviour
 
         
         m_interactableComponent?.SetIsInteractable(false);
+        m_interactableComponent?.ForceCancelInteraction();
 
         // NOTE(ah): We do this because there is a chance that if two objects are colliding
         // and we change one to being filtered even though the collider is trigger and the rb
@@ -169,6 +170,5 @@ public class FilterObject : MonoBehaviour
         this.gameObject.layer = m_originalLayer;
         
         m_interactableComponent?.SetIsInteractable(true);
-        m_interactableComponent?.ForceCancelInteraction();
     }
 }
