@@ -6,7 +6,7 @@ public enum DoorDirection
 {
     Up,
     Sideways,
-    Forewards
+    Forwards
 }
 
 [RequireComponent(typeof(Collider))]
@@ -18,6 +18,9 @@ public class Door : MonoBehaviour
         Unfreeze,
         Off
     }
+
+    [SerializeField]
+    private Rigidbody m_rb;
 
     [SerializeField]
     private AudioCueSO m_sound;
@@ -38,24 +41,39 @@ public class Door : MonoBehaviour
     [SerializeField]
     private DoorDirection direction; 
 
-    private Vector3 m_direction => direction == DoorDirection.Up ? new Vector3(0,1,0) : 
-       direction == DoorDirection.Sideways ? new Vector3(1,0,0) : new Vector3(0,0,1);
+    private Vector3 m_direction => direction == DoorDirection.Up ? this.transform.up : 
+       direction == DoorDirection.Sideways ? this.transform.right  : this.transform.forward;
 
-    private float m_timeRemaining;
+
     private bool  m_closing;
     private bool  m_opening;
+
     private Vector3 m_closePosition;
-    private bool m_isNotFiltered;
+    private Vector3 m_openPosition;
 
     private Collider m_collider;
+
+    private float m_openSpeed;
+    private float m_closeSpeed;
 
 
     void Awake()
     {
         m_closePosition = this.transform.position;
+        m_openPosition  = m_closePosition + m_direction * m_openDistance;
         m_collider      = GetComponent<Collider>();
 
-        m_isNotFiltered = IsNotFiltered();
+        if(m_rb == null)
+        {
+            Debug.LogError("Door needs rigidbody!");
+        }
+        else
+        {
+            // ah: lock rotations 
+            m_rb.constraints = RigidbodyConstraints.FreezeRotation;
+            m_rb.useGravity  = false;
+
+        }
 
         // Create sound instance and get id for freeze event
         if(m_sound != null)
@@ -75,6 +93,9 @@ public class Door : MonoBehaviour
             SetSoundEventParam(DoorSoundState.Freeze);
             m_soundInstance.start();
         }
+
+        m_closeSpeed = -m_openDistance / m_timeToClose;
+        m_openSpeed  = m_openDistance / m_timeToOpen;
     }
 
     void OnDestroy()
@@ -112,51 +133,22 @@ public class Door : MonoBehaviour
 
     public void Open()
     {
-        if(!m_opening)
+        bool is_fully_opened = Vector3.Dot(this.transform.position, m_direction * Mathf.Sign(m_openDistance)) >= Vector3.Dot(m_openPosition, m_direction * Mathf.Sign(m_openDistance));
+        if(!m_opening && !is_fully_opened)
         {
             m_opening = true;
             m_closing = false;
-
-            float current_ratio = 0;
-            if(direction == DoorDirection.Up)
-            {
-                current_ratio = 1.0f - (this.transform.position.y - m_closePosition.y) / m_openDistance;
-            }
-            if(direction == DoorDirection.Sideways)
-            {
-                current_ratio = 1.0f - (this.transform.position.x - m_closePosition.x) / m_openDistance;
-            }
-            if(direction == DoorDirection.Forewards)
-            {
-                current_ratio = 1.0f - (this.transform.position.z - m_closePosition.z) / m_openDistance;
-            }
-            m_timeRemaining = m_timeToOpen * current_ratio;
-
             SetSoundEventParam(DoorSoundState.Off);
         }
     }
 
     public void Close()
     {
-        if(m_timeToClose != 0 && !m_closing)
+        bool is_fully_closed = Vector3.Dot(this.transform.position, -m_direction * Mathf.Sign(m_openDistance)) >= Vector3.Dot(m_closePosition, -m_direction * Mathf.Sign(m_openDistance));
+        if(!m_closing && !is_fully_closed)
         {
-            m_closing = true;
             m_opening = false;
-            float current_ratio = 0;
-            if(direction == DoorDirection.Up)
-            {
-                current_ratio = (this.transform.position.y - m_closePosition.y) / m_openDistance;
-            }
-            if(direction == DoorDirection.Sideways)
-            {
-                current_ratio = (this.transform.position.x - m_closePosition.x) / m_openDistance;
-            }
-            if(direction == DoorDirection.Forewards)
-            {
-                current_ratio = (this.transform.position.z - m_closePosition.z) / m_openDistance;
-            }
-            m_timeRemaining = m_timeToClose * current_ratio;
-
+            m_closing = true;
             SetSoundEventParam(DoorSoundState.Off);
         }
     }
@@ -168,60 +160,49 @@ public class Door : MonoBehaviour
     }
 
 
-    void Update()
+    private void SetVelocity(float speed)
     {
-        if(m_timeRemaining != 0)
+        if(m_rb != null && !m_rb.isKinematic) m_rb.linearVelocity = m_direction * speed;
+    }
+
+    void FixedUpdate()
+    {
+        bool is_not_moving = !IsNotFiltered() && (m_opening || m_closing);
+
+        if(!is_not_moving)
         {
-            if(IsNotFiltered())
+            if(m_opening)
             {
-                m_timeRemaining = Mathf.Max(0, m_timeRemaining - Time.deltaTime);
-
-                if(m_opening)
+                is_not_moving = Vector3.Dot(this.transform.position, m_direction * Mathf.Sign(m_openDistance)) >= Vector3.Dot(m_openPosition, m_direction * Mathf.Sign(m_openDistance));
+                if(is_not_moving)
                 {
-                    float ratio       = 1.0f - m_timeRemaining / m_timeToOpen;
-                    float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
-                    this.transform.position = m_closePosition + m_direction * additional_distance;
-
-                }
-                else if(m_closing)
-                {
-                    float ratio = m_timeRemaining / m_timeToClose;
-                    float additional_distance = Mathf.Lerp(0, m_openDistance, ratio);
-                    this.transform.position = m_closePosition + m_direction * additional_distance;
+                    this.transform.position = m_openPosition;
+                    m_opening = false;
                 }
                 else
                 {
-                    // ah: This should never happen
-                    Debug.LogError("Invalid door state");
-                    m_opening = false;
-                    m_closing = false;
-                    m_timeRemaining = 0;
-                    this.transform.position = m_closePosition;
-                }
-
-                if(m_timeRemaining == 0)
-                {
-                    SetSoundEventParam(DoorSoundState.Freeze);
-                    m_closing  = false;
-                    m_opening  = false;
-                }
-                else if(!m_isNotFiltered)
-                {
-                    m_isNotFiltered = true;
-                    SetSoundEventParam(DoorSoundState.Unfreeze);
+                    SetVelocity(m_openSpeed);
                 }
             }
-            else
+            else if(m_closing)
             {
-                m_isNotFiltered = false;
-                SetSoundEventParam(DoorSoundState.Freeze);
+                is_not_moving = Vector3.Dot(this.transform.position, -m_direction * Mathf.Sign(m_openDistance)) >= Vector3.Dot(m_closePosition, -m_direction * Mathf.Sign(m_openDistance));
+                if(is_not_moving)
+                {
+                    this.transform.position = m_closePosition;
+                    m_closing = false;
+                }
+                else
+                {
+                    SetVelocity(m_closeSpeed);
+                }
             }
         }
-        else
+
+        if(is_not_moving)
         {
+            SetVelocity(0);
             SetSoundEventParam(DoorSoundState.Freeze);
-            m_closing  = false;
-            m_opening  = false;
         }
     }
 }

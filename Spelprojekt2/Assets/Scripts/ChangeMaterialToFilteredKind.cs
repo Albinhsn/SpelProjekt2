@@ -4,12 +4,23 @@ using UnityEngine;
 public class ChangeMaterialToFilteredKind : MonoBehaviour
 {
     [SerializeField] private FilterKind m_kind;
+    [SerializeField] private MeshRenderer m_rend;
 
     void Start()
     {
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        if(m_rend == null)
+        {
+            m_rend = GetComponent<MeshRenderer>();
+        }
 
-        renderer.material = new Material(renderer.material);
+        if(m_rend != null)
+        {
+            m_rend.material = new Material(m_rend.material);
+        }
+        else
+        {
+            Debug.LogWarning("You need to either assign a renderer or have it active on start in ChangeMaterialToFilteredKind");
+        }
     }
 
     public void ChangeMaterialColor(FilterColorData filterColorData, FilterMaterialData material_data)

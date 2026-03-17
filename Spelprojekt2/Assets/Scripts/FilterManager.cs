@@ -159,6 +159,52 @@ public class FilterManager : MonoBehaviour
             SfxDirector.PlayCue2(activating ? m_filterOnCue : m_filterOffCue, this.transform.position);
         }
 
+        // ah: set global params
+        {
+            var audio_system = AudioSystem.I;
+            if(audio_system != null)
+            {
+                switch(new_filter)
+                {
+                    case FilterKind.Primary:
+                    {
+                        audio_system.SetGlobalParam("PrimaryFilter", activating ? 1.0f : 0.0f);
+                        break;
+                    }
+                    case FilterKind.Secondary:
+                    {
+                        audio_system.SetGlobalParam("SecondaryFilter", activating ? 1.0f : 0.0f);
+                        break;
+                    }
+                }
+                if(new_filter != m_activeFilter)
+                {
+                    switch(m_activeFilter)
+                    {
+                        case FilterKind.Primary:
+                        {
+                            audio_system.SetGlobalParam("PrimaryFilter", !activating ? 1.0f : 0.0f);
+                            break;
+                        }
+                        case FilterKind.Secondary:
+                        {
+                            audio_system.SetGlobalParam("SecondaryFilter", !activating ? 1.0f : 0.0f);
+                            break;
+                        }
+                    }
+                }
+                bool wasAnyFilterActive = m_activeFilter != FilterKind.None;
+                FilterKind resultingFilter = activating ? new_filter : FilterKind.None;
+                bool isAnyFilterActive = resultingFilter != FilterKind.None;
+
+                if (wasAnyFilterActive != isAnyFilterActive)
+                {
+                    audio_system.SetSnapshot("snapshot:/FilterActive", isAnyFilterActive, 1f);
+                }
+            }
+
+        }
+
 
         // ah: broadcast event
         this.m_filterChanged?.Invoke(new_filter, activating);
