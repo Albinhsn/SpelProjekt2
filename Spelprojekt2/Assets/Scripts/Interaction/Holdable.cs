@@ -139,20 +139,26 @@ namespace Interaction
 
         public override bool TryCancelInteraction()
         {
-            m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
-            m_isHeld = false;
-            m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+            if (m_isHeld)
+            {
+                m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
+                m_rb.useGravity = m_savedGravity;
+                m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+                m_isHeld = false;
+            }
             base.TryCancelInteraction();
-            m_rb.useGravity = m_savedGravity;
             return true;
         }
 
         public override void ForceCancelInteraction()
         {
-            m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
-            m_isHeld = false;
-            m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
-            m_rb.useGravity = m_savedGravity;
+            if (m_isHeld)
+            {
+                m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
+                m_rb.useGravity = m_savedGravity;
+                m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+                m_isHeld = false;
+            }
             base.ForceCancelInteraction();
         }
 
