@@ -18,8 +18,8 @@ VAR info = false
     * [> <i>Inquire: Priest?</i>] Eh... Hi? Are you the Priest? # speaker=Alea
         Hmm? Oh yes, I am. Who are you? And why are you in my study? # speaker=Priest
         ** [> <i>Initiate introduction</i>] I'm Alea. Someone told me to find you; # speaker=Alea
-        they said you could help me find <color="purple">The Baring</color>. # speaker=Alea
-            ->stitch2
+        they said you could help me find <color="purple">The Baring</color>. 
+            ->sacred
 ->DONE
 
 = stitch2
