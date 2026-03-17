@@ -17,6 +17,8 @@ namespace Interaction
         [SerializeField] private float m_coneBaseRad;
         [SerializeField] private float m_coneFactor;
 
+        [SerializeField] private Collider m_mainCollider;
+
         [SerializeField] private UnityEvent m_onStartInteraction1;
         [SerializeField] private UnityEvent m_onFinishInteraction;
 
@@ -25,9 +27,13 @@ namespace Interaction
         [ItemCanBeNull] private Interactable[] m_selected;
         private int m_interacting = -1; //Interaction type. -1=not interacting
 
-        public Vector3 aimDirection => m_targetOrigin.forward;
+        public Vector3 aimDirection => InputManager.GetForwardAimDir();
 
         public Vector3 position => m_targetOrigin.position;
+
+        public LayerMask blockLineOfSight => m_blockLineOfSight;
+
+        public Collider mainCollider => m_mainCollider;
 
         private void Awake()
         {
@@ -128,14 +134,14 @@ namespace Interaction
                 Vector3 obj_relative_position = obj.position - m_targetOrigin.transform.position;
                 float obj_linear_distance = Vector3.Dot(obj_relative_position, aimDirection);
                 
-                if(obj_linear_distance < 0 || obj_linear_distance > m_range) continue; //Out of range
+                if(obj_linear_distance < 0 || obj_relative_position.magnitude > m_range) continue; //Out of range
 
 
                 float obj_radial_distance = (obj_relative_position - aimDirection * obj_linear_distance).magnitude;
                 if (obj_radial_distance > obj_linear_distance * m_coneFactor + m_coneBaseRad) continue; //Out of range
 
                 RaycastHit hit;
-                Physics.Raycast(m_targetOrigin.transform.position, obj_relative_position.normalized, out hit, Mathf.Infinity, m_blockLineOfSight);
+                Physics.Raycast(m_targetOrigin.transform.position, obj_relative_position.normalized, out hit, Mathf.Infinity, m_blockLineOfSight, QueryTriggerInteraction.Ignore);
 
                 if(hit.collider == null || hit.collider.gameObject != obj.gameObject)
                 {
