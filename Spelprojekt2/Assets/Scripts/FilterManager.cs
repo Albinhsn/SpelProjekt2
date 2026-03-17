@@ -193,6 +193,14 @@ public class FilterManager : MonoBehaviour
                         }
                     }
                 }
+                bool wasAnyFilterActive = m_activeFilter != FilterKind.None;
+                FilterKind resultingFilter = activating ? new_filter : FilterKind.None;
+                bool isAnyFilterActive = resultingFilter != FilterKind.None;
+
+                if (wasAnyFilterActive != isAnyFilterActive)
+                {
+                    audio_system.SetSnapshot("snapshot:/FilterActive", isAnyFilterActive, 1f);
+                }
             }
 
         }
