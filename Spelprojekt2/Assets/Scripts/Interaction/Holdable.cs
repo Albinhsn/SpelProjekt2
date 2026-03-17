@@ -32,7 +32,22 @@ namespace Interaction
 
         private Vector3 m_horizontalAimDirection => new Vector3(m_activeInteractor.aimDirection.x, 0, m_activeInteractor.aimDirection.z).normalized;
         private Vector3 m_upwardAimDirection => m_activeInteractor.aimDirection.y > 0 ? m_activeInteractor.aimDirection : m_horizontalAimDirection;
-        private Vector3 m_targetPosition => m_activeInteractor.position + m_upwardAimDirection * m_holdDistance;
+        private Vector3 m_targetPosition
+        {
+            get
+            {
+                if (Physics.Raycast(m_activeInteractor.position, m_upwardAimDirection, out RaycastHit hit,
+                        m_holdDistance + m_boundingRadius, 1, QueryTriggerInteraction.Ignore))
+                {//Real target position would be behind wall, override to raycast hit point
+                    if ((hit.point - m_activeInteractor.mainCollider.ClosestPoint(hit.point)).magnitude > m_boundingRadius + 0.1f)
+                    {//If object fits between player and wall
+                        return m_activeInteractor.position + m_upwardAimDirection * (hit.distance - m_boundingRadius - 0.05f);
+                    }
+                }
+                return m_activeInteractor.position + m_upwardAimDirection * m_holdDistance;
+            }
+        }
+
         private Vector3 m_linearTargetDirection => (m_targetPosition - transform.position).normalized;
         private float m_targetDistance => Vector3.Distance(transform.position, m_targetPosition);
         private Vector3 m_interactorDirection => (m_activeInteractor.position - transform.position).normalized;
