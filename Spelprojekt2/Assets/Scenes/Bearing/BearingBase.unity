@@ -8572,31 +8572,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6281125445952770457, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_Size.x
-      value: 2.3970733
+      value: 1.5439248
       objectReference: {fileID: 0}
     - target: {fileID: 6281125445952770457, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_Size.y
-      value: 1.1694635
+      value: 1.1290041
       objectReference: {fileID: 0}
     - target: {fileID: 6281125445952770457, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_Size.z
-      value: 4.9237604
+      value: 1.5532079
       objectReference: {fileID: 0}
     - target: {fileID: 6281125445952770457, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_Center.x
-      value: 1.0043352
+      value: -1.1702254
       objectReference: {fileID: 0}
     - target: {fileID: 6281125445952770457, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_Center.y
-      value: -0.3539564
+      value: -0.3741861
       objectReference: {fileID: 0}
     - target: {fileID: 6281125445952770457, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_Center.z
-      value: 0.08293104
+      value: 0.016147256
       objectReference: {fileID: 0}
     - target: {fileID: 6281125445952770457, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7215846987663437686, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_LocalScale.x
@@ -8721,10 +8721,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3176023773755229823, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1733975502}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1188959944526972866, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1390469011}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
 --- !u!4 &397074698 stripped
 Transform:
@@ -22132,50 +22129,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1388942773}
   m_Mesh: {fileID: 5030466290829247371, guid: e047eec8a8c5f014d9756430b8ecc63d, type: 3}
---- !u!1 &1390469006 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1188959944526972866, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
-  m_PrefabInstance: {fileID: 397074697}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1390469011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1390469006}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a54f5d1c514fd82ffa0d3bda507454b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onTrigger:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1643795273}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1264113041}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
 --- !u!1 &1393512287
 GameObject:
   m_ObjectHideFlags: 0
@@ -25537,7 +25490,7 @@ Transform:
   m_GameObject: {fileID: 1733975501}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 5.08, y: -5.624, z: 2.717}
+  m_LocalPosition: {x: 5.229, y: -5.624, z: 2.96}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

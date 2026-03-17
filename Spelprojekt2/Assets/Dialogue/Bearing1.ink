@@ -2,6 +2,13 @@
 
 # font=0
 
+/*
+Camera = 0 (default  overlook)
+Camera = 1 (Look directly at screen, at the USER)
+Camera = 2 (USER POV)
+Camera = 3 (Black screen, the construction site collapsing)
+*/
+
 Alea.  # speaker=USER # camera=0
 USER. # speaker=Alea
 You have done a good job getting here. Finally, we can get this over with. # speaker=USER
