@@ -69,6 +69,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private SensitivityData m_sensitivity;
 
+    [SerializeField]
+    private GameObject m_mainMenuParent;
+
 
     private UIState m_state;
 
@@ -95,6 +98,32 @@ public class UIManager : MonoBehaviour
     private bool m_useSelected;
 
     private Texture2D m_whitePixel;
+
+    void Awake()
+    {
+        if(I != null && I != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        m_whitePixel = new Texture2D(1,1, TextureFormat.ARGB32, false);
+        m_whitePixel.SetPixel(0,0, new Color(0.8f, 0.8f, 0.8f, 1.0f));
+        m_whitePixel.Apply();
+
+        LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
+
+        I = this;
+        m_buttonSignals = new();
+        DontDestroyOnLoad(this.gameObject);
+
+        EnterState(m_stateOnInitialization);
+    }
+
+    void OnEnable()
+    {
+        m_buttonSignals = new();
+    }
 
     public void HideCursor()
     {
@@ -134,6 +163,7 @@ public class UIManager : MonoBehaviour
             case UIState.MainMenu:
             {
                 I.ShowCursor();
+                I.m_mainMenuParent.SetActive(true);
                 I.m_selectedButtonEnabled = true;
                 InputManager.DisablePlayerInput();
                 break;
@@ -158,35 +188,50 @@ public class UIManager : MonoBehaviour
         I.m_state   = state;
     }
 
-    void Awake()
-    {
-        if(I != null && I != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-
-        m_whitePixel = new Texture2D(1,1, TextureFormat.ARGB32, false);
-        m_whitePixel.SetPixel(0,0, new Color(0.8f, 0.8f, 0.8f, 1.0f));
-        m_whitePixel.Apply();
-
-        LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
-
-        I = this;
-        m_buttonSignals = new();
-        DontDestroyOnLoad(this.gameObject);
-
-        EnterState(m_stateOnInitialization);
-    }
-
-    void OnEnable()
-    {
-        m_buttonSignals = new();
-    }
-
     void Start()
     {
         m_audioSystem = FindFirstObjectByType<AudioSystem>();
+    }
+
+    public void MainMenu_PlayClicked()
+    {
+        // Query PDM for which level to load
+        LevelData level_to_load = PersistentDataManager.LevelToLoad(m_levelData);
+
+        LevelManager.m_onTransitionEnd += SetupScene;
+        LevelManager.TransitionToSceneAsync(level_to_load);
+        
+        m_mainMenuParent.SetActive(false);
+        EnterState(UIState.None);
+    }
+
+    public void MainMenu_SettingsClicked()
+    {
+        m_mainMenuParent.SetActive(false);
+        EnterState(UIState.Settings);
+    }
+
+    public void MainMenu_DeleteSaveClicked()
+    {
+        PersistentDataManager.DeleteSave();
+        GlobalInkVariableManager.ClearAll();
+        FilterManager.m_filterUnlocked = false;
+    }
+
+    public void MainMenu_CreditsClicked()
+    {
+        m_mainMenuParent.SetActive(false);
+        EnterState(UIState.None);
+        LevelManager.TransitionToSceneAsync(m_creditsLevelData, 0);
+    }
+
+    public void MainMenu_QuitClicked()
+    {
+        PersistentDataManager.DeleteSave();
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #endif
+        Application.Quit();
     }
 
 
@@ -412,6 +457,7 @@ public class UIManager : MonoBehaviour
         switch(m_state)
         {
 
+#if false
             case UIState.MainMenu:
             {
                 // ah: title
@@ -477,16 +523,12 @@ public class UIManager : MonoBehaviour
                 GUILayout.Space((int)GetScreenScaledSize(25));
                 if(MenuBtn("Quit", btn_index++))
                 {
-                    PersistentDataManager.DeleteSave();
-                #if UNITY_EDITOR
-                    UnityEditor.EditorApplication.isPlaying = false;
-                #endif
-                    Application.Quit();
                 }
 
                 AreaEnd();
                 break;
             }
+#endif
             case UIState.Settings:
             {
                 AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 2.5f);
