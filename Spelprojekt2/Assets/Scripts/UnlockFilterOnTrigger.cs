@@ -1,22 +1,30 @@
 using UnityEngine;
+using AudioKit.FMOD;
 
 [RequireComponent(typeof(Collider))]
 public class UnlockFilterOnTrigger : MonoBehaviour
 {
+    [Header("Audio")]
+    [SerializeField] private AudioCueSO m_pickupCue;
 
     public void Unlock()
     {
         FilterManager fm = FindFirstObjectByType<FilterManager>();
         fm.Unlock();
-        Destroy(this.gameObject);
+
+        if (m_pickupCue != null)
+        {
+            SfxDirector.PlayCue2(m_pickupCue, transform.position);
+        }
+
+        Destroy(gameObject);
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Player")
+        if (other.CompareTag("Player"))
         {
             Unlock();
         }
-
     }
 }

@@ -366,11 +366,6 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -489,6 +484,11 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
 --- !u!108 &324439456
 Light:
   m_ObjectHideFlags: 0
@@ -651,6 +651,20 @@ MonoBehaviour:
     m_inkAsset: {fileID: 4900000, guid: 6925717776ea94fe89e7092000955131, type: 3}
   - m_name: Box2
     m_inkAsset: {fileID: 4900000, guid: 581212dd139b1487f98d5e25d97f45b6, type: 3}
+--- !u!114 &354351139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354351131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f0aab27c4382bda7801496c9854370f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_serializePositionAndRotation: 0
+  m_ID: b3cca94249df06469e7890b0792cedcf
 --- !u!1001 &380277721
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -807,6 +821,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -834,6 +850,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -849,6 +868,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1001 &482973788
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1098,6 +1118,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -1125,6 +1147,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -1140,6 +1165,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1 &571291056
 GameObject:
   m_ObjectHideFlags: 0
@@ -1339,6 +1365,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -1366,6 +1394,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -1381,6 +1412,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1001 &712634481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1537,6 +1569,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -1564,6 +1598,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -1579,6 +1616,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1 &731120768
 GameObject:
   m_ObjectHideFlags: 0
@@ -1821,6 +1859,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -1848,6 +1888,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -1863,6 +1906,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1001 &880276283
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2019,6 +2063,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -2046,6 +2092,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -2061,6 +2110,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1001 &914507459
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2173,6 +2223,74 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boxmover
       objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: m_ID.Array.size
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[0]'
+      value: 168
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[1]'
+      value: 96
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[2]'
+      value: 176
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[3]'
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[4]'
+      value: 113
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[5]'
+      value: 185
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[6]'
+      value: 176
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[7]'
+      value: 66
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[8]'
+      value: 152
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[9]'
+      value: 81
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[10]'
+      value: 177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[11]'
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[12]'
+      value: 245
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[13]'
+      value: 113
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[14]'
+      value: 178
+      objectReference: {fileID: 0}
+    - target: {fileID: 8014705432382288869, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_ID.Array.data[15]'
+      value: 255
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2180,6 +2298,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1188959944526972866, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 354351138}
+    - targetCorrespondingSourceObject: {fileID: 1188959944526972866, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 354351139}
   m_SourcePrefab: {fileID: 100100000, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
 --- !u!4 &914507460 stripped
 Transform:
@@ -2497,6 +2618,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -2524,6 +2647,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -2539,6 +2665,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1 &1361816500 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 53736f7b311c8d04bbe560f7b4d62369, type: 3}
@@ -2813,6 +2940,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -2840,6 +2969,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -2855,6 +2987,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1 &1522875116
 GameObject:
   m_ObjectHideFlags: 0
@@ -3383,6 +3516,8 @@ MonoBehaviour:
   m_interactableSet: {fileID: 11400000, guid: 3428616af334ebe4aafc7eef1f5c804d, type: 2}
   m_active: 1
   m_requireUninteract: 1
+  m_canControlWhileInteracting: 0
+  m_cancelable: 0
   m_onInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -3410,6 +3545,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  m_onInteractionCancelled:
+    m_PersistentCalls:
+      m_Calls: []
   m_toggleHighlighted:
     m_PersistentCalls:
       m_Calls:
@@ -3425,6 +3563,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  m_indicatorKind: 0
 --- !u!1 &1874544823
 GameObject:
   m_ObjectHideFlags: 0
@@ -3563,11 +3702,6 @@ MonoBehaviour:
   m_LightUnit: 0
   m_LuxAtDistance: 1
   m_Intensity: 0
-  m_Version: 13
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
   m_InnerSpotPercent: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
@@ -3686,6 +3820,11 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
+  m_Version: 13
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
 --- !u!108 &1906632839
 Light:
   m_ObjectHideFlags: 0
