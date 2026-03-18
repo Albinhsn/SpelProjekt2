@@ -16,11 +16,17 @@ namespace Interaction.Dialogue
                 if (m_assets[a].name == name)
                 {
                     m_activeAssetIndex = a;
+                    Debug.Log($"Setting active ink asset to {a}");
+                    return;
                 }
             }
         }
 
-        public void SetActiveAsset(int index) => m_activeAssetIndex = index;
+        public void SetActiveAsset(int index)
+        {
+            m_activeAssetIndex = index;
+            Debug.Log($"Setting active ink asset to {index}");
+        }
 
         public TextAsset activeInkAsset => m_assets[m_activeAssetIndex].inkAsset;
 

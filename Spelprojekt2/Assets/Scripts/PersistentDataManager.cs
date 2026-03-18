@@ -330,7 +330,7 @@ public sealed class PersistentDataManager
                 
                 // sh: ink asset registry data (am I doing this right?)
                 int size_of_iar_data = 16 + sizeof(int);
-                size += size_of_iar_data += size_of_iar_data * (m_iaregs?.Count ?? 0);
+                size += size_of_iar_data * (m_iaregs?.Count ?? 0);
 
                 return size;
             }
