@@ -12,10 +12,11 @@ VAR isFirstInteractionM = true
 = think
 ~isFirstInteractionM = false
 Ey, you there lad or lassy. Can't tell. # speaker=Unknown
-I've been looking at those platforms ova' there and for the darndest long time I have not figured them out. # speaker=Platforms Guy
+I've been looking at those platforms ova' there # speaker=Disgruntled Citizen
+and for the darndest long time I have not figured them out. 
 They keep going out of sync, if I had a way to maybe stop one or two I coulda scuttled on over.
-But no dice! Aye, I'm too old for this. # speaker=Old Platforms Guy
+But no dice! Aye, I'm too old for this. # speaker=Old Disgruntled Citizen
 -> DONE
 = think2
-Platforms platforms and platforms... # speaker=Old Platforms Guy
+Platforms platforms and platforms... # speaker=Old Disgruntled Citizen
 -> DONE
