@@ -159,6 +159,15 @@ public sealed class LevelManager
             }
         }
 
+        // ah: change filter colors
+        {
+            FilterManager fm = UnityEngine.Object.FindFirstObjectByType<FilterManager>();
+            if(fm != null)
+            {
+                fm.ChangeFilterColor();
+            }
+        }
+
 
         Instance.m_isGlitchingDone = false;
         Instance.m_scenesLoaded = false;
