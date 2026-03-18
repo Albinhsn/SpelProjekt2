@@ -16985,7 +16985,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_kind: 0
-  m_rend: {fileID: 0}
+  m_rend: {fileID: 1870882805}
 --- !u!43 &1143285257
 Mesh:
   m_ObjectHideFlags: 0
@@ -39472,6 +39472,10 @@ PrefabInstance:
       value: SpawnerCube
       objectReference: {fileID: 0}
     - target: {fileID: 6253886137575412616, guid: b8bdebdb183d8c0459f8383ae920322b, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6253886137575412616, guid: b8bdebdb183d8c0459f8383ae920322b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 481a94037db08454f8a4b5e2a3aa9888, type: 2}
@@ -39502,6 +39506,11 @@ PrefabInstance:
 --- !u!4 &1870882804 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 511006768584859587, guid: b8bdebdb183d8c0459f8383ae920322b, type: 3}
+  m_PrefabInstance: {fileID: 1870882803}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1870882805 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6253886137575412616, guid: b8bdebdb183d8c0459f8383ae920322b, type: 3}
   m_PrefabInstance: {fileID: 1870882803}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1881404163
