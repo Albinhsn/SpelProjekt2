@@ -26,14 +26,18 @@ public class ChangeMaterialToFilteredKind : MonoBehaviour
     public void ChangeMaterialColor(FilterColorData filterColorData, FilterMaterialData material_data)
     {
 
+        if(m_rend == null)
+        {
+            Start();
+        }
+
         FilterColor color = filterColorData.m_Colors[(int)m_kind];
         
         var m_deactivatedMaterial = material_data.m_materials[(int)color].m_deactivatedMaterial;
 
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
-        if(renderer != null)
+        if(m_rend != null)
         {
-            renderer.material.color = m_deactivatedMaterial.color;
+            m_rend.material.color = m_deactivatedMaterial.color;
         }
 
     }
