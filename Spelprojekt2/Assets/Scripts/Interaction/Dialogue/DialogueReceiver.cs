@@ -352,7 +352,8 @@ namespace Interaction.Dialogue
                             use_default_color = false;
                             break;
                         case "speaker":
-                            m_prefix = value + ": ";
+                            if (value == "") m_prefix = "";
+                            else m_prefix = value + ": ";
                             break;
                         case "delay":
                             if (value == "default") m_typeDelay = m_dfTypeDelay;
