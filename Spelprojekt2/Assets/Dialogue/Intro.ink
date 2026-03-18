@@ -1,15 +1,15 @@
 #font=0
-It's all darkness. # Speaker=You
+It's all darkness. # speaker=You
 Then, I'm released into the unknown.
 What's going on?
 -> choice
 === choice ===
- * [Identity.]
+ * [> <i>Contemplate: Identity</i>]
  I look metallic and constructed. My face feels itchy. # Speaker=You
  -> choice
- * [Purpose.]
+ * [> <i>Contemplate: Purpose</i>]
  I was born, or, eh. Built for a reason, probably. Not really sure what for. # Speaker=You
  -> choice
- * [Move on.]
+ * [> <i>Proceed</i>]
 Nothing else to do but to move forward. # Speaker=You
     -> END
