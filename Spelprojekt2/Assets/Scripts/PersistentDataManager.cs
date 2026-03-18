@@ -57,7 +57,7 @@ public sealed class PersistentDataManager
 
         public int Serialize(ref byte[] buffer, int offset)
         {
-            offset = SerializeArray<byte>(ref buffer, id, offset, 4);
+            offset = SerializeArray<byte>(ref buffer, id, offset, 1);
             offset = SerializeScalar<int>(ref buffer, m_activeAssetIndex, offset, 4);
             return offset;
         }
@@ -65,7 +65,7 @@ public sealed class PersistentDataManager
         public static InkAssetRegistryData Deserialize(byte[] buffer, ref int offset)
         {
             byte[] id = new byte[16];
-            offset = DeserializeArray<byte>(ref id, buffer, offset, 4);
+            offset = DeserializeArray<byte>(ref id, buffer, offset, 1);
 
             int active_asset_index = 0;
             offset = DeserializeScalar<int>(ref active_asset_index, buffer, offset, 4);
@@ -314,7 +314,7 @@ public sealed class PersistentDataManager
                 int size_of_object_data = 16 + sizeof(float) * 3 + sizeof(float) * 4;
 
                 // ah: the fucking size of the arrays (spent some time debuggin this :) )
-                size += sizeof(int) * 4;
+                size += sizeof(int) * 5;
 
                 // ah: sgo and spawners
                 size += size_of_object_data * (m_sgos != null ? m_sgos.Count : 0);
@@ -858,6 +858,7 @@ public sealed class PersistentDataManager
                         }
                     }
 
+                    // sh: look for iaReg
                     InkAssetRegistry iareg = obj.GetComponent<InkAssetRegistry>();
                     if (iareg != null)
                     {
