@@ -44,6 +44,36 @@ public sealed class PersistentDataManager
     private static GameState m_gameState;
     private static string m_dataPath => Path.Combine(Application.persistentDataPath, "game.bin");
 
+    private struct InkAssetRegistryData
+    {
+        public byte[] id;
+        public int m_activeAssetIndex;
+
+        public InkAssetRegistryData(byte[] id, int active_asset_index)
+        {
+            this.id = id;
+            this.m_activeAssetIndex = active_asset_index;
+        }
+
+        public int Serialize(ref byte[] buffer, int offset)
+        {
+            offset = SerializeArray<byte>(ref buffer, id, offset, 4);
+            offset = SerializeScalar<int>(ref buffer, m_activeAssetIndex, offset, 4);
+            return offset;
+        }
+        
+        public static InkAssetRegistryData Deserialize(byte[] buffer, ref int offset)
+        {
+            byte[] id = new byte[16];
+            offset = DeserializeArray<byte>(ref id, buffer, offset, 4);
+
+            int active_asset_index = 0;
+            offset = DeserializeScalar<int>(ref active_asset_index, buffer, offset, 4);
+
+            return new InkAssetRegistryData(id, active_asset_index);
+        }
+
+    }
     private struct ForceInteractorTriggerData
     {
         public byte[] id;
@@ -266,6 +296,7 @@ public sealed class PersistentDataManager
         public List<ObjectData> m_spawners;
         public List<FlippedData> m_flipped;
         public List<ForceInteractorTriggerData> m_triggers;
+        public List<InkAssetRegistryData> m_iaregs;
 
         private const int version = 0;
 
@@ -296,6 +327,10 @@ public sealed class PersistentDataManager
                 // ah: force interaction trigger data
                 int size_of_trigger_data = 16 + sizeof(int);
                 size += size_of_trigger_data * (m_triggers != null ? m_triggers.Count : 0);
+                
+                // sh: ink asset registry data (am I doing this right?)
+                int size_of_iar_data = 16 + sizeof(int);
+                size += size_of_iar_data += size_of_iar_data * (m_iaregs?.Count ?? 0);
 
                 return size;
             }
@@ -346,6 +381,14 @@ public sealed class PersistentDataManager
             for(int i = 0; i < count; i++)
             {
                 offset = m_triggers[i].Serialize(ref buffer, offset);
+            }
+            
+            // sh: inkAssetRegistries
+            count = m_iaregs?.Count ?? 0;
+            offset = SerializeScalar<int>(ref buffer, count, offset);
+            for (int i = 0; i < count; i++)
+            {
+                offset = m_iaregs[i].Serialize(ref buffer, offset);
             }
 
             return offset;
@@ -511,6 +554,14 @@ public sealed class PersistentDataManager
                         for(int i = 0; i < count; i++)
                         {
                             lvl.m_triggers.Add(ForceInteractorTriggerData.Deserialize(buffer, ref offset));
+                        }
+                        
+                        // sh: InkAssetRegistries
+                        offset = DeserializeScalar<int>(ref count, buffer, offset);
+                        lvl.m_iaregs = new List<InkAssetRegistryData>(count);
+                        for (int i = 0; i < count; i++)
+                        {
+                            lvl.m_iaregs.Add(InkAssetRegistryData.Deserialize(buffer, ref offset));
                         }
 
                         // ah: Add the lvl
@@ -717,6 +768,7 @@ public sealed class PersistentDataManager
             Dictionary<Guid, ObjectData> spawners = new();
             Dictionary<Guid, FlippedData> flipped = new();
             Dictionary<Guid, ForceInteractorTriggerData> triggers = new();
+            Dictionary<Guid, InkAssetRegistryData> iaregs = new();
 
             // ah: map lvl chunks based on id
             for(int i = 0; i < lvls.m_levels.Count; i++)
@@ -744,6 +796,12 @@ public sealed class PersistentDataManager
                 {
                     ForceInteractorTriggerData obj = lvl.m_triggers[j];
                     triggers[new Guid(obj.id)] = obj;
+                }
+                
+                for(int j = 0; lvl.m_iaregs != null && j < lvl.m_iaregs.Count; j++)
+                {
+                    InkAssetRegistryData obj = lvl.m_iaregs[j];
+                    iaregs[new Guid(obj.id)] = obj;
                 }
             }
 
@@ -799,6 +857,16 @@ public sealed class PersistentDataManager
                             trigger.SetActive(!data.m_hasBeenActivated);
                         }
                     }
+
+                    InkAssetRegistry iareg = obj.GetComponent<InkAssetRegistry>();
+                    if (iareg != null)
+                    {
+                        if (iaregs.ContainsKey(guid))
+                        {
+                            InkAssetRegistryData data = iaregs[guid];
+                            iareg.SetActiveAsset(data.m_activeAssetIndex);
+                        }
+                    }
                 }
             }
         }
@@ -840,6 +908,7 @@ public sealed class PersistentDataManager
                 chunk.m_triggers = new();
                 chunk.m_spawners = new();
                 chunk.m_flipped  = new();
+                chunk.m_iaregs = new List<InkAssetRegistryData>();
                 scene_chunks[scene_guid] = chunk;
             }
 
@@ -879,6 +948,13 @@ public sealed class PersistentDataManager
             if(trigger != null)
             {
                 scene_chunks[scene_guid].m_triggers.Add(new(obj.m_id, trigger.m_hasBeenActivated ? 1 : 0));
+            }
+            
+            // sh: InkAssetRegistry
+            InkAssetRegistry iareg = obj.GetComponent<InkAssetRegistry>();
+            if (iareg != null)
+            {
+                scene_chunks[scene_guid].m_iaregs.Add(new InkAssetRegistryData(obj.m_id, iareg.activeAssetIndex));
             }
         }
 

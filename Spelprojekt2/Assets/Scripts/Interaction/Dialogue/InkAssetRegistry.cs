@@ -7,6 +7,8 @@ namespace Interaction.Dialogue
         [SerializeField] private Entry[] m_assets;
         private int m_activeAssetIndex = 0;
 
+        public int activeAssetIndex => m_activeAssetIndex;
+
         public void SetActiveAsset(string name)
         {
             for (int a = 0; a < m_assets.Length; a++)
@@ -17,6 +19,8 @@ namespace Interaction.Dialogue
                 }
             }
         }
+
+        public void SetActiveAsset(int index) => m_activeAssetIndex = index;
 
         public TextAsset activeInkAsset => m_assets[m_activeAssetIndex].inkAsset;
 
