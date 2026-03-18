@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Interaction.Dialogue
 {
+    [RequireComponent(typeof(SerializableObject))]
     public class InkAssetRegistry : MonoBehaviour
     {
         [SerializeField] private Entry[] m_assets;
