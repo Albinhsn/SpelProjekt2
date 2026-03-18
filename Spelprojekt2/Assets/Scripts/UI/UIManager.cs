@@ -1,4 +1,6 @@
 using UnityEngine;
+
+using UnityEngine.UI;
 using Interaction.Dialogue;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
@@ -19,12 +21,6 @@ public class UIManager : MonoBehaviour
     private static UIManager I;
 
     [SerializeField]
-    private string m_gameName;
-
-    [SerializeField]
-    private Font font;
-
-    [SerializeField]
     private UIState m_stateOnInitialization;
 
     [SerializeField]
@@ -40,31 +36,13 @@ public class UIManager : MonoBehaviour
     private Player m_playerPrefab;
 
     [SerializeField]
-    private float m_areaWidth;
-
-    [SerializeField]
-    private float m_areaHeight;
-
-    [SerializeField]
-    private float m_btnWidth;
-
-    [SerializeField]
-    private float m_btnHeight;
-
-    [SerializeField]
-    private float m_sliderWidth;
-
-    [SerializeField]
-    private int m_titleFontHeight;
-
-    [SerializeField]
-    private Texture2D m_btnTexture;
-
-    [SerializeField]
-    private Texture2D m_pauseMenuBG;
-
-    [SerializeField]
     private AudioCueSO m_onButtonHoverCue;
+
+    [SerializeField]
+    private Color m_buttonColor;
+
+    [SerializeField]
+    private Color m_selectedButtonColor;
 
     [SerializeField]
     private SensitivityData m_sensitivity;
@@ -72,32 +50,60 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject m_mainMenuParent;
 
+    [SerializeField]
+    private GameObject m_pauseMenuParent;
+
+    [Header("Settings Page")]
+    [SerializeField]
+    private GameObject m_settingsMenuParent;
+
+    [SerializeField]
+    private Button[] m_primaryFilterButtons;
+
+    [SerializeField]
+    private Button[] m_secondaryFilterButtons;
+
+    [SerializeField]
+    private GameObject m_settingsPageAudio;
+
+    [SerializeField]
+    private GameObject m_settingsPageControls;
+
+    [SerializeField]
+    private GameObject m_settingsPageGameplay;
+
+    [SerializeField]
+    private Button m_settingsPageAudioButton;
+
+    [SerializeField]
+    private Button m_settingsPageControlsButton;
+
+    [SerializeField]
+    private Scrollbar m_settingsPageSensitivitySlider;
+
+    [SerializeField]
+    private Scrollbar m_settingsPage_MasterVolumeSlider;
+
+    [SerializeField]
+    private Scrollbar m_settingsPage_MusicVolumeSlider;
+
+    [SerializeField]
+    private Scrollbar m_settingsPage_SFXVolumeSlider;
+
+    [SerializeField]
+    private Scrollbar m_settingsPage_UIVolumeSlider;
+
+    [SerializeField]
+    private Button m_settingsPageGameplayButton;
 
     private UIState m_state;
 
     // TODO(ah): Do something stack based over this nonsense
     private UIState m_statePriorToSettingsMenu;
     
-    private AudioSystem m_audioSystem;
     private bool m_transitionFromMainMenuToGameIsDone;
     private SceneLoader m_sceneLoader;
     private LevelData m_loadedLevel;
-    private float m_menuScrollTimer = 0f;
-
-
-    // (ah): Signal state
-    struct UI_Signal
-    {
-        public bool m_hot;
-        public bool m_active;
-    }
-
-    private Dictionary<string, UI_Signal> m_buttonSignals;
-    private bool m_selectedButtonEnabled;
-    private int m_selectedIndex = 0;
-    private bool m_useSelected;
-
-    private Texture2D m_whitePixel;
 
     void Awake()
     {
@@ -107,22 +113,93 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        m_whitePixel = new Texture2D(1,1, TextureFormat.ARGB32, false);
-        m_whitePixel.SetPixel(0,0, new Color(0.8f, 0.8f, 0.8f, 1.0f));
-        m_whitePixel.Apply();
-
         LevelManager.SetCurrentLevel(m_MainMenuLevelData.m_levels[0]);
 
         I = this;
-        m_buttonSignals = new();
         DontDestroyOnLoad(this.gameObject);
 
         EnterState(m_stateOnInitialization);
+
+        // TODO(ah): deserialize settings
+        {
+
+        }
+
+        // ah: init filter button listeners
+        {
+            for(int i = 0; i < m_primaryFilterButtons.Length; i++)
+            {
+                var btn = m_primaryFilterButtons[i];
+                FilterColor color = (FilterColor)i;
+                SetButtonColor(btn, m_buttonColor);
+                btn.onClick.AddListener(() => PrimaryFilterButtonClicked(color));
+            }
+
+            for(int i = 0; i < m_secondaryFilterButtons.Length; i++)
+            {
+                var btn = m_secondaryFilterButtons[i];
+                FilterColor color = (FilterColor)i;
+                SetButtonColor(btn, m_buttonColor);
+                btn.onClick.AddListener(() => SecondaryFilterButtonClicked(color));
+            }
+
+        }
     }
 
-    void OnEnable()
+    void SecondaryFilterButtonClicked(FilterColor color)
     {
-        m_buttonSignals = new();
+        FilterManager fm = Object.FindFirstObjectByType<FilterManager>();
+        FilterColor[] colors = fm.m_filterColorData.m_Colors;
+
+        var primary   = colors[0];
+        var secondary = colors[1];
+
+        if(secondary != color)
+        {
+            colors[1]            = color;
+
+            if(primary == color)
+            {
+                colors[0] = (FilterColor)(((int)primary + 1) % (int)FilterColor.COUNT);
+                SetButtonColor(m_primaryFilterButtons[(int)primary], m_buttonColor);
+            }
+
+            SetButtonColor(m_secondaryFilterButtons[(int)secondary], m_buttonColor);
+            SetButtonColor(m_primaryFilterButtons[(int)colors[0]], m_selectedButtonColor);
+            SetButtonColor(m_secondaryFilterButtons[(int)colors[1]], m_selectedButtonColor);
+
+            fm.ChangeFilterColor();
+        }
+    }
+
+    void PrimaryFilterButtonClicked(FilterColor color)
+    {
+        FilterManager fm = Object.FindFirstObjectByType<FilterManager>();
+        FilterColor[] colors = fm.m_filterColorData.m_Colors;
+        var primary   = colors[0];
+        var secondary = colors[1];
+
+        if(primary != color)
+        {
+            colors[0]            = color;
+
+            if(secondary == color)
+            {
+                colors[1] = (FilterColor)(((int)secondary + 1) % (int)FilterColor.COUNT);
+                SetButtonColor(m_secondaryFilterButtons[(int)secondary], m_buttonColor);
+            }
+
+            SetButtonColor(m_primaryFilterButtons[(int)primary], m_buttonColor);
+            SetButtonColor(m_primaryFilterButtons[(int)colors[0]], m_selectedButtonColor);
+            SetButtonColor(m_secondaryFilterButtons[(int)colors[1]], m_selectedButtonColor);
+
+            fm.ChangeFilterColor();
+        }
+    }
+
+    public void PlayHoverButtonSound()
+    {
+        SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
     }
 
     public void HideCursor()
@@ -149,14 +226,13 @@ public class UIManager : MonoBehaviour
             {
                 I.ShowCursor();
                 InputManager.DisablePlayerInput();
-                I.m_selectedButtonEnabled    = false;
+                I.m_settingsMenuParent.SetActive(true);
                 I.m_statePriorToSettingsMenu = I.m_state;
                 break;
             }
             case UIState.None:
             {
                 I.HideCursor();
-                I.m_selectedButtonEnabled = false;
                 InputManager.EnablePlayerInput();
                 break;
             }
@@ -164,33 +240,56 @@ public class UIManager : MonoBehaviour
             {
                 I.ShowCursor();
                 I.m_mainMenuParent.SetActive(true);
-                I.m_selectedButtonEnabled = true;
                 InputManager.DisablePlayerInput();
                 break;
             }
             case UIState.PauseMenu:
             {
                 I.ShowCursor();
-                I.m_selectedButtonEnabled = true;
+                I.m_pauseMenuParent.SetActive(true);
                 InputManager.DisablePlayerInput();
                 break;
             }
             case UIState.Dialogue:
             {
                 I.ShowCursor();
-                I.m_selectedButtonEnabled = false;
                 InputManager.DisablePlayerInput();
                 break;
             }
         }
-
-        I.m_selectedIndex = 0;
         I.m_state   = state;
     }
 
+    private enum SettingsPageKind
+    {
+        Gameplay,
+        Audio,
+        Controls,
+    }
+    private SettingsPageKind m_activeSettingsPage;
+
     void Start()
     {
-        m_audioSystem = FindFirstObjectByType<AudioSystem>();
+        // ah: Set default values in settings menu
+        {
+            // ah: current header
+
+            // ah: current filters
+            FilterManager fm = Object.FindFirstObjectByType<FilterManager>();
+            if(fm != null)
+            {
+                FilterColor[] colors = fm.m_filterColorData.m_Colors;
+
+                SetButtonColor(m_primaryFilterButtons[(int)colors[0]], m_selectedButtonColor);
+                SetButtonColor(m_secondaryFilterButtons[(int)colors[1]], m_selectedButtonColor);
+            }
+
+            // ah: settings page
+            SetActiveSettingsPage(m_activeSettingsPage);
+
+            // ah: sensitivity
+            m_settingsPageSensitivitySlider.value = (m_sensitivity.m_currentSensitivity - m_sensitivity.m_minSensitivity) / (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity);
+        }
     }
 
     public void MainMenu_PlayClicked()
@@ -234,189 +333,128 @@ public class UIManager : MonoBehaviour
         Application.Quit();
     }
 
-
-    float GetScreenScaledSize(float width)
+    public void PauseMenu_ResumeClicked()
     {
-        float expected = 1920.0f;
-        float actual   = Screen.width;
-        return (actual / expected) * width;
+        I.m_pauseMenuParent.SetActive(false);
+        EnterState(UIState.None);
     }
 
-    bool MenuBtn(string text, int index)
+    public void PauseMenu_SaveClicked()
     {
+        PersistentDataManager.SerializeAll();
+    }
 
-        UI_Signal signal = new();
+    public void PauseMenu_GoToCheckpointClicked()
+    {
+        LevelCheckpointManager.Respawn();
+    }
 
-        GUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
+    public void PauseMenu_SettingsClicked()
+    {
+        I.m_pauseMenuParent.SetActive(false);
+        EnterState(UIState.Settings);
+    }
 
-        GUILayoutOption[] button_options = new GUILayoutOption[2];
-        button_options[0] = GUILayout.Width(GetScreenScaledSize(m_btnWidth));
-        button_options[1] = GUILayout.Height(GetScreenScaledSize(m_btnHeight));
+    public void PauseMenu_MainMenuClicked()
+    {
+        I.m_pauseMenuParent.SetActive(false);
+        PersistentDataManager.SerializeAll();
+        Player player = FindFirstObjectByType<Player>();
+        Destroy(player.gameObject);
 
-        UI_Signal prev_signal = new();
-        m_buttonSignals.TryGetValue(text, out prev_signal);
+        // HACK(ah): just want no ui shown here, don't want to enter state
+        this.m_state  = UIState.None;
+        LevelManager.m_onTransitionEnd += SetupMainMenu;
+        LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
+    }
 
-        GUIStyle btn_style = new GUIStyle(GUI.skin.button);
-        btn_style.fontSize = (int)(GetScreenScaledSize(m_btnHeight) * 0.75f);
-        if(m_selectedButtonEnabled)
+    public void SettingsMenu_BackClicked()
+    {
+        I.m_settingsMenuParent.SetActive(false);
+        EnterState(m_statePriorToSettingsMenu);
+    }
+
+    public void SettingsMenu_SensitivitySliderValueChange()
+    {
+        float s               = (m_sensitivity.m_currentSensitivity - m_sensitivity.m_minSensitivity) / (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity);
+        float new_sensitivity = m_settingsPageSensitivitySlider.value;
+
+        if(Mathf.Abs(s - new_sensitivity) > 0.00001f)
         {
-            btn_style.normal.background = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
-            btn_style.hover.background  = m_selectedIndex == index ? btn_style.onHover.background : btn_style.normal.background;
+            m_sensitivity.m_currentSensitivity = Mathf.Clamp(new_sensitivity * (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity), 
+                    m_sensitivity.m_minSensitivity, m_sensitivity.m_maxSensitivity);
         }
-        btn_style.font = font;
+    }
 
-        bool result = GUILayout.Button(text, btn_style, button_options) || (index == m_selectedIndex && m_useSelected && m_selectedButtonEnabled);
+    public void SettingsMenu_MasterAudioValueChange()
+    {
+        AudioSystem.I.SetMasterVolume(m_settingsPage_MasterVolumeSlider.value);
+    }
 
-        Rect btn_rect = GUILayoutUtility.GetLastRect();
+    public void SettingsMenu_MusicAudioValueChange()
+    {
+        AudioSystem.I.SetMusicVolume(m_settingsPage_MusicVolumeSlider.value);
+    }
 
-        // HACK(ah): God i fucking hate unity with a passion
-        if(Event.current.type == EventType.Repaint)
+    public void SettingsMenu_SFXAudioValueChange()
+    {
+        AudioSystem.I.SetSfxVolume(m_settingsPage_SFXVolumeSlider.value);
+    }
+
+    public void SettingsMenu_UIAudioValueChange()
+    {
+        AudioSystem.I.SetUiVolume(m_settingsPage_UIVolumeSlider.value);
+    }
+
+    void SetButtonColor(Button btn, Color color)
+    {
+        var cb = btn.colors;
+        cb.normalColor = cb.highlightedColor = cb.disabledColor = cb.pressedColor = cb.selectedColor = color;
+        btn.colors = cb;
+    }
+
+    void SetActiveSettingsPage(SettingsPageKind kind)
+    {
+        m_activeSettingsPage = kind;
+        m_settingsPageGameplay.SetActive(kind == SettingsPageKind.Gameplay);
+        m_settingsPageAudio.SetActive(kind == SettingsPageKind.Audio);
+        m_settingsPageControls.SetActive(kind == SettingsPageKind.Controls);
+        switch(kind)
         {
-            // Create signal
-            signal.m_active = result;
-            signal.m_hot    = btn_rect.Contains(Event.current.mousePosition);
-
-            if(m_buttonSignals.ContainsKey(text))
+            case SettingsPageKind.Gameplay:
             {
-                if(!prev_signal.m_hot && signal.m_hot)
-                {
-                    SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
-                    m_selectedIndex = index;
-                }
-            }
-            else if(signal.m_hot)
+                SetButtonColor(m_settingsPageGameplayButton, m_selectedButtonColor);
+                SetButtonColor(m_settingsPageAudioButton, m_buttonColor);
+                SetButtonColor(m_settingsPageControlsButton, m_buttonColor);
+            }break;
+            case SettingsPageKind.Audio:
             {
-                SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
-            }
-            m_buttonSignals[text] = signal;
+                SetButtonColor(m_settingsPageGameplayButton, m_buttonColor);
+                SetButtonColor(m_settingsPageAudioButton, m_selectedButtonColor);
+                SetButtonColor(m_settingsPageControlsButton, m_buttonColor);
+            }break;
+            case SettingsPageKind.Controls:
+            {
+                SetButtonColor(m_settingsPageGameplayButton, m_buttonColor);
+                SetButtonColor(m_settingsPageAudioButton, m_buttonColor);
+                SetButtonColor(m_settingsPageControlsButton, m_selectedButtonColor);
+            }break;
         }
-
-
-        GUILayout.FlexibleSpace();
-        GUILayout.EndHorizontal();
-        return result;
     }
 
-
-    float
-    Slider(float initial_value)
+    public void SettingsMenu_AudioClicked()
     {
-        GUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-
-        GUILayoutOption[] options = new GUILayoutOption[1];
-        options[0] = GUILayout.Width(m_sliderWidth);
-
-        GUIStyle slider_style = new GUIStyle(GUI.skin.horizontalSlider);
-        slider_style.padding.top = (int)GetScreenScaledSize(-2);
-        slider_style.normal.background  = m_whitePixel;
-        slider_style.hover.background   = m_whitePixel;
-        slider_style.active.background  = m_whitePixel;
-        slider_style.focused.background = m_whitePixel;
-
-        float result = GUILayout.HorizontalSlider(initial_value, 0, 1, slider_style, GUI.skin.horizontalScrollbarThumb, options);
-
-        GUILayout.FlexibleSpace();
-        GUILayout.EndHorizontal();
-
-        return result;
+        SetActiveSettingsPage(SettingsPageKind.Audio);
     }
 
-    float VolumeSlider(string title, float initial_value)
+    public void SettingsMenu_ControlsClicked()
     {
-        GUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-
-        GUIStyle label_style = new GUIStyle(GUI.skin.label);
-        label_style.font     = font;
-        label_style.fontSize = (int)GetScreenScaledSize(15);
-        GUILayout.Label(title, label_style);
-
-        GUILayout.FlexibleSpace();
-        GUILayout.EndHorizontal();
-
-        return Slider(initial_value);
+        SetActiveSettingsPage(SettingsPageKind.Controls);
     }
 
-    void
-    AreaBegin(float w, float h)
+    public void SettingsMenu_GameplayClicked()
     {
-        w = GetScreenScaledSize(w);
-        h = GetScreenScaledSize(h);
-
-        GUIStyle window_style    = new GUIStyle(GUI.skin.window);
-        window_style.padding.top = 0;
-
-        float x = (Screen.width - w) * 0.5f;
-        float y = (Screen.height - h) * 0.5f;
-
-        Rect window_rect         = new Rect(x, y, w, h);
-        GUI.Box(window_rect, GUIContent.none);
-
-        GUILayout.BeginArea(window_rect);
-        GUILayout.BeginVertical();
-
-        GUILayout.FlexibleSpace();
-
-    }
-
-    void 
-    AreaEnd()
-    {
-        GUILayout.FlexibleSpace();
-        GUILayout.EndVertical();
-        GUILayout.EndArea();
-    }
-
-    int 
-    MenuSelection(int prev_value, string label, string[] selections, Color[] btn_colors)
-    {
-        GUIStyle style  = new(GUI.skin.button);
-        style.fontSize -= (int)GetScreenScaledSize(10);
-        style.font      = font;
-        GUIStyle selected_style = new(style);
-        selected_style.hover  = selected_style.hover;
-        selected_style.normal = selected_style.active;
-
-        GUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-
-        GUIStyle label_style = new GUIStyle(GUI.skin.label);
-        label_style.font = font;
-        label_style.fontSize = (int)GetScreenScaledSize(15);
-        GUILayout.Label(label, label_style);
-
-        GUILayout.FlexibleSpace();
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-
-        // Make the buttons actually the same size as well
-        // Show which buttons are selected
-
-        int new_value = prev_value;
-        for(int i = 0; i < selections.Length; i++)
-        {
-            GUIStyle current_style = prev_value == i ? selected_style : style;
-            current_style.normal.textColor = btn_colors[i];
-            current_style.hover.textColor  = btn_colors[i];
-            current_style.active.textColor = btn_colors[i];
-
-            if(GUILayout.Button(selections[i], current_style))
-            {
-                new_value = i;
-            }
-        }
-
-        // int new_value = GUILayout.SelectionGrid(prev_value, selections, (int)FilterColor.COUNT, style);
-        
-        GUILayout.FlexibleSpace();
-        GUILayout.EndHorizontal();
-
-        return new_value;
-
+        SetActiveSettingsPage(SettingsPageKind.Gameplay);
     }
 
     void SetupScene()
@@ -451,318 +489,20 @@ public class UIManager : MonoBehaviour
         LevelManager.m_onTransitionEnd -= SetupMainMenu;
     }
 
-    void OnGUI()
-    {
-        int btn_index = 0;
-        switch(m_state)
-        {
-
-#if false
-            case UIState.MainMenu:
-            {
-                // ah: title
-                {
-
-                    GUIContent content = new GUIContent(m_gameName);
-
-                    GUIStyle title_style  = new(GUI.skin.label);
-                    title_style.alignment = TextAnchor.MiddleCenter;
-                    title_style.fontSize  = (int)GetScreenScaledSize((float)m_titleFontHeight);
-                    title_style.font = font;
-
-                    title_style.active = title_style.normal;
-                    title_style.normal.textColor = Color.white;
-
-                    title_style.active = title_style.normal;
-                    title_style.hover  = title_style.normal;
-
-                    var size  = title_style.CalcSize(content);
-
-                    size.x *= 1.5f;
-                    float x = (Screen.width - size.x) * 0.5f;
-                    float y = (Screen.height - size.y) * 0.2f;
-
-
-                    Rect rect = new(x,y,size.x,size.y);
-                    GUI.Label(rect, content, title_style);
-                }
-
-                AreaBegin(m_areaWidth, m_areaHeight);
-
-                if(MenuBtn("Play", btn_index++))
-                {
-                    // Query PDM for which level to load
-                    LevelData level_to_load = PersistentDataManager.LevelToLoad(m_levelData);
-
-                    LevelManager.m_onTransitionEnd += SetupScene;
-                    LevelManager.TransitionToSceneAsync(level_to_load);
-                    
-                    EnterState(UIState.None);
-                }
-
-                GUILayout.Space((int)GetScreenScaledSize(25));
-                if(MenuBtn("Settings", btn_index++))
-                {
-                    EnterState(UIState.Settings);
-                }
-
-                if(MenuBtn("Credits", btn_index++))
-                {
-                    EnterState(UIState.None);
-                    LevelManager.TransitionToSceneAsync(m_creditsLevelData, 0);
-                }
-
-
-                if(MenuBtn("Delete save", btn_index++))
-                {
-                    PersistentDataManager.DeleteSave();
-                    GlobalInkVariableManager.ClearAll();
-                    FilterManager.m_filterUnlocked = false;
-                }
-
-                GUILayout.Space((int)GetScreenScaledSize(25));
-                if(MenuBtn("Quit", btn_index++))
-                {
-                }
-
-                AreaEnd();
-                break;
-            }
-#endif
-            case UIState.Settings:
-            {
-                AreaBegin(m_areaWidth * 2.0f, m_areaHeight * 2.5f);
-
-                // Sensitivity
-                {
-                    float sensitivity     = m_sensitivity.m_currentSensitivity;
-
-                    float s = (m_sensitivity.m_currentSensitivity - m_sensitivity.m_minSensitivity) / (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity);
-                    float new_sensitivity = VolumeSlider("Sensitivity", s);
-
-                    if(Mathf.Abs(s - new_sensitivity) > 0.00001f)
-                    {
-                        m_sensitivity.m_currentSensitivity = Mathf.Clamp(new_sensitivity * (m_sensitivity.m_maxSensitivity - m_sensitivity.m_minSensitivity), 
-                                m_sensitivity.m_minSensitivity, m_sensitivity.m_maxSensitivity);
-                    }
-
-                    
-                }
-
-                // Volume slider
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.FlexibleSpace();
-
-                    GUILayout.Label("Volume");
-
-                    GUILayout.FlexibleSpace();
-                    GUILayout.EndHorizontal();
-                    
-                    // ah: master
-                    {
-                        float audio_volume = m_audioSystem.GetMasterVolume();
-                        float new_volume   = VolumeSlider("Master", audio_volume);
-                        if(new_volume != audio_volume)
-                        {
-                            m_audioSystem.SetMasterVolume(new_volume);
-                        }
-                    }
-
-                    // ah: music
-                    {
-                        float audio_volume = m_audioSystem.GetMusicVolume();
-                        float new_volume   = VolumeSlider("Music", audio_volume);
-                        if(new_volume != audio_volume)
-                        {
-                            m_audioSystem.SetMusicVolume(new_volume);
-                        }
-                    }
-
-                    // ah: sfx
-                    {
-                        float audio_volume = m_audioSystem.GetSfxVolume();
-                        float new_volume   = VolumeSlider("Sfx", audio_volume);
-                        if(new_volume != audio_volume)
-                        {
-                            m_audioSystem.SetSfxVolume(new_volume);
-                        }
-                    }
-
-                    // ah: UI
-                    {
-                        float audio_volume = m_audioSystem.GetUiVolume();
-                        float new_volume   = VolumeSlider("UI", audio_volume);
-                        if(new_volume != audio_volume)
-                        {
-                            m_audioSystem.SetUiVolume(new_volume);
-                        }
-                    }
-                }
-
-                // Color Accessibility
-                {
-
-                    FilterManager fm = FindFirstObjectByType<FilterManager>();
-                    if(fm != null)
-                    {
-                        GUILayout.BeginHorizontal();
-                        GUILayout.FlexibleSpace();
-
-                        GUILayout.Label("Color settings");
-
-                        GUILayout.FlexibleSpace();
-                        GUILayout.EndHorizontal();
-
-
-                        FilterColor[] colors = fm.m_filterColorData.m_Colors;
-
-                        int prev_primary   = (int)colors[0];
-                        int prev_secondary = (int)colors[1];
-
-                        string[] filter_color_strings = new string[(int)FilterColor.COUNT];
-                        for(int i = 0; i < (int)FilterColor.COUNT; i++)
-                        {
-                            filter_color_strings[i] = ((FilterColor)i).ToString();
-                        }
-
-                        bool change_filter = false;
-                        int new_primary = MenuSelection(prev_primary, "Primary", filter_color_strings, FilterManager.FilterColorColors);
-                        if(prev_primary != new_primary)
-                        {
-                            if(new_primary == prev_secondary)
-                            {
-                                prev_secondary = (new_primary + 1) % (int)FilterColor.COUNT;
-                            }
-                            change_filter = true;
-                        }
-
-                        int new_secondary = MenuSelection(prev_secondary, "Secondary", filter_color_strings, FilterManager.FilterColorColors);
-                        if(prev_secondary != new_secondary)
-                        {
-                            if(new_secondary == new_primary)
-                            {
-                                new_primary = (new_secondary + 1) % (int)FilterColor.COUNT;
-                            }
-                            change_filter = true;
-                        }
-
-                        if(change_filter)
-                        {
-                            colors[0] = (FilterColor)new_primary;
-                            colors[1] = (FilterColor)new_secondary;
-                            fm.ChangeFilterColor();
-                        }
-                    }
-                }
-
-                GUILayout.Space((int)GetScreenScaledSize(15));
-
-                if(MenuBtn("Back", btn_index++))
-                {
-                    EnterState(m_statePriorToSettingsMenu);
-                }
-
-                AreaEnd();
-                break;
-            }
-            case UIState.PauseMenu:
-            {
-                AreaBegin(m_areaWidth, m_areaHeight);
-
-                if(MenuBtn("Resume", btn_index++))
-                {
-                    EnterState(UIState.None);
-                }
-
-                if(MenuBtn("Save", btn_index++))
-                {
-                    PersistentDataManager.SerializeAll();
-                }
-
-                if(MenuBtn("Reset to checkpoint", btn_index++))
-                {
-                    LevelCheckpointManager.Respawn();
-                }
-
-                if(MenuBtn("Settings", btn_index++))
-                {
-                    EnterState(UIState.Settings);
-                }
-
-                if(MenuBtn("Main Menu", btn_index++))
-                {
-                    PersistentDataManager.SerializeAll();
-                    Player player = FindFirstObjectByType<Player>();
-                    Destroy(player.gameObject);
-
-                    // HACK(ah): just want no ui shown here, don't want to enter state
-                    this.m_state  = UIState.None;
-                    LevelManager.m_onTransitionEnd += SetupMainMenu;
-                    LevelManager.TransitionToSceneAsync(m_MainMenuLevelData.m_levels[0], 0.0f);
-                }
-
-                AreaEnd();
-                break;
-            }
-            default:{ break;}
-        }
-
-        if(btn_index > 0 && m_selectedButtonEnabled)
-        {
-            if(InputManager.ReadUINavigationValue().y > 0.5f && m_menuScrollTimer <= 0f)
-            {
-                m_menuScrollTimer = 0.25f;
-                m_selectedIndex--;
-                if(m_selectedIndex < 0)
-                {
-                    m_selectedIndex = btn_index - 1;
-                }
-                SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
-            }
-            if(InputManager.ReadUINavigationValue().y < -0.5f && m_menuScrollTimer <= 0f)
-            {
-                m_menuScrollTimer = 0.25f;
-                m_selectedIndex++;
-                if(m_selectedIndex >= btn_index)
-                {
-                    m_selectedIndex = 0;
-                }
-                SfxDirector.PlayCue2(m_onButtonHoverCue, Vector3.zero);
-            }
-        }
-
-        m_useSelected = false;
-    }
-
     void Update()
     {
-        m_menuScrollTimer -= Time.deltaTime;
-        if(InputManager.SelectUIOption())
-        {
-            m_useSelected = true;
-        }
 
-        if(m_state == UIState.None)
+        if(m_state == UIState.None && InputManager.Paused())
         {
-            if(InputManager.Paused())
-            {
-                EnterState(UIState.PauseMenu);
-            }
+            EnterState(UIState.PauseMenu);
         }
-        else if(m_state == UIState.PauseMenu)
+        else if(m_state == UIState.PauseMenu && InputManager.Unpaused())
         {
-            if(InputManager.Unpaused())
-            {
-                EnterState(UIState.None);
-            }
+            EnterState(UIState.None);
         }
-        else if(m_state == UIState.Settings)
+        else if(m_state == UIState.Settings && InputManager.Unpaused())
         {
-            if(InputManager.Unpaused())
-            {
-                EnterState(m_statePriorToSettingsMenu);
-            }
+            EnterState(m_statePriorToSettingsMenu);
         }
     }
 }
