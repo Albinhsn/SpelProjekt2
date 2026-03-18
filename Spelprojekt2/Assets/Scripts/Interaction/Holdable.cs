@@ -1,5 +1,6 @@
 using System;
 using AudioKit.FMOD;
+using FMOD.Studio;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -12,7 +13,9 @@ namespace Interaction
     {
 
         [Header("Audio")]
-        [SerializeField] private AudioCueSO m_pickupCue;
+        [SerializeField] private AudioCueSO m_holdLoopCue;
+
+        private EventInstance m_holdLoopInstance;
         
         [SerializeField] private float m_holdDistance = 2.25f;
         [SerializeField] private float m_linearMovementThreshold = 4;
@@ -98,25 +101,48 @@ namespace Interaction
             m_rb = GetComponent<Rigidbody>();
             m_boundingRadius = GetComponent<Collider>().bounds.extents.magnitude;
         }
+        
+        private void StartHoldLoop()
+        {
+            if (m_holdLoopCue == null) return;
+            if (SfxDirector.I == null) return;
+
+            StopHoldLoop();
+
+            m_holdLoopInstance = SfxDirector.I.CreateAttachedInstance(m_holdLoopCue, transform, false);
+
+            if (m_holdLoopInstance.isValid())
+            {
+                m_holdLoopInstance.start();
+            }
+        }
+
+        private void StopHoldLoop()
+        {
+            if (SfxDirector.I == null) return;
+            SfxDirector.I.StopAndRelease(ref m_holdLoopInstance, true);
+        }
 
         protected override void VirtOnDisable()
         {
             if (m_isHeld)
             {
-                m_activeInteractor.FinishInteraction();
+                StopHoldLoop();
+
                 m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
+                m_rb.useGravity = m_savedGravity;
+                m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
+
+                if (m_activeInteractor != null)
+                {
+                    m_activeInteractor.FinishInteraction();
+                }
+
                 m_activeInteractor = null;
                 m_isHeld = false;
             }
-            base.VirtOnDisable();
-        }
 
-        public override void SendIndicatorRequest()
-        {
-            if(!m_isHeld && m_indicatorKind != IndicatorKind.None)
-            {
-                PickupItemIndicatorManager.Request(this.transform.position, m_indicatorKind);
-            }
+            base.VirtOnDisable();
         }
 
         private CollisionDetectionMode m_savedCollissionDetectionMode;
@@ -128,24 +154,30 @@ namespace Interaction
             m_rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
             m_isHeld = true;
             m_rb.constraints |= RigidbodyConstraints.FreezeRotation;
-            SfxDirector.PlayCue2(m_pickupCue, transform.position);
+
+            StartHoldLoop();
+
             m_playerRb = interactor.mainCollider.attachedRigidbody;
 
             m_savedGravity = m_rb.useGravity;
             m_rb.useGravity = false;
-            
+
             m_previousDirection = Vector3.zero;
+            m_remainingHoldCancelTime = m_holdCancelTime;
         }
 
         public override bool TryCancelInteraction()
         {
             if (m_isHeld)
             {
+                StopHoldLoop();
+
                 m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
                 m_rb.useGravity = m_savedGravity;
                 m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
                 m_isHeld = false;
             }
+
             base.TryCancelInteraction();
             return true;
         }
@@ -154,14 +186,16 @@ namespace Interaction
         {
             if (m_isHeld)
             {
+                StopHoldLoop();
+
                 m_rb.collisionDetectionMode = m_savedCollissionDetectionMode;
                 m_rb.useGravity = m_savedGravity;
                 m_rb.constraints ^= RigidbodyConstraints.FreezeRotation;
                 m_isHeld = false;
             }
+
             base.ForceCancelInteraction();
         }
-
         void Update()
         {
             if(m_isHeld)
