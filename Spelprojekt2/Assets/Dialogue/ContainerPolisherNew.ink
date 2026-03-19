@@ -9,8 +9,8 @@ VAR helped = false
 = stitch1
 ~firstInteraction = false
 <i>The woman is softly banging her head into the container</i>
-It never ends. It never ends. It never ends. It never ends...
-+ [> <i>Intervene</i>]
+It never ends. It never ends. It never ends. It never ends... #speaker=Unknown
++ [Intervene]
     A..are you alright? # speaker=Alea
         <i>The banging stops</i> # speaker=
         No... # disallowSkip # delay=0.1 # speaker=Unknown
@@ -18,18 +18,18 @@ It never ends. It never ends. It never ends. It never ends...
         I'm... the polisher. I polish the containers. # speaker=Polisher
         It is my duty to keep the containers shining, an assignment I've been doing ever since the start... # speaker=Polisher
         <i>The woman trails off</i> # speaker=
-        ++ [> <i>Inquire: Enjoyment</i>]
+        ++ [Inquire:]
             Do you like polishing the containers? # speaker=Alea
                 NO I DON'T LIKE IT! I HATE IT! It's too much... # speaker=Polisher
                 <i>The woman starts sobbing</i> # speaker=
                 It never ends, the dust in the air keeps undoing all my work. #speaker=Polisher
                 I've been working on this container for the last month,
                 and I will keep working on it until I throw myself off the edge.
-                +++ [> <i>Express confusion</i>]
-                    I don't understand; why don't you just stop? # speaker=Alea
+                +++ [I don't understand]
+                    Why don't you just stop? # speaker=Alea
                     Oh... you're an outsider... I'm sorry, I'm not supposed to talk to you. Please leave. # speaker=Polisher
                     <i>The woman starts banging her head angainst the container again</i> # speaker=
-                    ++++[> <i>Insist</i>]
+                    ++++[Insist]
                         Please, I want to help you. Why do you keep polishing the containers? # speaker=Alea
                             <i>The banging stops.</i> # speaker=
                             Because it's my job. My assignment. # speaker=Polisher
@@ -42,11 +42,11 @@ It never ends. It never ends. It never ends. It never ends...
                                 ~helped = true
                             
                     ->DONE
-                    ++++[> <i>Withdraw from interaction<i>]
+                    ++++[Leave her be]
                     ->DONE
         
     ->DONE
-+ [> <i>Withdraw from interaction<i>]
++ [Leave her be]
 ->DONE
 = stitch2
 {helped: ->thankfull| ->stitch1}
