@@ -46,80 +46,89 @@ public sealed class InputManager
         int binding_index = 0;
         switch(action)
         {
-            case KeyAction.Forward:
+            case KeyAction.KM_Forward:
             {
                 input_action  = m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up");
             }break;
-            case KeyAction.Back:
+            case KeyAction.KM_Back:
             {
                 input_action = m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down");
             }break;
-            case KeyAction.Left:
+            case KeyAction.KM_Left:
             {
                 input_action = m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left");
             }break;
-            case KeyAction.Right:
+            case KeyAction.KM_Right:
             {
                 input_action = m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right");
             }break;
-            case KeyAction.Pickup:
+            case KeyAction.KM_Pickup:
             {
                 input_action = m_inputActions.Player.Pickup;
                 binding_index = 0;
             }break;
-            case KeyAction.Interaction:
+            case KeyAction.KM_Interaction:
             {
                 input_action = m_inputActions.Player.Interact;
                 binding_index = 0;
             }break;
-            case KeyAction.PrimaryFilter:
+            case KeyAction.KM_PrimaryFilter:
             {
                 input_action = m_inputActions.Player.FilterPrimary;
                 binding_index = 0;
             }break;
-            case KeyAction.SecondaryFilter:
+            case KeyAction.KM_SecondaryFilter:
             {
                 input_action = m_inputActions.Player.FilterSecondary;
                 binding_index = 0;
             }break;
+            case KeyAction.C_Movement:
+            {
+                input_action  = m_inputActions.Player.Move;
+                binding_index = 0;
+            }break;
+            case KeyAction.C_Pickup:
+            {
+                input_action = m_inputActions.Player.Pickup;
+                binding_index = 0;
+            }break;
+            case KeyAction.C_Interaction:
+            {
+                input_action  = m_inputActions.Player.Interact;
+                binding_index = 1;
+            }break;
+            case KeyAction.C_PrimaryFilter:
+            {
+                input_action = m_inputActions.Player.FilterPrimary;
+                binding_index = 1;
+            }break;
+            case KeyAction.C_SecondaryFilter:
+            {
+                input_action = m_inputActions.Player.FilterSecondary;
+                binding_index = 1;
+            }break;
         }
-
-        input_action.Disable();
-        m_rebindingOperation = input_action.PerformInteractiveRebinding()
-            .WithControlsExcluding("Mouse")
-            .OnMatchWaitForAnother(0.1f)
-            .OnComplete(CompleteRebind);
 
         // ah: action is unbounded
         if(binding_index != -1)
         {
+            input_action.Disable();
+            m_rebindingOperation = input_action.PerformInteractiveRebinding()
+                .OnMatchWaitForAnother(0.1f)
+                .OnComplete(CompleteRebind);
             m_rebindingOperation.WithTargetBinding(binding_index);
+            m_rebindingOperation.Start();
+            m_currentRebindKeyAction    = action;
+            m_currentRebindBindingIndex = binding_index;
         }
         else
         {
-            switch(action)
-            {
-                case KeyAction.Forward:
-                {
-                }break;
-                case KeyAction.Back:
-                {
-                }break;
-                case KeyAction.Left:
-                {
-                }break;
-                case KeyAction.Right:
-                {
-                }break;
-            }
+            Debug.LogError($"Couldn't rebind {action}");
         }
-        m_rebindingOperation.Start();
-        m_currentRebindKeyAction    = action;
-        m_currentRebindBindingIndex = binding_index;
     }
 
 
@@ -130,42 +139,42 @@ public sealed class InputManager
         int binding_index = -1;
         switch(action)
         {
-            case KeyAction.Forward:
+            case KeyAction.KM_Forward:
             {
                 input_action  = Instance.m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up");
             }break;
-            case KeyAction.Back:
+            case KeyAction.KM_Back:
             {
                 input_action  = Instance.m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down");
             }break;
-            case KeyAction.Left:
+            case KeyAction.KM_Left:
             {
                 input_action  = Instance.m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left");
             }break;
-            case KeyAction.Right:
+            case KeyAction.KM_Right:
             {
                 input_action  = Instance.m_inputActions.Player.Move;
                 binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right");
             }break;
-            case KeyAction.Pickup:
+            case KeyAction.KM_Pickup:
             {
                 input_action = Instance.m_inputActions.Player.Pickup;
                 binding_index = 0;
             }break;
-            case KeyAction.Interaction:
+            case KeyAction.KM_Interaction:
             {
                 input_action = Instance.m_inputActions.Player.Interact;
                 binding_index = 0;
             }break;
-            case KeyAction.PrimaryFilter:
+            case KeyAction.KM_PrimaryFilter:
             {
                 input_action = Instance.m_inputActions.Player.FilterPrimary;
                 binding_index = 0;
             }break;
-            case KeyAction.SecondaryFilter:
+            case KeyAction.KM_SecondaryFilter:
             {
                 input_action = Instance.m_inputActions.Player.FilterSecondary;
                 binding_index = 0;
@@ -184,45 +193,45 @@ public sealed class InputManager
     {
         switch(action)
         {
-            case KeyAction.Forward:
+            case KeyAction.KM_Forward:
             {
                 var input_action  = Instance.m_inputActions.Player.Move;
-                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up")).Erase();
+                input_action.ApplyBindingOverride(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up"), "");
             }break;
-            case KeyAction.Back:
+            case KeyAction.KM_Back:
             {
                 var input_action  = Instance.m_inputActions.Player.Move;
-                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down")).Erase();
+                input_action.ApplyBindingOverride(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down"), "");
             }break;
-            case KeyAction.Left:
+            case KeyAction.KM_Left:
             {
                 var input_action  = Instance.m_inputActions.Player.Move;
-                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left")).Erase();
+                input_action.ApplyBindingOverride(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left"), "");
             }break;
-            case KeyAction.Right:
+            case KeyAction.KM_Right:
             {
                 var input_action  = Instance.m_inputActions.Player.Move;
-                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right")).Erase();
+                input_action.ApplyBindingOverride(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right"), "");
             }break;
-            case KeyAction.Pickup:
+            case KeyAction.KM_Pickup:
             {
                 var input_action = Instance.m_inputActions.Player.Pickup;
-                input_action.ChangeBinding(0).Erase();
+                input_action.ApplyBindingOverride(0, "");
             }break;
-            case KeyAction.Interaction:
+            case KeyAction.KM_Interaction:
             {
                 var input_action = Instance.m_inputActions.Player.Interact;
-                input_action.ChangeBinding(0).Erase();
+                input_action.ApplyBindingOverride(0, "");
             }break;
-            case KeyAction.PrimaryFilter:
+            case KeyAction.KM_PrimaryFilter:
             {
                 var input_action = Instance.m_inputActions.Player.FilterPrimary;
-                input_action.ChangeBinding(0).Erase();
+                input_action.ApplyBindingOverride(0, "");
             }break;
-            case KeyAction.SecondaryFilter:
+            case KeyAction.KM_SecondaryFilter:
             {
                 var input_action = Instance.m_inputActions.Player.FilterSecondary;
-                input_action.ChangeBinding(0).Erase();
+                input_action.ApplyBindingOverride(0, "");
             }break;
         }
     }
