@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using AudioKit.FMOD;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public enum UIState
 {
@@ -14,6 +15,19 @@ public enum UIState
     Settings,
     PauseMenu,
     Dialogue,
+}
+
+public enum KeyAction
+{
+    Forward,
+    Left,
+    Right,
+    Back,
+    Pickup,
+    Interaction,
+    PrimaryFilter,
+    SecondaryFilter,
+    COUNT,
 }
 
 public class UIManager : MonoBehaviour
@@ -96,6 +110,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Button m_settingsPageGameplayButton;
 
+    [SerializeField]
+    private TextMeshProUGUI[] m_keyActionTexts;
+
     private UIState m_state;
 
     // TODO(ah): Do something stack based over this nonsense
@@ -120,6 +137,7 @@ public class UIManager : MonoBehaviour
 
         EnterState(m_stateOnInitialization);
 
+        InputManager.onRebindComplete.AddListener(CompleteRemap);
         // TODO(ah): deserialize settings
         {
 
@@ -143,6 +161,17 @@ public class UIManager : MonoBehaviour
                 btn.onClick.AddListener(() => SecondaryFilterButtonClicked(color));
             }
 
+        }
+
+        // ah: init keyaction text
+        UpdateActionTexts();
+    }
+
+    void UpdateActionTexts()
+    {
+        for(int i = 0; i < m_keyActionTexts.Length; i++)
+        {
+            m_keyActionTexts[i].text = InputManager.GetStringFromKeyAction((KeyAction)i);
         }
     }
 
@@ -195,6 +224,16 @@ public class UIManager : MonoBehaviour
 
             fm.ChangeFilterColor();
         }
+    }
+
+    public void StartRemap(int action_to_map)
+    {
+        InputManager.StartRemap((KeyAction)action_to_map);
+    }
+
+    public void CompleteRemap(KeyAction action)
+    {
+        UpdateActionTexts();
     }
 
     public void PlayHoverButtonSound()

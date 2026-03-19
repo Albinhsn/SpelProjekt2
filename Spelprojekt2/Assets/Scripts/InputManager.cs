@@ -1,13 +1,8 @@
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-public enum Dir
-{
-    Y,
-    X
-}
 public sealed class InputManager
 {
     private static InputManager _instance;
@@ -26,11 +21,217 @@ public sealed class InputManager
     {
         m_inputActions = new InputSystem_Actions();
         m_inputActions.Enable();
+        m_onRebindComplete = new();
     }
     
     private InputSystem_Actions m_inputActions;
     private Vector3 m_aimDirectionForward = Vector3.zero;
     private Vector3 m_aimDirectionRight = Vector3.zero;
+    public static UnityEvent<KeyAction> onRebindComplete => Instance.m_onRebindComplete;
+    private UnityEvent<KeyAction> m_onRebindComplete;
+
+    private int m_currentRebindBindingIndex;
+    private KeyAction m_currentRebindKeyAction;
+
+    private InputActionRebindingExtensions.RebindingOperation m_rebindingOperation;
+
+    public static void StartRemap(KeyAction action)
+    {
+        Instance.StartRemap_(action);
+    }
+    
+    private void StartRemap_(KeyAction action)
+    {
+        InputAction input_action = null;
+        int binding_index = 0;
+        switch(action)
+        {
+            case KeyAction.Forward:
+            {
+                input_action  = m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up");
+            }break;
+            case KeyAction.Back:
+            {
+                input_action = m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down");
+            }break;
+            case KeyAction.Left:
+            {
+                input_action = m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left");
+            }break;
+            case KeyAction.Right:
+            {
+                input_action = m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right");
+            }break;
+            case KeyAction.Pickup:
+            {
+                input_action = m_inputActions.Player.Pickup;
+                binding_index = 0;
+            }break;
+            case KeyAction.Interaction:
+            {
+                input_action = m_inputActions.Player.Interact;
+                binding_index = 0;
+            }break;
+            case KeyAction.PrimaryFilter:
+            {
+                input_action = m_inputActions.Player.FilterPrimary;
+                binding_index = 0;
+            }break;
+            case KeyAction.SecondaryFilter:
+            {
+                input_action = m_inputActions.Player.FilterSecondary;
+                binding_index = 0;
+            }break;
+        }
+
+        input_action.Disable();
+        m_rebindingOperation = input_action.PerformInteractiveRebinding()
+            .WithControlsExcluding("Mouse")
+            .OnMatchWaitForAnother(0.1f)
+            .OnComplete(CompleteRebind);
+        if(binding_index != -1)
+        {
+            m_rebindingOperation.WithTargetBinding(binding_index);
+        }
+        m_rebindingOperation.Start();
+        m_currentRebindKeyAction    = action;
+        m_currentRebindBindingIndex = binding_index;
+    }
+
+
+    private InputBinding InputBindingFromKeyAction(KeyAction action)
+    {
+        InputBinding binding = new();
+        InputAction input_action = new();
+        int binding_index = -1;
+        switch(action)
+        {
+            case KeyAction.Forward:
+            {
+                input_action  = Instance.m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up");
+            }break;
+            case KeyAction.Back:
+            {
+                input_action  = Instance.m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down");
+            }break;
+            case KeyAction.Left:
+            {
+                input_action  = Instance.m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left");
+            }break;
+            case KeyAction.Right:
+            {
+                input_action  = Instance.m_inputActions.Player.Move;
+                binding_index = input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right");
+            }break;
+            case KeyAction.Pickup:
+            {
+                input_action = Instance.m_inputActions.Player.Pickup;
+                binding_index = 0;
+            }break;
+            case KeyAction.Interaction:
+            {
+                input_action = Instance.m_inputActions.Player.Interact;
+                binding_index = 0;
+            }break;
+            case KeyAction.PrimaryFilter:
+            {
+                input_action = Instance.m_inputActions.Player.FilterPrimary;
+                binding_index = 0;
+            }break;
+            case KeyAction.SecondaryFilter:
+            {
+                input_action = Instance.m_inputActions.Player.FilterSecondary;
+                binding_index = 0;
+            }break;
+        }
+
+        if(binding_index >= 0 && binding_index < input_action.bindings.Count)
+        {
+            binding = input_action.bindings[binding_index];
+        }
+
+        return binding;
+    }
+    
+    void Unbind(KeyAction action)
+    {
+        switch(action)
+        {
+            case KeyAction.Forward:
+            {
+                var input_action  = Instance.m_inputActions.Player.Move;
+                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up")).Erase();
+            }break;
+            case KeyAction.Back:
+            {
+                var input_action  = Instance.m_inputActions.Player.Move;
+                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down")).Erase();
+            }break;
+            case KeyAction.Left:
+            {
+                var input_action  = Instance.m_inputActions.Player.Move;
+                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left")).Erase();
+            }break;
+            case KeyAction.Right:
+            {
+                var input_action  = Instance.m_inputActions.Player.Move;
+                input_action.ChangeBinding(input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right")).Erase();
+            }break;
+            case KeyAction.Pickup:
+            {
+                var input_action = Instance.m_inputActions.Player.Pickup;
+                input_action.ChangeBinding(0).Erase();
+            }break;
+            case KeyAction.Interaction:
+            {
+                var input_action = Instance.m_inputActions.Player.Interact;
+                input_action.ChangeBinding(0).Erase();
+            }break;
+            case KeyAction.PrimaryFilter:
+            {
+                var input_action = Instance.m_inputActions.Player.FilterPrimary;
+                input_action.ChangeBinding(0).Erase();
+            }break;
+            case KeyAction.SecondaryFilter:
+            {
+                var input_action = Instance.m_inputActions.Player.FilterSecondary;
+                input_action.ChangeBinding(0).Erase();
+            }break;
+        }
+    }
+
+    private void CompleteRebind(InputActionRebindingExtensions.RebindingOperation operation)
+    {
+        operation.action.Enable();
+
+        InputBinding new_binding = InputBindingFromKeyAction(m_currentRebindKeyAction);
+        for(int i = 0; i < (int)KeyAction.COUNT; i++) 
+        {
+            KeyAction action = (KeyAction)i;
+            InputBinding binding = InputBindingFromKeyAction(action);
+            if(action != m_currentRebindKeyAction)
+            {
+                if(binding == new_binding)
+                {
+                    Unbind(action);
+                }
+            }
+        }
+
+        m_onRebindComplete?.Invoke(m_currentRebindKeyAction);
+    }
+
+    public static string GetStringFromKeyAction(KeyAction action)
+    {
+        return Instance.InputBindingFromKeyAction(action).ToDisplayString();
+    }
 
     public static void SetAimDirection(Vector3 forward, Vector3 Right)
     {
