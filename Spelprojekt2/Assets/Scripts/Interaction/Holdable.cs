@@ -101,27 +101,6 @@ namespace Interaction
             m_rb = GetComponent<Rigidbody>();
             m_boundingRadius = GetComponent<Collider>().bounds.extents.magnitude;
         }
-        
-        private void StartHoldLoop()
-        {
-            if (m_holdLoopCue == null) return;
-            if (SfxDirector.I == null) return;
-
-            StopHoldLoop();
-
-            m_holdLoopInstance = SfxDirector.I.CreateAttachedInstance(m_holdLoopCue, transform, false);
-
-            if (m_holdLoopInstance.isValid())
-            {
-                m_holdLoopInstance.start();
-            }
-        }
-
-        private void StopHoldLoop()
-        {
-            if (SfxDirector.I == null) return;
-            SfxDirector.I.StopAndRelease(ref m_holdLoopInstance, true);
-        }
 
         protected override void VirtOnDisable()
         {
@@ -282,6 +261,27 @@ namespace Interaction
                 }
                 
             }
+        }
+        
+        private void StartHoldLoop()
+        {
+            if (m_holdLoopCue == null) return;
+            if (SfxDirector.I == null) return;
+
+            StopHoldLoop();
+
+            m_holdLoopInstance = SfxDirector.I.CreateAttachedInstance(m_holdLoopCue, transform, false);
+
+            if (m_holdLoopInstance.isValid())
+            {
+                m_holdLoopInstance.start();
+            }
+        }
+
+        private void StopHoldLoop()
+        {
+            if (SfxDirector.I == null) return;
+            SfxDirector.I.StopAndRelease(ref m_holdLoopInstance, true);
         }
 
         public override void SendIndicatorRequest()
