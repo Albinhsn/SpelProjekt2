@@ -284,6 +284,14 @@ namespace Interaction
             }
         }
 
+        public override void SendIndicatorRequest()
+        {
+            if(!m_isHeld && m_indicatorKind != IndicatorKind.None)
+            {
+                PickupItemIndicatorManager.Request(this.transform.position, m_indicatorKind);
+            }
+        }
+
         private void OnCollisionEnter(Collision other)
         {
             if (m_isHeld && (m_activeInteractor.mainCollider.ClosestPoint(transform.position) - transform.position).magnitude - m_boundingRadius > 0.25f)
