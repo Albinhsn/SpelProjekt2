@@ -462,7 +462,8 @@ MonoBehaviour:
   m_playerJumpSound: {fileID: 0}
   m_footstepSound: {fileID: 0}
   m_animator: {fileID: 0}
-  m_speed: 5
+  m_walkSpeed: 0
+  m_sprintSpeed: 0
   m_inAirSpeed: 0
   m_jumpForce: 5
   m_smoothAccelerationFactor: 0.1
@@ -1490,9 +1491,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_interactableSets: []
   m_targetOrigin: {fileID: 0}
+  m_indicatorOrigin: {fileID: 0}
   m_range: 15
   m_coneBaseRad: 0.76
   m_coneFactor: 0.27
+  m_mainCollider: {fileID: 0}
+  m_onStartInteraction1:
+    m_PersistentCalls:
+      m_Calls: []
+  m_onFinishInteraction:
+    m_PersistentCalls:
+      m_Calls: []
   m_blockLineOfSight:
     serializedVersion: 2
     m_Bits: 0
@@ -2427,6 +2436,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 290323168213860369, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_fullTransparencyDistance
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 290323168213860369, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
+      propertyPath: m_transmarencyStartDistance
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 348597078942166485, guid: bc12403dd842d5143b2c87ce303301cb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.4653053
