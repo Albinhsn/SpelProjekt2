@@ -93,9 +93,29 @@ public sealed class InputManager
             .WithControlsExcluding("Mouse")
             .OnMatchWaitForAnother(0.1f)
             .OnComplete(CompleteRebind);
+
+        // ah: action is unbounded
         if(binding_index != -1)
         {
             m_rebindingOperation.WithTargetBinding(binding_index);
+        }
+        else
+        {
+            switch(action)
+            {
+                case KeyAction.Forward:
+                {
+                }break;
+                case KeyAction.Back:
+                {
+                }break;
+                case KeyAction.Left:
+                {
+                }break;
+                case KeyAction.Right:
+                {
+                }break;
+            }
         }
         m_rebindingOperation.Start();
         m_currentRebindKeyAction    = action;
@@ -212,13 +232,17 @@ public sealed class InputManager
         operation.action.Enable();
 
         InputBinding new_binding = InputBindingFromKeyAction(m_currentRebindKeyAction);
+        // HACK(ah): For some reason the display string is the correct newly remapped key
+        // but the path, and doing == doesn't always work xd
+        string new_str = new_binding.ToDisplayString();
         for(int i = 0; i < (int)KeyAction.COUNT; i++) 
         {
-            KeyAction action = (KeyAction)i;
+            KeyAction action     = (KeyAction)i;
             InputBinding binding = InputBindingFromKeyAction(action);
             if(action != m_currentRebindKeyAction)
             {
-                if(binding == new_binding)
+                string str = binding.ToDisplayString();
+                if(str == new_str)
                 {
                     Unbind(action);
                 }
