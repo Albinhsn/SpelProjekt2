@@ -1,13 +1,8 @@
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-public enum Dir
-{
-    Y,
-    X
-}
 public sealed class InputManager
 {
     private static InputManager _instance;
@@ -26,11 +21,284 @@ public sealed class InputManager
     {
         m_inputActions = new InputSystem_Actions();
         m_inputActions.Enable();
+        m_onRebindComplete = new();
     }
     
     private InputSystem_Actions m_inputActions;
     private Vector3 m_aimDirectionForward = Vector3.zero;
     private Vector3 m_aimDirectionRight = Vector3.zero;
+    public static UnityEvent<KeyAction> onRebindComplete => Instance.m_onRebindComplete;
+    private UnityEvent<KeyAction> m_onRebindComplete;
+
+    private int m_currentRebindBindingIndex;
+    private KeyAction m_currentRebindKeyAction;
+
+    private InputActionRebindingExtensions.RebindingOperation m_rebindingOperation;
+
+    public static void StartRemap(KeyAction action)
+    {
+        Instance.StartRemap_(action);
+    }
+
+    private struct InputActionBindingIndexPair
+    {
+        public InputAction input_action;
+        public int binding_index;
+    };
+
+    private InputActionBindingIndexPair InputActionBindingIndexPairFromKeyAction(KeyAction action)
+    {
+        InputActionBindingIndexPair result = new();
+        result.binding_index = -1;
+        result.input_action  = null;
+        switch(action)
+        {
+            case KeyAction.KM_Forward:
+            {
+                result.input_action  = m_inputActions.Player.Move;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up");
+            }break;
+            case KeyAction.KM_Back:
+            {
+                result.input_action = m_inputActions.Player.Move;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down");
+            }break;
+            case KeyAction.KM_Left:
+            {
+                result.input_action = m_inputActions.Player.Move;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "left");
+            }break;
+            case KeyAction.KM_Right:
+            {
+                result.input_action = m_inputActions.Player.Move;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "right");
+            }break;
+            case KeyAction.KM_Pickup:
+            {
+                result.input_action = m_inputActions.Player.Pickup;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_Interaction:
+            {
+                result.input_action = m_inputActions.Player.Interact;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_PrimaryFilter:
+            {
+                result.input_action = m_inputActions.Player.FilterPrimary;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_Sprint:
+            {
+                result.input_action = m_inputActions.Player.Sprint;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_CameraChangeShoulder:
+            {
+                result.input_action = m_inputActions.Player.CameraChangeShoulder;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_CameraZoomIn:
+            {
+                result.input_action = m_inputActions.Player.CameraZoom;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up");
+            }break;
+            case KeyAction.KM_CameraZoomOut:
+            {
+                result.input_action = m_inputActions.Player.CameraZoom;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down");
+            }break;
+            case KeyAction.KM_CameraFreeLookToggle:
+            {
+                result.input_action = m_inputActions.Player.CameraFreeLookToggle;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_CameraFirstPerson:
+            {
+                result.input_action = m_inputActions.Player.CameraFirstPerson;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_UIUp:
+            {
+                result.input_action  = m_inputActions.UI.Navigate;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "up");
+            }break;
+            case KeyAction.KM_UIDown:
+            {
+                result.input_action  = m_inputActions.UI.Navigate;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.isPartOfComposite && x.name == "down");
+            }break;
+            case KeyAction.KM_UISelect:
+            {
+                result.input_action  = m_inputActions.UI.Select;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_UIAdvance:
+            {
+                result.input_action  = m_inputActions.UI.Advance;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_SecondaryFilter:
+            {
+                result.input_action = m_inputActions.Player.FilterSecondary;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.C_Movement:
+            {
+                result.input_action  = m_inputActions.Player.Move;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.groups != null && x.groups.Contains("Gamepad"));
+            }break;
+            case KeyAction.C_Pickup:
+            {
+                result.input_action = m_inputActions.Player.Pickup;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_Interaction:
+            {
+                result.input_action  = m_inputActions.Player.Interact;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_PrimaryFilter:
+            {
+                result.input_action = m_inputActions.Player.FilterPrimary;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_SecondaryFilter:
+            {
+                result.input_action = m_inputActions.Player.FilterSecondary;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_Sprint:
+            {
+                result.input_action = m_inputActions.Player.Sprint;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_Look:
+            {
+                result.input_action = m_inputActions.Player.Look;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_CameraChangeShoulder:
+            {
+                result.input_action = m_inputActions.Player.Look;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_CameraZoom:
+            {
+                result.input_action = m_inputActions.Player.CameraZoom;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.groups != null && x.groups.Contains("Gamepad"));
+            }break;
+            case KeyAction.C_CameraFreeLookToggle:
+            {
+                result.input_action = m_inputActions.Player.CameraFreeLookToggle;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_CameraFirstPerson:
+            {
+                result.input_action = m_inputActions.Player.CameraFirstPerson;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_UIMovement:
+            {
+                result.input_action  = m_inputActions.UI.NavigateController;
+                result.binding_index = result.input_action.bindings.IndexOf(x => x.groups != null && x.groups.Contains("Gamepad"));
+            }break;
+            case KeyAction.C_UISelect:
+            {
+                result.input_action  = m_inputActions.UI.Select;
+                result.binding_index = 1;
+            }break;
+            case KeyAction.C_UIAdvance:
+            {
+                result.input_action  = m_inputActions.UI.Advance;
+                result.binding_index = 1;
+            }break;
+        }
+        return result;
+    }
+    
+    private void StartRemap_(KeyAction action)
+    {
+        InputActionBindingIndexPair pair = InputActionBindingIndexPairFromKeyAction(action);
+
+        if(pair.binding_index != -1)
+        {
+            string group = action.ToString().Contains("KM_") ? "KeyboardMouse" : "Gamepad";
+
+            pair.input_action.Disable();
+            m_rebindingOperation = pair.input_action.PerformInteractiveRebinding()
+                .OnMatchWaitForAnother(0.1f)
+                // ah: i hope that some day i will wake up and that from that 
+                // day onwards, i don't have to use unity
+                .WithControlsExcluding("<Mouse>/scroll/y")
+                .WithCancelingThrough("<Keyboard>/escape")
+                .WithBindingGroup(group)
+                .WithTargetBinding(pair.binding_index)
+                .OnComplete(CompleteRebind);
+
+            m_rebindingOperation.Start();
+            m_currentRebindKeyAction    = action;
+            m_currentRebindBindingIndex = pair.binding_index;
+        }
+        else
+        {
+            Debug.LogError($"Couldn't rebind {action}");
+        }
+    }
+
+
+    private InputBinding InputBindingFromKeyAction(KeyAction action)
+    {
+        InputActionBindingIndexPair pair = InputActionBindingIndexPairFromKeyAction(action);
+        InputBinding binding = new();
+
+        if(pair.binding_index >= 0 && pair.binding_index < pair.input_action.bindings.Count)
+        {
+            binding = pair.input_action.bindings[pair.binding_index];
+        }
+
+        return binding;
+    }
+    
+    void Unbind(KeyAction action)
+    {
+        InputActionBindingIndexPair pair = InputActionBindingIndexPairFromKeyAction(action);
+        pair.input_action.ApplyBindingOverride(pair.binding_index, "");
+    }
+
+    private void CompleteRebind(InputActionRebindingExtensions.RebindingOperation operation)
+    {
+        operation.action.Enable();
+
+        InputBinding new_binding = InputBindingFromKeyAction(m_currentRebindKeyAction);
+        // HACK(ah): For some reason the display string is the correct newly remapped key
+        // but the path, and doing == doesn't always work xd
+        string new_str = new_binding.ToDisplayString();
+        bool new_is_ui = m_currentRebindKeyAction.ToString().Contains("UI");
+        for(int i = 0; i < (int)KeyAction.COUNT; i++) 
+        {
+            KeyAction action     = (KeyAction)i;
+            InputBinding binding = InputBindingFromKeyAction(action);
+            bool is_ui = action.ToString().Contains("UI");
+
+            bool is_same_key_map = new_is_ui == is_ui;
+            if(action != m_currentRebindKeyAction && is_same_key_map)
+            {
+                string str = binding.ToDisplayString();
+                if(str == new_str)
+                {
+                    Unbind(action);
+                }
+            }
+        }
+
+        m_onRebindComplete?.Invoke(m_currentRebindKeyAction);
+    }
+
+    public static string GetStringFromKeyAction(KeyAction action)
+    {
+        return Instance.InputBindingFromKeyAction(action).ToDisplayString();
+    }
 
     public static void SetAimDirection(Vector3 forward, Vector3 Right)
     {
@@ -52,9 +320,10 @@ public sealed class InputManager
         Vector2 movement = Instance.m_inputActions.Player.Move.ReadValue<Vector2>();
         return movement;
     }
+
     public static Vector2 ReadUINavigationValue()
     {
-        return Instance.m_inputActions.UI.Navigate.ReadValue<Vector2>() + Instance.m_inputActions.UI.NavigateController.ReadValue<Vector2>();    
+        return Instance.m_inputActions.UI.Navigate.ReadValue<Vector2>() + Instance.m_inputActions.UI.NavigateController.ReadValue<Vector2>() + Instance.m_inputActions.UI.NavigateArrowKeys.ReadValue<Vector2>();
     }
     public static Vector2 ReadPointerPosition()
     {
@@ -75,11 +344,13 @@ public sealed class InputManager
     }
     public static bool CameraZoomIn()
     {
-        return Instance.m_inputActions.Player.CameraZoom.ReadValue<Vector2>().y == 1;
+        float value = Instance.m_inputActions.Player.CameraZoom.ReadValue<Vector2>().y;
+        return value != 0 && Mathf.Sign(value) == 1;
     }
     public static bool CameraZoomOut()
     {
-        return Instance.m_inputActions.Player.CameraZoom.ReadValue<Vector2>().y == -1;
+        float value = Instance.m_inputActions.Player.CameraZoom.ReadValue<Vector2>().y;
+        return value != 0 && Mathf.Sign(value) == -1;
     }
     public static bool SelectUIOption()
     {
