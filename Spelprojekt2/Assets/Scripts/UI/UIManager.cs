@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Interaction.Dialogue;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
@@ -148,6 +149,18 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject m_controlsPageKeyboard;
 
+    [SerializeField]
+    private EventSystem m_eventSystem;
+
+    [SerializeField]
+    private GameObject m_settingsSelected;
+
+    [SerializeField]
+    private GameObject m_firstMainMenuSelected;
+
+    [SerializeField]
+    private GameObject m_firstPauseMenuSelected;
+
     private UIState m_state;
 
     // TODO(ah): Do something stack based over this nonsense
@@ -294,6 +307,7 @@ public class UIManager : MonoBehaviour
                 I.m_settingsMenuParent.SetActive(true);
                 I.m_statePriorToSettingsMenu = I.m_state;
 
+                I.m_eventSystem.SetSelectedGameObject(I.m_settingsSelected);
                 break;
             }
             case UIState.None:
@@ -307,6 +321,7 @@ public class UIManager : MonoBehaviour
                 I.ShowCursor();
                 I.m_mainMenuParent.SetActive(true);
                 InputManager.DisablePlayerInput();
+                I.m_eventSystem.SetSelectedGameObject(I.m_firstMainMenuSelected);
                 break;
             }
             case UIState.PauseMenu:
@@ -314,6 +329,7 @@ public class UIManager : MonoBehaviour
                 I.ShowCursor();
                 I.m_pauseMenuParent.SetActive(true);
                 InputManager.DisablePlayerInput();
+                I.m_eventSystem.SetSelectedGameObject(I.m_firstPauseMenuSelected);
                 break;
             }
             case UIState.Dialogue:
@@ -622,6 +638,7 @@ public class UIManager : MonoBehaviour
         else if(m_state == UIState.Settings && InputManager.Unpaused())
         {
             I.m_settingsMenuParent.SetActive(false);
+            I.m_settingsSelected = I.m_eventSystem.currentSelectedGameObject;
             EnterState(m_statePriorToSettingsMenu);
         }
     }
