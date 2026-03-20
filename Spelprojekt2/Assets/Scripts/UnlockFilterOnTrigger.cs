@@ -20,11 +20,18 @@ public class UnlockFilterOnTrigger : MonoBehaviour
         Destroy(gameObject);
     }
 
+    private void ActivateOutline(Collider other)
+    {
+        PlayerPowerUpAnimation player = other.GetComponentInChildren<PlayerPowerUpAnimation>();
+        if(player != null) player.ActivateOutlineAnimation();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             Unlock();
+            ActivateOutline(other);
         }
     }
 }
