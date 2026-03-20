@@ -28,11 +28,15 @@ public enum KeyAction
     KM_PrimaryFilter,
     KM_SecondaryFilter,
     KM_Sprint,
-    KM_Look,
     KM_CameraChangeShoulder,
-    KM_CameraZoom,
+    KM_CameraZoomIn,
+    KM_CameraZoomOut,
     KM_CameraFreeLookToggle,
     KM_CameraFirstPerson,
+    KM_UIUp,
+    KM_UIDown,
+    KM_UISelect,
+    KM_UIAdvance,
     C_Movement,
     C_Pickup,
     C_Interaction,
@@ -44,6 +48,9 @@ public enum KeyAction
     C_CameraZoom,
     C_CameraFreeLookToggle,
     C_CameraFirstPerson,
+    C_UIMovement,
+    C_UISelect,
+    C_UIAdvance,
     COUNT,
 }
 
@@ -127,8 +134,19 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Button m_settingsPageGameplayButton;
 
+    [Header("Controls")]
+
     [SerializeField]
-    private TextMeshProUGUI[] m_keyActionTexts;
+    private Button m_controlsPageControllerButton;
+
+    [SerializeField]
+    private Button m_controlsPageKeyboardButton;
+
+    [SerializeField]
+    private GameObject m_controlsPageController;
+
+    [SerializeField]
+    private GameObject m_controlsPageKeyboard;
 
     private UIState m_state;
 
@@ -152,7 +170,8 @@ public class UIManager : MonoBehaviour
         I = this;
         DontDestroyOnLoad(this.gameObject);
 
-        EnterState(m_stateOnInitialization);
+
+
 
         InputManager.onRebindComplete.AddListener(CompleteRemap);
         // TODO(ah): deserialize settings
@@ -180,16 +199,7 @@ public class UIManager : MonoBehaviour
 
         }
 
-        // ah: init keyaction text
-        UpdateActionTexts();
-    }
-
-    void UpdateActionTexts()
-    {
-        for(int i = 0; i < m_keyActionTexts.Length; i++)
-        {
-            m_keyActionTexts[i].text = InputManager.GetStringFromKeyAction((KeyAction)i);
-        }
+        EnterState(m_stateOnInitialization);
     }
 
     void SecondaryFilterButtonClicked(FilterColor color)
@@ -243,14 +253,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void StartRemap(int action_to_map)
-    {
-        InputManager.StartRemap((KeyAction)action_to_map);
-    }
-
     public void CompleteRemap(KeyAction action)
     {
-        UpdateActionTexts();
+        var rebindButtons = FindObjectsByType<RebindButton>(FindObjectsSortMode.None);
+        foreach(var btn in rebindButtons)
+        {
+            btn.UpdateText();
+        }
     }
 
     public void PlayHoverButtonSound()
@@ -284,6 +293,7 @@ public class UIManager : MonoBehaviour
                 InputManager.DisablePlayerInput();
                 I.m_settingsMenuParent.SetActive(true);
                 I.m_statePriorToSettingsMenu = I.m_state;
+
                 break;
             }
             case UIState.None:
@@ -322,7 +332,13 @@ public class UIManager : MonoBehaviour
         Audio,
         Controls,
     }
+    private enum ControlsPageKind
+    {
+        Keyboard,
+        Controller,
+    }
     private SettingsPageKind m_activeSettingsPage;
+    private ControlsPageKind m_activeControlsPage;
 
     void Start()
     {
@@ -442,9 +458,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void SettingsMenu_MasterAudioSetSliderValue()
+    {
+        m_settingsPage_MasterVolumeSlider.value = AudioSystem.I.GetMasterVolume();
+    }
+
     public void SettingsMenu_MasterAudioValueChange()
     {
         AudioSystem.I.SetMasterVolume(m_settingsPage_MasterVolumeSlider.value);
+    }
+
+    public void SettingsMenu_MusicAudioSetSliderValue()
+    {
+        m_settingsPage_MusicVolumeSlider.value = AudioSystem.I.GetMusicVolume();
     }
 
     public void SettingsMenu_MusicAudioValueChange()
@@ -452,9 +478,19 @@ public class UIManager : MonoBehaviour
         AudioSystem.I.SetMusicVolume(m_settingsPage_MusicVolumeSlider.value);
     }
 
+    public void SettingsMenu_SFXAudioSetSliderValue()
+    {
+        m_settingsPage_SFXVolumeSlider.value = AudioSystem.I.GetSfxVolume();
+    }
+
     public void SettingsMenu_SFXAudioValueChange()
     {
         AudioSystem.I.SetSfxVolume(m_settingsPage_SFXVolumeSlider.value);
+    }
+
+    public void SettingsMenu_UIAudioSetSliderValue()
+    {
+        m_settingsPage_UIVolumeSlider.value = AudioSystem.I.GetUiVolume();
     }
 
     public void SettingsMenu_UIAudioValueChange()
@@ -467,6 +503,15 @@ public class UIManager : MonoBehaviour
         var cb = btn.colors;
         cb.normalColor = cb.highlightedColor = cb.disabledColor = cb.pressedColor = cb.selectedColor = color;
         btn.colors = cb;
+    }
+
+    void SetActiveControlsPage(ControlsPageKind kind)
+    {
+        m_controlsPageKeyboard.SetActive(kind == ControlsPageKind.Keyboard);
+        m_controlsPageController.SetActive(kind == ControlsPageKind.Controller);
+        SetButtonColor(m_controlsPageKeyboardButton, kind == ControlsPageKind.Keyboard ? m_selectedButtonColor : m_buttonColor);
+        SetButtonColor(m_controlsPageControllerButton, kind == ControlsPageKind.Controller ? m_selectedButtonColor : m_buttonColor);
+        m_activeControlsPage = kind;
     }
 
     void SetActiveSettingsPage(SettingsPageKind kind)
@@ -488,12 +533,20 @@ public class UIManager : MonoBehaviour
                 SetButtonColor(m_settingsPageGameplayButton, m_buttonColor);
                 SetButtonColor(m_settingsPageAudioButton, m_selectedButtonColor);
                 SetButtonColor(m_settingsPageControlsButton, m_buttonColor);
+
+                SettingsMenu_MasterAudioSetSliderValue();
+                SettingsMenu_MusicAudioSetSliderValue();
+                SettingsMenu_SFXAudioSetSliderValue();
+                SettingsMenu_UIAudioSetSliderValue();
+
             }break;
             case SettingsPageKind.Controls:
             {
                 SetButtonColor(m_settingsPageGameplayButton, m_buttonColor);
                 SetButtonColor(m_settingsPageAudioButton, m_buttonColor);
                 SetButtonColor(m_settingsPageControlsButton, m_selectedButtonColor);
+
+                SetActiveControlsPage(m_activeControlsPage);
             }break;
         }
     }
@@ -511,6 +564,16 @@ public class UIManager : MonoBehaviour
     public void SettingsMenu_GameplayClicked()
     {
         SetActiveSettingsPage(SettingsPageKind.Gameplay);
+    }
+
+    public void SettingsMenu_ControlsKeyboardClicked()
+    {
+        SetActiveControlsPage(ControlsPageKind.Keyboard);
+    }
+
+    public void SettingsMenu_ControlsControllerClicked()
+    {
+        SetActiveControlsPage(ControlsPageKind.Controller);
     }
 
     void SetupScene()
@@ -558,6 +621,7 @@ public class UIManager : MonoBehaviour
         }
         else if(m_state == UIState.Settings && InputManager.Unpaused())
         {
+            I.m_settingsMenuParent.SetActive(false);
             EnterState(m_statePriorToSettingsMenu);
         }
     }

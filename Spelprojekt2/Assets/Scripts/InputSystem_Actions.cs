@@ -485,37 +485,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""2D Vector"",
-                    ""id"": ""a9a6ce56-afbd-4179-b2f7-34eef7ab0b9c"",
-                    ""path"": ""2DVector(mode=2)"",
+                    ""name"": """",
+                    ""id"": ""21d1d97a-436a-4fa0-9b69-018af599ef7b"",
+                    ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Gamepad"",
                     ""action"": ""CameraZoom"",
-                    ""isComposite"": true,
+                    ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""up"",
-                    ""id"": ""9c81bb75-36e0-4c46-bc5d-87790a2e8b1a"",
-                    ""path"": ""<Gamepad>/leftStick/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""CameraZoom"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""5c309553-9c21-47a1-8762-46b7803a620f"",
-                    ""path"": ""<Gamepad>/leftStick/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""CameraZoom"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
@@ -725,64 +703,18 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""NavigateArrowKeys"",
+                    ""type"": ""Value"",
+                    ""id"": ""c2e35a75-f273-4571-8f93-b33aa19ccf89"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": ""Arrow keys"",
-                    ""id"": ""ff527021-f211-4c02-933e-5976594c46ed"",
-                    ""path"": ""2DVector"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""up"",
-                    ""id"": ""eb480147-c587-4a33-85ed-eb0ab9942c43"",
-                    ""path"": ""<Keyboard>/upArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""85d264ad-e0a0-4565-b7ff-1a37edde51ac"",
-                    ""path"": ""<Keyboard>/downArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""left"",
-                    ""id"": ""cea9b045-a000-445b-95b8-0c171af70a3b"",
-                    ""path"": ""<Keyboard>/leftArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""4cda81dc-9edd-4e03-9d7c-a71a14345d0b"",
-                    ""path"": ""<Keyboard>/rightArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Navigate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
                 {
                     ""name"": ""WASD"",
                     ""id"": ""96126cb1-421d-4b80-b51b-75d9a16ed040"",
@@ -1079,6 +1011,61 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Advance"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""ArrowKeys"",
+                    ""id"": ""1e1537fc-38c4-411b-ac03-944d56822fee"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NavigateArrowKeys"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""2c671b97-b3b9-4436-9ab5-dd083292872a"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""NavigateArrowKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""af2e40fa-f76b-4a80-9802-7e200f74b1ef"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""NavigateArrowKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""8c0e4267-35f3-4b3e-a2e6-847cbe3e2c4d"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""NavigateArrowKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""55f61763-55f2-4650-8071-f140dc5bdf7d"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""NavigateArrowKeys"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -1178,6 +1165,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_Pause = m_UI.FindAction("Pause", throwIfNotFound: true);
         m_UI_PointerSelect = m_UI.FindAction("PointerSelect", throwIfNotFound: true);
         m_UI_Advance = m_UI.FindAction("Advance", throwIfNotFound: true);
+        m_UI_NavigateArrowKeys = m_UI.FindAction("NavigateArrowKeys", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1512,6 +1500,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Pause;
     private readonly InputAction m_UI_PointerSelect;
     private readonly InputAction m_UI_Advance;
+    private readonly InputAction m_UI_NavigateArrowKeys;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1580,6 +1569,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Advance => m_Wrapper.m_UI_Advance;
         /// <summary>
+        /// Provides access to the underlying input action "UI/NavigateArrowKeys".
+        /// </summary>
+        public InputAction @NavigateArrowKeys => m_Wrapper.m_UI_NavigateArrowKeys;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_UI; }
@@ -1647,6 +1640,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Advance.started += instance.OnAdvance;
             @Advance.performed += instance.OnAdvance;
             @Advance.canceled += instance.OnAdvance;
+            @NavigateArrowKeys.started += instance.OnNavigateArrowKeys;
+            @NavigateArrowKeys.performed += instance.OnNavigateArrowKeys;
+            @NavigateArrowKeys.canceled += instance.OnNavigateArrowKeys;
         }
 
         /// <summary>
@@ -1700,6 +1696,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Advance.started -= instance.OnAdvance;
             @Advance.performed -= instance.OnAdvance;
             @Advance.canceled -= instance.OnAdvance;
+            @NavigateArrowKeys.started -= instance.OnNavigateArrowKeys;
+            @NavigateArrowKeys.performed -= instance.OnNavigateArrowKeys;
+            @NavigateArrowKeys.canceled -= instance.OnNavigateArrowKeys;
         }
 
         /// <summary>
@@ -2009,5 +2008,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAdvance(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "NavigateArrowKeys" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnNavigateArrowKeys(InputAction.CallbackContext context);
     }
 }
