@@ -215,7 +215,8 @@ namespace Interaction.Dialogue
             m_dialogueContainer.gameObject.SetActive(false);
             m_activeStory = null;
             m_prefix = "";
-            
+
+            m_camera.DefaultBlend = new CinemachineBlendDefinition(m_camera.DefaultBlend.Style, m_cameraGlobalDefaultBlendTime);
             
             UIManager.EnterState(UIState.None);
         }
