@@ -26,6 +26,7 @@ namespace Interaction.Dialogue
         [SerializeField] private float m_altButtonOffset;
         [SerializeField] private float m_inputRepeatDelay = 0.1f;
         [SerializeField] private string m_speakerSoundEvent = "dsSpeakingSound";
+        [SerializeField] private float m_fontSizeAt1080;
         
         private List<TextMeshProUGUI> m_pooledAltObjects;
         private int m_currentAltCount;
@@ -77,6 +78,7 @@ namespace Interaction.Dialogue
                 if (m_pooledAltObjects is null) m_pooledAltObjects = new List<TextMeshProUGUI>();
                 m_subscribed = true;
                 m_initialSubscribed = true;
+                m_textOut.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
             }
         }
 
