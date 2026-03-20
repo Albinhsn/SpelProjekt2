@@ -17,6 +17,8 @@ public class UnlockFilterOnTrigger : MonoBehaviour
             SfxDirector.PlayCue2(m_pickupCue, transform.position);
         }
 
+        Material material = GetComponent<MeshRenderer>().material;
+        ParticleManager.PlayParticleEffect(transform.position, transform.rotation, gameObject.GetComponent<Mesh>(), material, new Vector3(.5f,.5f,.5f), this.gameObject.scene);
         Destroy(gameObject);
     }
 
