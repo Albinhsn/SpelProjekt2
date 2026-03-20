@@ -14,7 +14,7 @@ USER. # speaker=Alea
 You have done a good job getting here. Finally, we can get this over with. # speaker=USER
 What is it you want me to do exactly? What's going to happen now? # speaker=Alea
 I am going to reset this world. # speaker=USER # camera=1
-All you have to do is stand there and be the catalyst. # camera=2
+All you have to do is stand there and be the catalyst. # camera=2 #transition=0.1
 You… You’re going to kill everyone? # speaker=Alea
 It’s a process where I move back the world to a previous version of itself. # speaker=USER # camera=0
 Nobody dies Alea, the Localites will simply experience a slight hole in their memories.
