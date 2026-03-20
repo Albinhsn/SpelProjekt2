@@ -266,6 +266,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void SetSelectGameObject(GameObject obj)
+    {
+        I.m_eventSystem.SetSelectedGameObject(obj);
+    }
+
     public void CompleteRemap(KeyAction action)
     {
         var rebindButtons = FindObjectsByType<RebindButton>(FindObjectsSortMode.None);
@@ -525,8 +530,6 @@ public class UIManager : MonoBehaviour
     {
         m_controlsPageKeyboard.SetActive(kind == ControlsPageKind.Keyboard);
         m_controlsPageController.SetActive(kind == ControlsPageKind.Controller);
-        SetButtonColor(m_controlsPageKeyboardButton, kind == ControlsPageKind.Keyboard ? m_selectedButtonColor : m_buttonColor);
-        SetButtonColor(m_controlsPageControllerButton, kind == ControlsPageKind.Controller ? m_selectedButtonColor : m_buttonColor);
         m_activeControlsPage = kind;
     }
 
@@ -538,18 +541,8 @@ public class UIManager : MonoBehaviour
         m_settingsPageControls.SetActive(kind == SettingsPageKind.Controls);
         switch(kind)
         {
-            case SettingsPageKind.Gameplay:
-            {
-                SetButtonColor(m_settingsPageGameplayButton, m_selectedButtonColor);
-                SetButtonColor(m_settingsPageAudioButton, m_buttonColor);
-                SetButtonColor(m_settingsPageControlsButton, m_buttonColor);
-            }break;
             case SettingsPageKind.Audio:
             {
-                SetButtonColor(m_settingsPageGameplayButton, m_buttonColor);
-                SetButtonColor(m_settingsPageAudioButton, m_selectedButtonColor);
-                SetButtonColor(m_settingsPageControlsButton, m_buttonColor);
-
                 SettingsMenu_MasterAudioSetSliderValue();
                 SettingsMenu_MusicAudioSetSliderValue();
                 SettingsMenu_SFXAudioSetSliderValue();
@@ -558,10 +551,6 @@ public class UIManager : MonoBehaviour
             }break;
             case SettingsPageKind.Controls:
             {
-                SetButtonColor(m_settingsPageGameplayButton, m_buttonColor);
-                SetButtonColor(m_settingsPageAudioButton, m_buttonColor);
-                SetButtonColor(m_settingsPageControlsButton, m_selectedButtonColor);
-
                 SetActiveControlsPage(m_activeControlsPage);
             }break;
         }
