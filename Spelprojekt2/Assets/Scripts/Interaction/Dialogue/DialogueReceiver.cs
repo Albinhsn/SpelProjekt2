@@ -4,6 +4,7 @@ using AudioKit.FMOD;
 using Ink.Runtime;
 using JetBrains.Annotations;
 using TMPro;
+using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -31,6 +32,11 @@ namespace Interaction.Dialogue
         private List<TextMeshProUGUI> m_pooledAltObjects;
         private int m_currentAltCount;
         private int m_selectedAlt = 0;
+        
+        //Refs
+        private CinemachineBrain m_camera;
+        private float m_cameraGlobalDefaultBlendTime;
+        private float m_cameraInteractionDefaultBlendTime;
         
         //Static
         private Vector2Int m_screenBounds;
@@ -79,6 +85,8 @@ namespace Interaction.Dialogue
                 m_subscribed = true;
                 m_initialSubscribed = true;
                 m_textOut.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
+                m_camera = FindFirstObjectByType<CinemachineBrain>();
+                m_cameraGlobalDefaultBlendTime = m_camera.DefaultBlend.Time;
             }
         }
 
@@ -177,6 +185,7 @@ namespace Interaction.Dialogue
             m_typeDelay = packet.typeDelay;
             m_dfTypeDelay = packet.typeDelay;
             m_typingIndicator = packet.typingIndicator;
+            m_cameraInteractionDefaultBlendTime = m_cameraGlobalDefaultBlendTime;
 
             if(m_activeStory.globalTags is not null) ParseGlobalTags(m_activeStory.globalTags.ToArray());
             UpdateDialogue();
@@ -206,7 +215,8 @@ namespace Interaction.Dialogue
             m_dialogueContainer.gameObject.SetActive(false);
             m_activeStory = null;
             m_prefix = "";
-            
+
+            m_camera.DefaultBlend = new CinemachineBlendDefinition(m_camera.DefaultBlend.Style, m_cameraGlobalDefaultBlendTime);
             
             UIManager.EnterState(UIState.None);
         }
@@ -328,6 +338,7 @@ namespace Interaction.Dialogue
         private void ParseTags(string[] tags)//Tag syntax: "{tag}={value}" or "{static tag}"
         {
             bool use_default_color = true;
+            bool use_default_transition_time = true;
             
             for (int a = 0; a < tags.Length; a++)
             {
@@ -361,12 +372,17 @@ namespace Interaction.Dialogue
                             if (value == "default") m_typeDelay = m_dfTypeDelay;
                             else m_typeDelay = float.Parse(value);
                             break;
+                        case "transition":
+                            m_camera.DefaultBlend = new CinemachineBlendDefinition(m_camera.DefaultBlend.Style, float.Parse(value));
+                            use_default_transition_time = false;
+                            break;
                         
                     }
                 }
             }
 
             if (use_default_color) m_textOut.color = m_colorSet.textDefaultColor;
+            if (use_default_transition_time) m_camera.DefaultBlend = new CinemachineBlendDefinition(m_camera.DefaultBlend.Style, m_cameraInteractionDefaultBlendTime);
         }
 
         private void ParseGlobalTags(string[] tags)
@@ -386,6 +402,9 @@ namespace Interaction.Dialogue
                         case "speaker":
                             if (value == "") m_prefix = "";
                             else m_prefix = value + ": ";
+                            break;
+                        case "transition":
+                            m_cameraInteractionDefaultBlendTime = float.Parse(value);
                             break;
                     }
                 }
