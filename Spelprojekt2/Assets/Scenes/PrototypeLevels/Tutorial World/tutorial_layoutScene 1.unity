@@ -1213,6 +1213,85 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6d126219480e744469d9e86ca4a1ecc0, type: 3}
+--- !u!1 &656462957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 656462958}
+  - component: {fileID: 656462960}
+  - component: {fileID: 656462959}
+  m_Layer: 0
+  m_Name: Indoor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &656462958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656462957}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 14.65, y: 11.79, z: -0.74}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1432891690}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &656462959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656462957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99977a57c08d4ed0b8312b0a9483ab90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snapshotEvent:
+    Guid:
+      Data1: 582224655
+      Data2: 1140236698
+      Data3: -911970161
+      Data4: -317531124
+    Path: snapshot:/IndoorTutorial
+  snapshotIdOrPath: 
+  fadeOutSeconds: 0.25
+  requiredTag: Player
+  requiredLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!65 &656462960
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656462957}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 48, y: 25, z: 18.5}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &716084445
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4316,11 +4395,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: endActions.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: startActions.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: actions.Array.data[4].fade
@@ -4339,20 +4418,96 @@ PrefabInstance:
       value: MainMusic
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[0].fade
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: endActions.Array.data[0].type
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[1].fade
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[1].type
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[2].type
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[0].fade
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: startActions.Array.data[0].type
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[1].fade
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[1].type
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[2].type
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: endActions.Array.data[0].eventId
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[1].eventId
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[2].eventId
       value: TutorialMusic
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[0].snapshot
+      value: snapshot:/IndoorTutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[1].snapshot
+      value: snapshot:/OutdoorTutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[2].snapshot
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: startActions.Array.data[0].eventId
       value: TutorialMusic
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[1].eventId
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[1].snapshot
+      value: snapshot:/IndoorTutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[2].snapshot
+      value: snapshot:/OutdoorTutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: endActions.Array.data[1].snapshotEnable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[1].snapshotEnable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3255923164066876921, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      propertyPath: startActions.Array.data[2].snapshotEnable
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8694868728491342582, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4396,9 +4551,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 8694868728491342582, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 656462958}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+--- !u!4 &1432891690 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8694868728491342582, guid: ecfc0ed68093b2a44ac47fc0d2ea2ab1, type: 3}
+  m_PrefabInstance: {fileID: 1432891689}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1453576257
 PrefabInstance:
   m_ObjectHideFlags: 0
