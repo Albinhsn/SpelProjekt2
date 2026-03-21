@@ -22,6 +22,10 @@ namespace AudioKit.FMOD
         [Header("Värde")]
         [SerializeField] private bool invert;
         [SerializeField] private float smoothTime = 0.10f;
+        
+        [Header("Teleport Snap")]
+        [SerializeField] private bool snapOnTeleport = true;
+        [SerializeField] private float teleportDistance = 3.5f;
 
         [Header("Update")]
         [SerializeField] private bool updateInFixed;
@@ -32,6 +36,9 @@ namespace AudioKit.FMOD
         private string paramName;
         private float vel;
         private float current;
+        private bool initialized;
+        private bool hasLastPlayerPos;
+        private Vector3 lastPlayerPos;
 
         private void TryToFindPlayer()
         {
@@ -50,6 +57,7 @@ namespace AudioKit.FMOD
         {
             TryToFindPlayer();
             paramName = parameter.Resolve(AudioResources.ParamLibrary);
+            SnapToCurrentPlayerPosition();
         }
 
         private void OnValidate()
@@ -79,6 +87,23 @@ namespace AudioKit.FMOD
             Tick(Time.fixedDeltaTime);
         }
 
+        private void SnapToCurrentPlayerPosition()
+        {
+            if (player == null) return;
+            if (points == null || points.Length < 2) return;
+            if (pointValues == null || pointValues.Length != points.Length) return;
+            if (string.IsNullOrEmpty(paramName)) return;
+
+            current = ComputeValue(player.position);
+            vel = 0f;
+            initialized = true;
+
+            lastPlayerPos = player.position;
+            hasLastPlayerPos = true;
+
+            AudioSystem.I?.SetGlobalParam(paramName, current);
+        }
+        
         private void Tick(float dt)
         {
             if (player == null) return;
@@ -87,11 +112,31 @@ namespace AudioKit.FMOD
             if (string.IsNullOrEmpty(paramName)) return;
 
             float target = ComputeValue(player.position);
-            current = smoothTime > 0f
-                ? Mathf.SmoothDamp(current, target, ref vel, smoothTime)
-                : target;
+
+            bool teleported = false;
+            if (snapOnTeleport && hasLastPlayerPos)
+            {
+                float sqrDist = (player.position - lastPlayerPos).sqrMagnitude;
+                teleported = sqrDist >= teleportDistance * teleportDistance;
+            }
+
+            if (!initialized || teleported)
+            {
+                current = target;
+                vel = 0f;
+                initialized = true;
+            }
+            else
+            {
+                current = smoothTime > 0f
+                    ? Mathf.SmoothDamp(current, target, ref vel, smoothTime)
+                    : target;
+            }
 
             AudioSystem.I?.SetGlobalParam(paramName, current);
+
+            lastPlayerPos = player.position;
+            hasLastPlayerPos = true;
         }
 
         private float ComputeValue(Vector3 pos)
