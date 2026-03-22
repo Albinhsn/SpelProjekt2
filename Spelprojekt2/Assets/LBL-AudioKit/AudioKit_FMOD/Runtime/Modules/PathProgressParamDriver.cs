@@ -22,10 +22,20 @@ namespace AudioKit.FMOD
         [Header("Värde")]
         [SerializeField] private bool invert;
         [SerializeField] private float smoothTime = 0.10f;
-        
+
         [Header("Teleport Snap")]
         [SerializeField] private bool snapOnTeleport = true;
         [SerializeField] private float teleportDistance = 3.5f;
+
+        [Header("Stacked Path Priority")]
+        [Tooltip("Om flera delar av pathen ligger ovanpå varandra i X/Z väljs den högsta delen under spelaren.")]
+        [SerializeField] private bool preferHighestSegmentUnderPlayer = true;
+
+        [Tooltip("Hur nära i X/Z spelaren måste vara ett segment för att det ska räknas som 'under/ovanför'.")]
+        [SerializeField] private float stackedHorizontalThreshold = 1.5f;
+
+        [Tooltip("Tillåt att segmentet ligger lite ovanför spelaren och ändå räknas.")]
+        [SerializeField] private float maxAbovePlayerTolerance = 0.75f;
 
         [Header("Update")]
         [SerializeField] private bool updateInFixed;
@@ -48,9 +58,8 @@ namespace AudioKit.FMOD
                 if (go != null)
                 {
                     player = go.transform;
-                } 
+                }
             }
-
         }
 
         private void Start()
@@ -62,16 +71,20 @@ namespace AudioKit.FMOD
 
         private void OnValidate()
         {
-            // Håll pointValues synkad med points (så du slipper manuellt fixa storlek).
             int n = points != null ? points.Length : 0;
             if (n < 0) n = 0;
 
             if (pointValues == null || pointValues.Length != n)
             {
                 var newVals = new float[n];
-                for (int i = 0; i < n; i++) newVals[i] = i; // default: 0,1,2,3...
+                for (int i = 0; i < n; i++) newVals[i] = i;
                 pointValues = newVals;
             }
+
+            stackedHorizontalThreshold = Mathf.Max(0.01f, stackedHorizontalThreshold);
+            maxAbovePlayerTolerance = Mathf.Max(0f, maxAbovePlayerTolerance);
+            teleportDistance = Mathf.Max(0f, teleportDistance);
+            smoothTime = Mathf.Max(0f, smoothTime);
         }
 
         private void Update()
@@ -103,7 +116,7 @@ namespace AudioKit.FMOD
 
             AudioSystem.I?.SetGlobalParam(paramName, current);
         }
-        
+
         private void Tick(float dt)
         {
             if (player == null) return;
@@ -139,79 +152,145 @@ namespace AudioKit.FMOD
             hasLastPlayerPos = true;
         }
 
-        private float ComputeValue(Vector3 pos)
+private float ComputeValue(Vector3 pos)
+{
+    // 1) Räkna totallängd + segment-start längs pathen
+    float total = 0f;
+    float[] segmentStartAlong = new float[points.Length - 1];
+
+    for (int i = 0; i < points.Length - 1; i++)
+    {
+        var a = points[i];
+        var b = points[i + 1];
+        segmentStartAlong[i] = total;
+
+        if (a == null || b == null) continue;
+        total += Vector3.Distance(a.position, b.position);
+    }
+
+    if (total <= 0.0001f)
+        return pointValues[0];
+
+    // 2) Först: använd point-ordningen som prioritet vid stackade delar
+    if (preferHighestSegmentUnderPlayer)
+    {
+        float horizontalThresholdSqr = stackedHorizontalThreshold * stackedHorizontalThreshold;
+
+        // Gå BAKLÄNGES så senare/högre segment vinner
+        for (int i = points.Length - 2; i >= 0; i--)
         {
-            // 1) Räkna totallängd
-            float total = 0f;
-            for (int i = 0; i < points.Length - 1; i++)
+            var aT = points[i];
+            var bT = points[i + 1];
+            if (aT == null || bT == null) continue;
+
+            Vector3 a = aT.position;
+            Vector3 b = bT.position;
+
+            Vector2 aXZ = new Vector2(a.x, a.z);
+            Vector2 bXZ = new Vector2(b.x, b.z);
+            Vector2 pXZ = new Vector2(pos.x, pos.z);
+
+            Vector2 abXZ = bXZ - aXZ;
+            float abXZLenSqr = abXZ.sqrMagnitude;
+            if (abXZLenSqr <= 0.0001f) continue;
+
+            float tXZ = Mathf.Clamp01(Vector2.Dot(pXZ - aXZ, abXZ) / abXZLenSqr);
+            Vector3 closest = Vector3.Lerp(a, b, tXZ);
+
+            Vector2 closestXZ = new Vector2(closest.x, closest.z);
+            float horizontalDistSqr = (pXZ - closestXZ).sqrMagnitude;
+
+            if (horizontalDistSqr > horizontalThresholdSqr)
+                continue;
+
+            if (closest.y > pos.y + maxAbovePlayerTolerance)
+                continue;
+
+            float segLen = Vector3.Distance(a, b);
+            float chosenAlong = segmentStartAlong[i] + (segLen * tXZ);
+
+            float alongPriority = invert ? (total - chosenAlong) : chosenAlong;
+            alongPriority = Mathf.Clamp(alongPriority, 0f, total);
+
+            float accPriority = 0f;
+            for (int j = 0; j < points.Length - 1; j++)
             {
-                var a = points[i];
-                var b = points[i + 1];
-                if (a == null || b == null) continue;
-                total += Vector3.Distance(a.position, b.position);
-            }
-            if (total <= 0.0001f) return pointValues[0];
+                var pa = points[j];
+                var pb = points[j + 1];
+                if (pa == null || pb == null) continue;
 
-            // 2) Hitta närmaste punkt på polyline och "along" i meter längs pathen
-            float bestDistSqr = float.PositiveInfinity;
-            float bestAlong = 0f;
-
-            float alongSoFar = 0f;
-            for (int i = 0; i < points.Length - 1; i++)
-            {
-                var aT = points[i];
-                var bT = points[i + 1];
-                if (aT == null || bT == null) continue;
-
-                var a = aT.position;
-                var b = bT.position;
-
-                var ab = b - a;
-                float len = ab.magnitude;
+                float len = Vector3.Distance(pa.position, pb.position);
                 if (len <= 0.0001f) continue;
 
-                var dir = ab / len;
-                float proj = Vector3.Dot(pos - a, dir);
-                float clamped = Mathf.Clamp(proj, 0f, len);
-
-                var closest = a + dir * clamped;
-                float distSqr = (pos - closest).sqrMagnitude;
-
-                if (distSqr < bestDistSqr)
+                if (alongPriority <= accPriority + len || j == points.Length - 2)
                 {
-                    bestDistSqr = distSqr;
-                    bestAlong = alongSoFar + clamped;
+                    float segT = Mathf.Clamp01((alongPriority - accPriority) / len);
+                    return Mathf.Lerp(pointValues[j], pointValues[j + 1], segT);
                 }
 
-                alongSoFar += len;
+                accPriority += len;
             }
-
-            // 3) invert = gå från slutet
-            float along = invert ? (total - bestAlong) : bestAlong;
-            along = Mathf.Clamp(along, 0f, total);
-
-            // 4) Konvertera "along" till segment + t och lerpa mellan pointValues
-            float acc = 0f;
-            for (int i = 0; i < points.Length - 1; i++)
-            {
-                var a = points[i];
-                var b = points[i + 1];
-                if (a == null || b == null) continue;
-
-                float len = Vector3.Distance(a.position, b.position);
-                if (len <= 0.0001f) continue;
-
-                if (along <= acc + len || i == points.Length - 2)
-                {
-                    float segT = Mathf.Clamp01((along - acc) / len);
-                    return Mathf.Lerp(pointValues[i], pointValues[i + 1], segT);
-                }
-
-                acc += len;
-            }
-
-            return pointValues[pointValues.Length - 1];
         }
+    }
+
+    // 3) Fallback: vanlig närmaste punkt i 3D
+    float bestDistSqr = float.PositiveInfinity;
+    float bestAlong = 0f;
+
+    float alongSoFar = 0f;
+    for (int i = 0; i < points.Length - 1; i++)
+    {
+        var aT = points[i];
+        var bT = points[i + 1];
+        if (aT == null || bT == null) continue;
+
+        Vector3 a = aT.position;
+        Vector3 b = bT.position;
+
+        Vector3 ab = b - a;
+        float len = ab.magnitude;
+        if (len <= 0.0001f) continue;
+
+        Vector3 dir = ab / len;
+        float proj = Vector3.Dot(pos - a, dir);
+        float clamped = Mathf.Clamp(proj, 0f, len);
+
+        Vector3 closest = a + dir * clamped;
+        float distSqr = (pos - closest).sqrMagnitude;
+
+        if (distSqr < bestDistSqr)
+        {
+            bestDistSqr = distSqr;
+            bestAlong = alongSoFar + clamped;
+        }
+
+        alongSoFar += len;
+    }
+
+    float along = invert ? (total - bestAlong) : bestAlong;
+    along = Mathf.Clamp(along, 0f, total);
+
+    float acc = 0f;
+    for (int i = 0; i < points.Length - 1; i++)
+    {
+        var a = points[i];
+        var b = points[i + 1];
+        if (a == null || b == null) continue;
+
+        float len = Vector3.Distance(a.position, b.position);
+        if (len <= 0.0001f) continue;
+
+        if (along <= acc + len || i == points.Length - 2)
+        {
+            float segT = Mathf.Clamp01((along - acc) / len);
+            return Mathf.Lerp(pointValues[i], pointValues[i + 1], segT);
+        }
+
+        acc += len;
+    }
+
+    return pointValues[pointValues.Length - 1];
+}
 
         private void OnDrawGizmos()
         {
