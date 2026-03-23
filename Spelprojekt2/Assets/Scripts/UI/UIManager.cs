@@ -591,6 +591,7 @@ public class UIManager : MonoBehaviour
                 if(fm != null)
                 {
                     fm.ChangeFilter(ok.active_filter);
+                    fm.m_filterUnlocked = ok.m_unlockedFilter;
                 }
             }
         }
