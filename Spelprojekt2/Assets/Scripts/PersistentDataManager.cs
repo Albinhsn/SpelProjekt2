@@ -1,4 +1,5 @@
 using UnityEngine;
+using AudioKit.FMOD;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System;
@@ -294,6 +295,7 @@ public sealed class PersistentDataManager
         public byte[] m_id;
         public List<ObjectData> m_sgos;
         public List<ObjectData> m_spawners;
+        public List<Guid> m_checkpoints;
         public List<FlippedData> m_flipped;
         public List<ForceInteractorTriggerData> m_triggers;
         public List<InkAssetRegistryData> m_iaregs;
@@ -331,6 +333,10 @@ public sealed class PersistentDataManager
                 // sh: ink asset registry data (am I doing this right?)
                 int size_of_iar_data = 16 + sizeof(int);
                 size += size_of_iar_data * (m_iaregs?.Count ?? 0);
+
+                // ah: checkpoints
+                size += sizeof(int);
+                size += 16 * (m_checkpoints != null ? m_checkpoints.Count : 0);
 
                 return size;
             }
@@ -389,6 +395,17 @@ public sealed class PersistentDataManager
             for (int i = 0; i < count; i++)
             {
                 offset = m_iaregs[i].Serialize(ref buffer, offset);
+            }
+
+            // ah: checkpoints
+            count = m_checkpoints == null ? 0 : m_checkpoints.Count;
+            offset = SerializeScalar<int>(ref buffer, count, offset);
+            if(count != 0)
+            {
+                foreach(var guid in m_checkpoints)
+                {
+                    offset = SerializeArray<byte>(ref buffer, guid.ToByteArray(), offset, 1);
+                }
             }
 
             return offset;
@@ -564,6 +581,16 @@ public sealed class PersistentDataManager
                             lvl.m_iaregs.Add(InkAssetRegistryData.Deserialize(buffer, ref offset));
                         }
 
+                        // ah: checkpoints
+                        offset = DeserializeScalar<int>(ref count, buffer, offset);
+                        lvl.m_checkpoints = new List<Guid>(count);
+                        for (int i = 0; i < count; i++)
+                        {
+                            var id = new byte[16];
+                            offset = DeserializeArray<byte>(ref id, buffer, offset, 1);
+                            lvl.m_checkpoints.Add(new Guid(id));
+                        }
+
                         // ah: Add the lvl
                         result.m_levels.m_exists = true;
                         if(result.m_levels.m_levels == null)
@@ -636,10 +663,7 @@ public sealed class PersistentDataManager
                 }
             }
         }
-        else
-        {
-            Debug.LogError($"Tried to deserialize but file at {path} didn't exist");
-        }
+        
         return result;
     }
 
@@ -659,7 +683,6 @@ public sealed class PersistentDataManager
             {
                 // ah: Find the target scene path
                 string target_scene = SceneUtility.GetScenePathByBuildIndex(play.m_sceneIndex);
-                Debug.Log($"Found target scene {target_scene}");
 
 
                 // ah: See if the target scene path exists within levels 
@@ -710,14 +733,10 @@ public sealed class PersistentDataManager
                 Debug.LogError("Tried to deserialize with no valid PLAY");
             }
         }
-        else
-        {
-            Debug.LogError("Tried to deserialize with no valid gamestate");
-        }
         return result;
     }
 
-    public static DeserializedPlayerResult DeserializePlayer(Player player)
+    public static DeserializedPlayerResult DeserializePlayer(Player player, PlayerTransformHandler handler, PlayerCamera camera)
     {
         // ah: init gamestate if it doesn't exist
         if(!m_gameState.m_isValid)
@@ -736,8 +755,9 @@ public sealed class PersistentDataManager
                 result.m_unlockedFilter = play.m_unlockedFilter;
                 result.m_unlockedFlipped = play.m_unlockedFlipped;
 
-                player.transform.position = play.m_playerP;
-                player.transform.rotation = play.m_playerR;
+                player.transform.position      = play.m_playerP;
+                handler.transform.rotation     = play.m_playerR;
+                camera.SetYaw(handler.transform.rotation.eulerAngles.y);
 
                 LevelCheckpointManager.SetNewSpawnPoint(play.m_spawnP, play.m_spawnR, play.m_sceneIndex);
             }
@@ -769,6 +789,7 @@ public sealed class PersistentDataManager
             Dictionary<Guid, FlippedData> flipped = new();
             Dictionary<Guid, ForceInteractorTriggerData> triggers = new();
             Dictionary<Guid, InkAssetRegistryData> iaregs = new();
+            HashSet<Guid> checkpoints = new();
 
             // ah: map lvl chunks based on id
             for(int i = 0; i < lvls.m_levels.Count; i++)
@@ -802,6 +823,11 @@ public sealed class PersistentDataManager
                 {
                     InkAssetRegistryData obj = lvl.m_iaregs[j];
                     iaregs[new Guid(obj.id)] = obj;
+                }
+
+                for(int j = 0; lvl.m_checkpoints != null && j < lvl.m_checkpoints.Count; j++)
+                {
+                    checkpoints.Add(lvl.m_checkpoints[j]);
                 }
             }
 
@@ -868,6 +894,12 @@ public sealed class PersistentDataManager
                             iareg.SetActiveAsset(data.m_activeAssetIndex);
                         }
                     }
+
+                    AudioTrigger audio_trigger = obj.GetComponent<AudioTrigger>();
+                    if(audio_trigger != null && !checkpoints.Contains(guid))
+                    {
+                        UnityEngine.Object.Destroy(obj.gameObject);
+                    }
                 }
             }
         }
@@ -909,6 +941,7 @@ public sealed class PersistentDataManager
                 chunk.m_triggers = new();
                 chunk.m_spawners = new();
                 chunk.m_flipped  = new();
+                chunk.m_checkpoints = new();
                 chunk.m_iaregs = new List<InkAssetRegistryData>();
                 scene_chunks[scene_guid] = chunk;
             }
@@ -956,6 +989,12 @@ public sealed class PersistentDataManager
             if (iareg != null)
             {
                 scene_chunks[scene_guid].m_iaregs.Add(new InkAssetRegistryData(obj.m_id, iareg.activeAssetIndex));
+            }
+
+            AudioTrigger audio_trigger = obj.GetComponent<AudioTrigger>();
+            if(audio_trigger != null)
+            {
+                scene_chunks[scene_guid].m_checkpoints.Add(new Guid(obj.m_id));
             }
         }
 

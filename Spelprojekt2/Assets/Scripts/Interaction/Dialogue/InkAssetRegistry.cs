@@ -17,7 +17,6 @@ namespace Interaction.Dialogue
                 if (m_assets[a].name == name)
                 {
                     m_activeAssetIndex = a;
-                    Debug.Log($"Setting active ink asset to {a}");
                     return;
                 }
             }
