@@ -586,7 +586,9 @@ public class UIManager : MonoBehaviour
         Player player = Instantiate(m_playerPrefab);
 
         PersistentDataManager.DeserializeLoadedScenes();
-        DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player);
+        var handler = Object.FindFirstObjectByType<PlayerTransformHandler>();
+        var camera = Object.FindFirstObjectByType<PlayerCamera>();
+        DeserializedPlayerResult ok = PersistentDataManager.DeserializePlayer(player, handler, camera);
         if(ok.found)
         {
             if(ok.active_filter != FilterKind.None)
@@ -601,7 +603,6 @@ public class UIManager : MonoBehaviour
         else
         {
             LevelCheckpointManager.Respawn();
-            // Find first checkpoint of the loaded level
         }
         EnterState(UIState.None);
         LevelManager.m_onTransitionEnd -= SetupScene;
