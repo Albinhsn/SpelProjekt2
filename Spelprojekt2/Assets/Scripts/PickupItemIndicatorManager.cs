@@ -381,7 +381,6 @@ public class PickupItemIndicatorManager : MonoBehaviour
                     combined_vertex_count += item_mesh.m_counts[0];
                     combined_index_count  += item_mesh.m_counts[1];
                 }
-
                 NativeArray<float3> vertices = new NativeArray<float3>(combined_vertex_count, Allocator.Temp);
                 NativeArray<float3> normals  = new NativeArray<float3>(combined_vertex_count, Allocator.Temp);
                 NativeArray<float2> uvs      = new NativeArray<float2>(combined_vertex_count, Allocator.Temp);
@@ -412,8 +411,10 @@ public class PickupItemIndicatorManager : MonoBehaviour
                     combined_mesh.SetIndices(indices, MeshTopology.Triangles, i, true, vertex_offset);
                     vertex_offset += mesh.m_counts[0];
                 }
-                combined_mesh.RecalculateTangents();
-                combined_mesh.RecalculateBounds();
+                // ah: These 2 cost like 1.3ms on my main pc for 4 ropes and didn't provide anything
+                // visually
+                // combined_mesh.RecalculateTangents();
+                // combined_mesh.RecalculateBounds();
                 combined_mesh.UploadMeshData(true);
                 
             }
@@ -439,7 +440,6 @@ public class PickupItemIndicatorManager : MonoBehaviour
                         Graphics.RenderMeshPrimitives(rp, combined_mesh, i);
                     }
                 }
-
             }
 
             // Reset request count
