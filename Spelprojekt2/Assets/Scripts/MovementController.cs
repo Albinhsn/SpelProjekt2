@@ -29,8 +29,7 @@ public class MovementController : MonoBehaviour
 
     [SerializeField,Tooltip("The force applied in y axis when the player jumps")] 
     private float m_jumpForce = 5.0f;
-    [SerializeField,Range(0.0f, 1.0f), Tooltip("The higher the value, the smoother the acceleration/deceleration(0 = instant, 1 = no movement)")]
-    private float m_smoothAccelerationFactor = 0.1f;
+    private float m_acceleration = 10;
     private Rigidbody m_rb;
     [HideInInspector] public bool m_isJumping;
     private PlayerCamera m_playerCamera;
@@ -105,6 +104,7 @@ public class MovementController : MonoBehaviour
         {
             m_isJumping = false;
             SetAnimBool("isGrounded", true);
+            SetAnimBool("jumping", false);
         }
         if (other.TryGetComponent<MovingPlatformReceiver>(out MovingPlatformReceiver platform))
         {
@@ -140,7 +140,7 @@ public class MovementController : MonoBehaviour
     {
         if(InputManager.Jumped() && !m_isJumping && m_jumpCooldown <= 0)
         {
-            SetAnimTrigger("jumped");
+            SetAnimBool("jumping", true);
             SetAnimBool("isGrounded", false);
             var vel = m_rb.linearVelocity;
             m_rb.linearVelocity = new Vector3(vel.x, m_jumpForce, vel.z);
@@ -176,6 +176,7 @@ public class MovementController : MonoBehaviour
         }
     }
 
+    private float m_currentSpeed;
     void FixedUpdate()
     {
         // Calculate movement direction
@@ -185,43 +186,50 @@ public class MovementController : MonoBehaviour
         Vector3 dir     = forward * input.y + right * input.x;
 
         // TryJump();
+        
 
         // Normalize direction
-        if(dir.sqrMagnitude > 0)
+        if (dir.sqrMagnitude > 0)
         {
             dir = dir.normalized;
 
-            if(!m_isJumping)
+            if (!m_isJumping)
             {
                 PlayFootstepSound();
-                SetAnimBool("walk", true);
+            }
+        }
+
+        if(InputManager.Sprinting())
+        {
+            if (m_currentSpeed <= m_sprintSpeed)
+            {
+                m_currentSpeed = MathF.Min(m_sprintSpeed, m_currentSpeed + m_acceleration * Time.fixedDeltaTime);
+            }
+            else
+            {
+                m_currentSpeed = m_currentSpeed - m_acceleration * Time.fixedDeltaTime;
             }
         }
         else
         {
-            SetAnimBool("walk", false);
-            // m_sprinting = false;
+            if (m_currentSpeed <= m_walkSpeed)
+            {
+                m_currentSpeed = MathF.Min(m_walkSpeed, m_currentSpeed + m_acceleration * Time.fixedDeltaTime);
+            }
+            else
+            {
+                m_currentSpeed = m_currentSpeed - m_acceleration * Time.fixedDeltaTime;
+            }
         }
 
-        float speed;
-        if(InputManager.Sprinting())
-        {
-            speed = m_sprintSpeed;
-            SetAnimBool("sprinting", true);
-        }
-        else
-        {
-            speed = m_walkSpeed;
-            SetAnimBool("sprinting", false);
-        }
+        m_currentSpeed *= dir.magnitude;
         // Apply movement
         if(!m_isJumping)
         {
-           m_rb.linearVelocity = Vector3.Lerp(new Vector3(
-            dir.x * speed, //Input
-            m_rb.linearVelocity.y,
-            dir.z * speed
-            ), m_rb.linearVelocity, m_smoothAccelerationFactor); //Acceleration
+            m_rb.linearVelocity = m_referenceVector + new Vector3(
+                dir.x * m_currentSpeed, //Input
+                m_rb.linearVelocity.y,
+                dir.z * m_currentSpeed);
         }
         else
         {
@@ -232,12 +240,15 @@ public class MovementController : MonoBehaviour
             ); //Acceleration
             Vector3 xzVelocity = new Vector3(m_rb.linearVelocity.x,0,m_rb.linearVelocity.z);
 
-            if(xzVelocity.magnitude > speed)
+            if(xzVelocity.magnitude > m_currentSpeed)
             {
-                xzVelocity = xzVelocity.normalized * speed;
+                xzVelocity = xzVelocity.normalized * m_currentSpeed;
                 m_rb.linearVelocity = new Vector3(xzVelocity.x,m_rb.linearVelocity.y,xzVelocity.z);
             }
-        }   
+        }
+        
+        m_animator.SetFloat("horizontalVelocity", new Vector2(m_rb.linearVelocity.x - m_referenceVector.x, m_rb.linearVelocity.z - m_referenceVector.z).magnitude);
+        m_animator.SetFloat("verticalVelocity", m_rb.linearVelocity.y - m_referenceVector.y);
     }
 
     private void UpdateReferenceVector(Vector3 reference)
