@@ -27,7 +27,6 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float m_shoulderSmoothSpeed = 8f;
     [Header("LayerMasks")]
     [SerializeField] private LayerMask m_layerToDecollideThirdPerson;
-    [SerializeField] private LayerMask m_layerToDecollideFirstPerson;
 
     private float m_targetYaw;
     private float m_targetPitch;
@@ -57,7 +56,6 @@ public class PlayerCamera : MonoBehaviour
         m_targetPitch = m_currentPitch = angles.x;
         m_targetDistance = m_currentDistance = m_cameraDistanceFromPlayer;
         m_camera = GetComponent<CinemachineCamera>();
-
     }
 
     public void SetYaw(float yaw)
@@ -123,8 +121,6 @@ public class PlayerCamera : MonoBehaviour
 
         HandleRotation(m_firstPersonRotationSmoothTime);
         HandleZoom();
-        // FirstPersonDecollider();
-
 
         transform.rotation = rotation;
         transform.position = m_parent.position + (Vector3.up * m_firstPersonCameraHeight) + rotation * Vector3.forward * m_currentDistance;
@@ -200,8 +196,6 @@ public class PlayerCamera : MonoBehaviour
 
     void UpdateCamera()
     {
-        
-        
         m_basePosition = m_parent.position + (m_thirdPersonCameraHeight * Vector3.up) + rotation * Vector3.back * m_currentDistance;
 
         float distanceT = 1f - Mathf.InverseLerp(m_cameraDistanceFromPlayer, 0, m_currentDistance);        
