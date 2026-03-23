@@ -40,6 +40,10 @@ public class OutlineMeshPreparator : MonoBehaviour
 
     private void CalculateMesh()
     {
+        if(m_srcMeshObject == null)
+        {
+            return;
+        }
         m_useSkinnedMeshRenderer = m_srcMeshObject.TryGetComponent(out SkinnedMeshRenderer smr);
 
         if (m_useSkinnedMeshRenderer)
