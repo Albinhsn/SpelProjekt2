@@ -226,7 +226,7 @@ public class MovementController : MonoBehaviour
         // Apply movement
         if(!m_isJumping)
         {
-            m_rb.linearVelocity = m_referenceVector + new Vector3(
+            m_rb.linearVelocity = new Vector3(
                 dir.x * m_currentSpeed, //Input
                 m_rb.linearVelocity.y,
                 dir.z * m_currentSpeed);
@@ -247,8 +247,8 @@ public class MovementController : MonoBehaviour
             }
         }
         
-        m_animator.SetFloat("horizontalVelocity", new Vector2(m_rb.linearVelocity.x - m_referenceVector.x, m_rb.linearVelocity.z - m_referenceVector.z).magnitude);
-        m_animator.SetFloat("verticalVelocity", m_rb.linearVelocity.y - m_referenceVector.y);
+        m_animator.SetFloat("horizontalVelocity", new Vector2(m_rb.linearVelocity.x, m_rb.linearVelocity.z).magnitude);
+        m_animator.SetFloat("verticalVelocity", m_rb.linearVelocity.y);
     }
 
     private void UpdateReferenceVector(Vector3 reference)
