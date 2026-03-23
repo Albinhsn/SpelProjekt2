@@ -183,14 +183,8 @@ public class UIManager : MonoBehaviour
         I = this;
         DontDestroyOnLoad(this.gameObject);
 
-
-
-
         InputManager.onRebindComplete.AddListener(CompleteRemap);
-        // TODO(ah): deserialize settings
-        {
-
-        }
+        PersistentDataManager.DeserializeSettings();
 
         // ah: init filter button listeners
         {
@@ -349,9 +343,9 @@ public class UIManager : MonoBehaviour
 
     private enum SettingsPageKind
     {
+        Controls,
         Gameplay,
         Audio,
-        Controls,
     }
     private enum ControlsPageKind
     {
@@ -419,7 +413,7 @@ public class UIManager : MonoBehaviour
 
     public void MainMenu_QuitClicked()
     {
-        PersistentDataManager.DeleteSave();
+        PersistentDataManager.SerializeSettings();
     #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
     #endif

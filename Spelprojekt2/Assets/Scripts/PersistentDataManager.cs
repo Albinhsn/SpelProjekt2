@@ -40,6 +40,7 @@ public sealed class PersistentDataManager
         public ChunkPLAY m_play;
         public ChunkSTRY m_story;
         public ChunkLVLS m_levels;
+        public ChunkSETT m_settings;
     }
 
     private static GameState m_gameState;
@@ -163,6 +164,83 @@ public sealed class PersistentDataManager
             offset = DeserializeVector3(ref data.position, buffer, offset);
             offset = DeserializeQuaternion(ref data.rotation, buffer, offset);
             return data;
+        }
+    }
+    public const int MAX_BINDING_PATH_STRING_LENGTH = 64;
+
+    private struct BindingPath
+    {
+        public KeyAction m_action;
+        public string m_binding;
+        public BindingPath(KeyAction action, string binding)
+        {
+            this.m_action   = action;
+            this.m_binding  = binding;
+        }
+
+        public int Serialize(byte[] buffer, int offset)
+        {
+            offset = SerializeScalar<int>(ref buffer, (int)m_action, offset);
+            offset = SerializeString(m_binding, buffer, offset, MAX_BINDING_PATH_STRING_LENGTH);
+            return offset;
+        }
+
+    }
+
+    private struct ChunkSETT
+    {
+        const int version = 0;
+        public bool m_exists;
+        public float m_sensitivity;
+        public FilterColor m_primaryFilter;
+        public FilterColor m_secondaryFilter;
+
+        // ah: store one string for per KeyAction.
+        // this is the override path if one exists 
+        public List<BindingPath> m_bindings;
+
+
+        public int m_chunkSize
+        {
+            get
+            {
+                int size = 0;
+
+                // ah: header
+                size += sizeof(int) * 3;
+
+                // ah: sensitivity
+                size += sizeof(float);
+
+                // ah: filters
+                size += sizeof(int) * 2;
+
+                // ah: bindings
+                size += sizeof(int);
+                size += (sizeof(int) + MAX_BINDING_PATH_STRING_LENGTH) * (m_bindings != null ? m_bindings.Count : 0);
+
+                return size;
+            }
+        }
+
+        public int Serialize(byte[] buffer, int offset)
+        {
+            offset = SerializeScalar<int>(ref buffer, SETT, offset);
+            offset = SerializeScalar<int>(ref buffer, m_chunkSize, offset);
+            offset = SerializeScalar<int>(ref buffer, version, offset);
+
+            offset = SerializeScalar<float>(ref buffer, m_sensitivity, offset);
+            offset = SerializeScalar<int>(ref buffer, (int)m_primaryFilter, offset);
+            offset = SerializeScalar<int>(ref buffer, (int)m_secondaryFilter, offset);
+
+            int count = m_bindings != null ? m_bindings.Count : 0;
+            offset = SerializeScalar<int>(ref buffer, count, offset);
+            for(int i = 0; i < count; i++)
+            {
+                offset = m_bindings[i].Serialize(buffer, offset);
+            }
+
+            return offset;
         }
     }
 
@@ -454,6 +532,7 @@ public sealed class PersistentDataManager
     private const int LVLS = (((int)'l') << 24) | (((int)'v') << 16) | (((int)'l') << 8) | (((int)'s') << 0);
     private const int STRY = (((int)'s') << 24) | (((int)'t') << 16) | (((int)'r') << 8) | (((int)'y') << 0);
     private const int PLAY = (((int)'p') << 24) | (((int)'l') << 16) | (((int)'a') << 8) | (((int)'y') << 0);
+    private const int SETT = (((int)'s') << 24) | (((int)'e') << 16) | (((int)'t') << 8) | (((int)'t') << 0);
     private const int MAX_INK_VARIABLE_SIZE = 64;
 
     private static void Serialize(GameState game_state)
@@ -464,6 +543,7 @@ public sealed class PersistentDataManager
             size += game_state.m_play.m_exists ? game_state.m_play.m_chunkSize : 0;
             size += game_state.m_story.m_exists ? game_state.m_story.m_chunkSize : 0;
             size += game_state.m_levels.m_exists ? game_state.m_levels.m_chunkSize : 0;
+            size += game_state.m_settings.m_exists ? game_state.m_settings.m_chunkSize : 0;
         }
 
         byte[] buffer = new byte[size];
@@ -487,6 +567,11 @@ public sealed class PersistentDataManager
         if(game_state.m_levels.m_exists)
         {
             offset = game_state.m_levels.Serialize(buffer, offset);
+        }
+
+        if(game_state.m_settings.m_exists)
+        {
+            offset = game_state.m_settings.Serialize(buffer, offset);
         }
 
 
@@ -660,6 +745,38 @@ public sealed class PersistentDataManager
                         result.m_play = play;
                         break;
                     }
+                    case SETT:
+                    {
+                        ChunkSETT sett = new();
+                        sett.m_exists = true;
+
+                        // ah: sensitivity
+                        offset = DeserializeScalar<float>(ref sett.m_sensitivity, buffer, offset);
+
+                        int filter = 0;
+                        offset = DeserializeScalar<int>(ref filter, buffer, offset);
+                        sett.m_primaryFilter = (FilterColor)filter;
+                        offset = DeserializeScalar<int>(ref filter, buffer, offset);
+                        sett.m_secondaryFilter = (FilterColor)filter;
+
+                        sett.m_bindings = new();
+                        int count = 0;
+                        offset = DeserializeScalar<int>(ref count, buffer, offset);
+
+                        for(int i = 0; i < count; i++)
+                        {
+                            BindingPath binding = new();
+                            int action          = 0;
+                            offset              = DeserializeScalar<int>(ref action, buffer, offset);
+                            binding.m_action    = (KeyAction)action;
+
+                            offset              = DeserializeString(ref binding.m_binding, buffer, offset, MAX_BINDING_PATH_STRING_LENGTH);
+                            sett.m_bindings.Add(binding);
+                        }
+
+                        result.m_settings = sett;
+                        break;
+                    }
                 }
             }
         }
@@ -764,6 +881,35 @@ public sealed class PersistentDataManager
         }
 
         return result;
+    }
+
+    public static void DeserializeSettings()
+    {
+        // ah: init gamestate if it doesn't exist
+        if(!m_gameState.m_isValid)
+        {
+            DeserializeAll();
+        }
+
+        if(m_gameState.m_settings.m_exists)
+        {
+            ChunkSETT settings = m_gameState.m_settings;
+            // ah: sensitivity
+            SensitivityData sensitivity_data = Resources.Load<SensitivityData>("ScriptableObjects/SensitivityData") as SensitivityData;
+            sensitivity_data.m_currentSensitivity = settings.m_sensitivity;
+
+            // ah: filter color data
+            var filter_color_data = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
+            filter_color_data.m_Colors[0] = settings.m_primaryFilter;
+            filter_color_data.m_Colors[1] = settings.m_secondaryFilter;
+
+            // ah: bindings
+            for(int i = 0; i < settings.m_bindings.Count; i++)
+            {
+                BindingPath binding = settings.m_bindings[i];
+                InputManager.SetOverridePath(binding.m_action, binding.m_binding);
+            }
+        }
     }
 
     public static void DeserializeLoadedScenes()
@@ -1008,7 +1154,7 @@ public sealed class PersistentDataManager
             m_gameState.m_levels.m_levels.Add(kv.Value);
         }
 
-        if(save)
+        if(save) 
         {
             Serialize(m_gameState);
         }
@@ -1017,6 +1163,37 @@ public sealed class PersistentDataManager
     public static void DeserializeAll()
     {
         m_gameState = Deserialize();
+    }
+    
+    public static void SerializeSettings(bool save = true)
+    {
+
+        m_gameState.m_settings.m_exists = true;
+
+        // ah: sensitivity
+        SensitivityData sensitivity_data = Resources.Load<SensitivityData>("ScriptableObjects/SensitivityData") as SensitivityData;
+        m_gameState.m_settings.m_sensitivity = sensitivity_data.m_currentSensitivity;
+
+        // ah: filters
+        var filter_color_data = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
+        m_gameState.m_settings.m_primaryFilter   = filter_color_data.m_Colors[0];
+        m_gameState.m_settings.m_secondaryFilter = filter_color_data.m_Colors[1];
+
+        // ah: keybinds
+        m_gameState.m_settings.m_bindings = new();
+        for(int i = 0; i < (int)KeyAction.COUNT; i++)
+        {
+            string override_path = InputManager.GetOverridePath((KeyAction)i);
+            if(override_path != null)
+            {
+                m_gameState.m_settings.m_bindings.Add(new ((KeyAction)i, override_path));
+            }
+
+        }
+        if(save)
+        {
+            Serialize(m_gameState);
+        }
     }
 
     public static void SerializeAll()
@@ -1034,14 +1211,11 @@ public sealed class PersistentDataManager
         // ah: player
         Player player = UnityEngine.Object.FindFirstObjectByType<Player>();
         PlayerTransformHandler handler = UnityEngine.Object.FindFirstObjectByType<PlayerTransformHandler>();
+        // NOTE(ah): we assume that this was previously saved and hence dont overwrite it either
         if(player != null && handler != null)
         {
             m_gameState.m_play.m_playerP = player.transform.position;
             m_gameState.m_play.m_playerR = handler.transform.rotation;
-        }
-        else
-        {
-            Debug.LogError("Tried to serialize game without a player?");
         }
 
         // ah: spawn
@@ -1057,6 +1231,8 @@ public sealed class PersistentDataManager
         {
             m_gameState.m_story.m_entries[kv.Key] = kv.Value;
         }
+
+        SerializeSettings(false);
 
         SerializeLoadedScenes(false);
         Serialize(m_gameState);

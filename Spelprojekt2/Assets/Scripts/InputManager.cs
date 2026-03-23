@@ -259,6 +259,18 @@ public sealed class InputManager
 
         return binding;
     }
+
+    public static string GetOverridePath(KeyAction action)
+    {
+        var binding = Instance.InputBindingFromKeyAction(action);
+        return binding.overridePath;
+    }
+
+    public static void SetOverridePath(KeyAction action, string binding)
+    {
+        InputActionBindingIndexPair pair = Instance.InputActionBindingIndexPairFromKeyAction(action);
+        pair.input_action.ApplyBindingOverride(pair.binding_index, binding);
+    }
     
     void Unbind(KeyAction action)
     {
