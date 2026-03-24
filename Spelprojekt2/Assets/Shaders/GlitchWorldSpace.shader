@@ -12,7 +12,7 @@ Shader "Custom/GlitchWorldSpace"
     }
     SubShader
     {
-        Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Transparent" "Queue"="Transparent" }
+        Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Opaque" }
         LOD 100
 
         Pass
@@ -20,8 +20,6 @@ Shader "Custom/GlitchWorldSpace"
 
             Name "Forward"
             Blend SrcAlpha OneMinusSrcAlpha
-            ZWrite Off
-            Cull Off
 
             HLSLPROGRAM
             #pragma vertex vert
