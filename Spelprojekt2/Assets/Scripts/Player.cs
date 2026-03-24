@@ -43,4 +43,13 @@ public class Player : MonoBehaviour
     }
 
 
+    void OnEnable()
+    {
+        InputManager.EnableInput();
+    }
+
+    void OnDisable()
+    {
+        InputManager.DisableInput();
+    }
 }

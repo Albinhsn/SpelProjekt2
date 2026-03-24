@@ -450,6 +450,11 @@ public sealed class InputManager
         Instance.m_inputActions.Player.Move.Disable();
     }
 
+    public static void DisableInput()
+    {
+        Instance.m_inputActions.Disable();
+    }
+
     public static void EnablePlayerInput()
     {
         Instance.m_inputActions.Player.Enable();
@@ -458,6 +463,11 @@ public sealed class InputManager
     public static void EnablePlayerMovement()
     {
         Instance.m_inputActions.Player.Move.Enable();
+    }
+
+    public static void EnableInput()
+    {
+        Instance.m_inputActions.Enable();
     }
 
     public static bool FlipGravity()

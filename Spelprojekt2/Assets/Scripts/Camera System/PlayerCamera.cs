@@ -18,18 +18,15 @@ public class PlayerCamera : MonoBehaviour
     
     [Header("First Person/Zoom")]
     [SerializeField] private float m_firstPersonCameraHeight = .75f;
-    [SerializeField] private float m_maxZoomDistance = 15;
-    [SerializeField] private float m_zoomSensitivity = 50;
-    [SerializeField] private float m_zoomSmoothSpeed = 10;
+    [SerializeField] private float m_minZoomFOV = 5;
+    [SerializeField] private float m_defaultFOV = 40;
     [SerializeField] private float m_firstPersonRotationSmoothTime = .2f;
-    [SerializeField] private float m_firstPersonDecolliderRadius = 1f;
 
     [Header("Shoulder")]
     [SerializeField] private float m_shoulderOffset = .8f;
     [SerializeField] private float m_shoulderSmoothSpeed = 8f;
     [Header("LayerMasks")]
     [SerializeField] private LayerMask m_layerToDecollideThirdPerson;
-    [SerializeField] private LayerMask m_layerToDecollideFirstPerson;
 
     private float m_targetYaw;
     private float m_targetPitch;
@@ -48,7 +45,9 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 m_basePosition;
     private bool m_changedToFirstPersonThisFrame = true;
     Quaternion rotation;
+    CinemachineCamera m_camera;
     [HideInInspector] public Vector3 m_playerForward, m_playerRight;
+    
 
     private void Awake()
     {
@@ -56,6 +55,7 @@ public class PlayerCamera : MonoBehaviour
         m_targetYaw = m_currentYaw = angles.y;
         m_targetPitch = m_currentPitch = angles.x;
         m_targetDistance = m_currentDistance = m_cameraDistanceFromPlayer;
+        m_camera = GetComponent<CinemachineCamera>();
     }
 
     public void SetYaw(float yaw)
@@ -103,6 +103,7 @@ public class PlayerCamera : MonoBehaviour
             m_changedToFirstPersonThisFrame = true;
             m_currentDistance = m_targetDistance = m_cameraDistanceFromPlayer;
             InputManager.EnablePlayerMovement();
+            m_camera.Lens.FieldOfView = m_defaultFOV;
         }
         HandleRotation(m_rotationSmoothTime);
         Decollider();
@@ -120,8 +121,6 @@ public class PlayerCamera : MonoBehaviour
 
         HandleRotation(m_firstPersonRotationSmoothTime);
         HandleZoom();
-        FirstPersonDecollider();
-
 
         transform.rotation = rotation;
         transform.position = m_parent.position + (Vector3.up * m_firstPersonCameraHeight) + rotation * Vector3.forward * m_currentDistance;
@@ -132,28 +131,25 @@ public class PlayerCamera : MonoBehaviour
 
         if (InputManager.CameraZoomIn())
         {
-            zoomInput = 1f;
+            zoomInput = -1f;
         }
         else if (InputManager.CameraZoomOut())
         {
-            zoomInput = -1f;
+            zoomInput = 1f;
         }
 
-        m_targetDistance += zoomInput * m_zoomSensitivity * Time.deltaTime;
-        
-        m_targetDistance = Mathf.Clamp(m_targetDistance, 0, m_maxZoomDistance);
-        m_currentDistance = Mathf.Lerp(m_currentDistance, m_targetDistance, m_zoomSmoothSpeed * Time.deltaTime);
-
-    }
-    void FirstPersonDecollider()
-    {
-        RaycastHit hit;
-        if(Physics.Raycast(m_parent.position + (Vector3.up * m_firstPersonCameraHeight),transform.forward, out hit, m_targetDistance + m_firstPersonDecolliderRadius, m_layerToDecollideFirstPerson, QueryTriggerInteraction.Ignore))
+        m_camera.Lens.FieldOfView += zoomInput;
+        if(m_camera.Lens.FieldOfView >= m_defaultFOV)
         {
-            m_targetDistance = (hit.point - m_parent.position).magnitude - m_firstPersonDecolliderRadius;
-            m_currentDistance = m_targetDistance;
+            m_camera.Lens.FieldOfView = m_defaultFOV;
+        }
+
+        if(m_camera.Lens.FieldOfView <= m_minZoomFOV)
+        {
+            m_camera.Lens.FieldOfView = m_minZoomFOV;
         }
     }
+
     void Decollider()
     {
         float sign = m_isRightShoulder ? 1 : -1;
@@ -200,8 +196,6 @@ public class PlayerCamera : MonoBehaviour
 
     void UpdateCamera()
     {
-        
-        
         m_basePosition = m_parent.position + (m_thirdPersonCameraHeight * Vector3.up) + rotation * Vector3.back * m_currentDistance;
 
         float distanceT = 1f - Mathf.InverseLerp(m_cameraDistanceFromPlayer, 0, m_currentDistance);        
