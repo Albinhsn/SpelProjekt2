@@ -40,6 +40,9 @@ public static class DisplayStringManager
             }break;
             case DisplayStringKind.TutorialShoulder:
             {
+                string km_shoulder = InputManager.GetStringFromKeyAction(KeyAction.KM_CameraChangeShoulder); 
+                string c_shoulder = InputManager.GetStringFromKeyAction(KeyAction.C_CameraChangeShoulder); 
+                result = $"Press \"{km_shoulder}\" / \"{c_shoulder}\" to move the camera shoulder";
             }break;
             case DisplayStringKind.TutorialJump:
             {
@@ -49,18 +52,33 @@ public static class DisplayStringManager
             }break;
             case DisplayStringKind.TutorialElevator:
             {
+                string km_interaction = InputManager.GetStringFromKeyAction(KeyAction.KM_Interaction);
+                string c_interaction = InputManager.GetStringFromKeyAction(KeyAction.C_Interaction);
+                result = $"Interact with buttons on walls\nand in elevators with \"{km_interaction}\" / \"{c_interaction}\"";
             }break;
             case DisplayStringKind.TutorialFreeLook:
             {
+                string km_free_look = InputManager.GetStringFromKeyAction(KeyAction.KM_CameraFreeLookToggle);
+                string c_free_look = InputManager.GetStringFromKeyAction(KeyAction.C_CameraFreeLookToggle);
+                result = $"Hold \"{km_free_look}\" / \"{c_free_look}\" to toggle freelook camera";
             }break;
             case DisplayStringKind.TutorialFirstPerson:
             {
+                string km_first_person = InputManager.GetStringFromKeyAction(KeyAction.KM_CameraFirstPerson);
+                string c_first_person = InputManager.GetStringFromKeyAction(KeyAction.C_CameraFirstPerson);
+                result = $"Hold \"{km_first_person}\" / \"{c_first_person}\" to go into first person While in first person, use the \"Scrollwheel\" / \"Left Stick Up and down\" to zoom";
             }break;
             case DisplayStringKind.World1FirstFilter:
             {
+                string km_filter = InputManager.GetStringFromKeyAction(KeyAction.KM_PrimaryFilter);
+                string c_filter = InputManager.GetStringFromKeyAction(KeyAction.C_PrimaryFilter);
+                result = $"Press \"{km_filter}\" / \"{c_filter}\" To activate filter";
             }break;
             case DisplayStringKind.World1SecondFilter:
             {
+                string km_filter = InputManager.GetStringFromKeyAction(KeyAction.KM_SecondaryFilter);
+                string c_filter = InputManager.GetStringFromKeyAction(KeyAction.C_SecondaryFilter);
+                result = $"Press \"{km_filter}\" / \"{c_filter}\" To activate filter";
             }break;
         }
         return result;
