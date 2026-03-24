@@ -76,7 +76,7 @@ public class Door : MonoBehaviour
         }
 
         // Create sound instance and get id for freeze event
-        if(m_sound != null)
+        if(m_sound != null && !m_sound.evt.IsNull)
         {
             m_soundInstance = RuntimeManager.CreateInstance(m_sound.evt);
 
@@ -125,7 +125,7 @@ public class Door : MonoBehaviour
             }
         }
 
-        if(m_sound != null)
+        if(m_sound != null && !m_sound.evt.IsNull)
         {
             m_soundInstance.setParameterByID(m_freezeID, val);
         }
