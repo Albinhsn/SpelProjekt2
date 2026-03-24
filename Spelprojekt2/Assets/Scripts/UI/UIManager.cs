@@ -52,6 +52,8 @@ public enum KeyAction
     C_UIMovement,
     C_UISelect,
     C_UIAdvance,
+    KM_Jump,
+    C_Jump,
     COUNT,
 }
 

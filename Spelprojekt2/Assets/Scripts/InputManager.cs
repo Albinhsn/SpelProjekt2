@@ -2,6 +2,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public sealed class InputManager
 {
@@ -24,6 +25,12 @@ public sealed class InputManager
         m_onRebindComplete = new();
     }
     
+    private static Dictionary<string, string> m_stringTable = new Dictionary<string, string>()
+    {
+        {"LS", "Left Stick"},
+        {"RS", "Right Stick"},
+    };
+
     private InputSystem_Actions m_inputActions;
     private Vector3 m_aimDirectionForward = Vector3.zero;
     private Vector3 m_aimDirectionRight = Vector3.zero;
@@ -76,6 +83,11 @@ public sealed class InputManager
             case KeyAction.KM_Pickup:
             {
                 result.input_action = m_inputActions.Player.Pickup;
+                result.binding_index = 0;
+            }break;
+            case KeyAction.KM_Jump:
+            {
+                result.input_action = m_inputActions.Player.Jump;
                 result.binding_index = 0;
             }break;
             case KeyAction.KM_Interaction:
@@ -213,6 +225,11 @@ public sealed class InputManager
                 result.input_action  = m_inputActions.UI.Advance;
                 result.binding_index = 1;
             }break;
+            case KeyAction.C_Jump:
+            {
+                result.input_action  = m_inputActions.Player.Jump;
+                result.binding_index = 1;
+            }break;
         }
         return result;
     }
@@ -309,7 +326,12 @@ public sealed class InputManager
 
     public static string GetStringFromKeyAction(KeyAction action)
     {
-        return Instance.InputBindingFromKeyAction(action).ToDisplayString();
+        string display_string = Instance.InputBindingFromKeyAction(action).ToDisplayString();
+        if(m_stringTable.ContainsKey(display_string))
+        {
+            display_string = m_stringTable[display_string];
+        }
+        return display_string;
     }
 
     public static void SetAimDirection(Vector3 forward, Vector3 Right)
