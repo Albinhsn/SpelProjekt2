@@ -52,7 +52,7 @@ public class PositionBasedDoor : MonoBehaviour
         m_isNotFiltered = IsNotFiltered();
 
         // Create sound instance and get id for freeze event
-        if(m_sound != null)
+        if(m_sound != null && !m_sound.evt.IsNull)
         {
             m_soundInstance = RuntimeManager.CreateInstance(m_sound.evt);
 
@@ -98,7 +98,7 @@ public class PositionBasedDoor : MonoBehaviour
             }
         }
 
-        if(m_sound != null)
+        if(m_sound != null && !m_sound.evt.IsNull)
         {
             m_soundInstance.setParameterByID(m_freezeID, val);
         }
