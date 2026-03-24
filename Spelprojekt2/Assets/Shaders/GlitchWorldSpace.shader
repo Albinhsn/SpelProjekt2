@@ -21,6 +21,7 @@ Shader "Custom/GlitchWorldSpace"
             Name "Forward"
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
+            Cull Off
 
             HLSLPROGRAM
             #pragma vertex vert
