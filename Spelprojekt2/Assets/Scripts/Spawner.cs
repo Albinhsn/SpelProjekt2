@@ -7,6 +7,8 @@ public class Spawner : MonoBehaviour
 
     [SerializeField] private GameObject m_objectToSpawn;
     [SerializeField] private Vector3 m_initialVelocity;
+    [SerializeField]
+    private UnityEvent m_onSpawn;
 
     [SerializeField]
     private bool m_spawnOnActivation;
@@ -66,6 +68,7 @@ public class Spawner : MonoBehaviour
                 gravity_flip.ResetGravity();
             }
             result = this.m_object;
+            m_onSpawn.Invoke();
         }
         return result;
     }
