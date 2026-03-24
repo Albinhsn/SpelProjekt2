@@ -339,6 +339,7 @@ namespace Interaction.Dialogue
                 {
                     m_altBGs[a].gameObject.SetActive(false);
                 }
+                m_textContainer.rectTransform.anchoredPosition = new Vector2(m_textContainer.rectTransform.anchoredPosition.x, m_textOutDefaultPos);
                 m_relay.Select(m_selectedAlt);
             }
         }
