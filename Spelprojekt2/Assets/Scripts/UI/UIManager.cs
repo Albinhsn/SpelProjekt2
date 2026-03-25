@@ -614,7 +614,7 @@ public class UIManager : MonoBehaviour
     void Update()
     {
 
-        if(m_state == UIState.None && InputManager.Paused())
+        if(m_state == UIState.None && InputManager.Paused() && !LevelManager.isTransitioning)
         {
             EnterState(UIState.PauseMenu);
         }

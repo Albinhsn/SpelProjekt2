@@ -39,6 +39,7 @@ public sealed class LevelManager
 
     private string m_activeSnapshot;
 
+    public static bool isTransitioning => Instance.m_isTransitioning;
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
     private bool m_scenesLoaded;
