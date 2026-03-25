@@ -12,26 +12,26 @@ VAR helped = false
 It never ends. It never ends. It never ends. It never ends... #speaker=Unknown
 + [Intervene]
     A..are you alright? # speaker=Alea
-        <i>The banging stops</i> # speaker=
-        No... # disallowSkip # delay=0.1 # speaker=Unknown
+        <i>The banging stops</i> #anim=isIdle:bool=true; # speaker=
+        No... # disallowSkip # delay=0.1 # speaker=Unknown 
         I'm Alea, whats your name? # delay=default # speaker=Alea
         I'm... the polisher. I polish the containers. # speaker=Polisher
         It is my duty to keep the containers shining, an assignment I've been doing ever since the start... # speaker=Polisher
         <i>The woman trails off</i> # speaker=
         ++ [Inquire:]
             Do you like polishing the containers? # speaker=Alea
-                NO I DON'T LIKE IT! I HATE IT! It's too much... # speaker=Polisher
-                <i>The woman starts sobbing</i> # speaker=
+                NO I DON'T LIKE IT! I HATE IT! It's too much... #anim=isTalking:bool=true; # speaker=Polisher
+                <i>The woman starts sobbing</i> #anim=isTalking:bool=false; # speaker=
                 It never ends, the dust in the air keeps undoing all my work. #speaker=Polisher
                 I've been working on this container for the last month,
                 and I will keep working on it until I throw myself off the edge.
                 +++ [I don't understand]
                     Why don't you just stop? # speaker=Alea
                     Oh... you're an outsider... I'm sorry, I'm not supposed to talk to you. Please leave. # speaker=Polisher
-                    <i>The woman starts banging her head angainst the container again</i> # speaker=
+                    <i>The woman starts banging her head angainst the container again</i> #anim=isIdle:bool=false # speaker=
                     ++++[Insist]
                         Please, I want to help you. Why do you keep polishing the containers? # speaker=Alea
-                            <i>The banging stops.</i> # speaker=
+                            <i>The banging stops.</i> #anim=isIdle:bool=true; # speaker=
                             Because it's my job. My assignment. # speaker=Polisher
                             We all have an assignment we do. 
                             A divine duty from the USER. If I stop, the others will notice and they will judge.
