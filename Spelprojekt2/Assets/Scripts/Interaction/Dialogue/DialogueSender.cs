@@ -151,7 +151,11 @@ namespace Interaction.Dialogue
                 {
                     m_animator = animator;
                 }
-                else Debug.LogError("Animation-containing ink data used on animatorless dialogue trigger", gameObject);
+                else
+                {
+                    Debug.LogError("Animation-containing ink data used on animatorless dialogue trigger", gameObject);
+                    return;
+                }
             }
 
             int segment_end_index = -1;
