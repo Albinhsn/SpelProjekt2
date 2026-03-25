@@ -21,7 +21,7 @@ public sealed class LevelManager
     LevelManager()
     {
         m_glitchAudio = Resources.Load<AudioCueSO>("Audio/AC_Glitch");
-        m_duckSnapshot = "MusicDuck";
+        m_duckSnapshot = "LevelChange";
     }
 
     private LevelData m_currentLevel;
