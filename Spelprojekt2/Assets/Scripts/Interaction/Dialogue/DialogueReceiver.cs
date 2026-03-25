@@ -73,33 +73,29 @@ namespace Interaction.Dialogue
 
         void Start()
         {
-            
-            if (!m_subscribed && !m_initialSubscribed)
+            m_relay.d_onDialogueInitiation += InitiateDialogue;
+            m_relay.d_onDialogueUpdate += UpdateDialogue;
+            m_relay.d_onDialogueExit += EndDialogue;
+
+            if (m_altTexts is null || m_altTexts.Length != m_altBGs.Length)
             {
-                m_relay.d_onDialogueInitiation += InitiateDialogue;
-                m_relay.d_onDialogueUpdate += UpdateDialogue;
-                m_relay.d_onDialogueExit += EndDialogue;
-
-                if (m_altTexts is null || m_altTexts.Length != m_altBGs.Length)
+                m_altTexts = new TextMeshProUGUI[m_altBGs.Length];
+                for (int a = 0; a < m_altBGs.Length; a++)
                 {
-                    m_altTexts = new TextMeshProUGUI[m_altBGs.Length];
-                    for (int a = 0; a < m_altBGs.Length; a++)
-                    {
-                        m_altTexts[a] = m_altBGs[a].GetComponentInChildren<TextMeshProUGUI>();
-                        m_altBGs[a].gameObject.SetActive(false);
-                    }
+                    m_altTexts[a] = m_altBGs[a].GetComponentInChildren<TextMeshProUGUI>();
+                    m_altBGs[a].gameObject.SetActive(false);
                 }
-
-                m_textOut = m_textContainer.GetComponentInChildren<TextMeshProUGUI>();
-                m_textContainer.gameObject.SetActive(false);
-                m_textOutDefaultPos = m_textContainer.rectTransform.anchoredPosition.y;
-                
-                m_subscribed = true;
-                m_initialSubscribed = true;
-                m_textOut.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
-                m_camera = FindFirstObjectByType<CinemachineBrain>();
-                m_cameraGlobalDefaultBlendTime = m_camera.DefaultBlend.Time;
             }
+
+            m_textOut = m_textContainer.GetComponentInChildren<TextMeshProUGUI>();
+            m_textContainer.gameObject.SetActive(false);
+            m_textOutDefaultPos = m_textContainer.rectTransform.anchoredPosition.y;
+            
+            m_subscribed = true;
+            m_initialSubscribed = true;
+            m_textOut.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
+            m_camera = FindFirstObjectByType<CinemachineBrain>();
+            m_cameraGlobalDefaultBlendTime = m_camera.DefaultBlend.Time;
         }
 
         private void Update()
@@ -155,32 +151,7 @@ namespace Interaction.Dialogue
 
         private void OnEnable()
         {
-            if (!m_subscribed && !m_initialSubscribed)
-            {
-                m_relay.d_onDialogueInitiation += InitiateDialogue;
-                m_relay.d_onDialogueUpdate += UpdateDialogue;
-                m_relay.d_onDialogueExit += EndDialogue;
-
-                if (m_altTexts is null || m_altTexts.Length != m_altBGs.Length)
-                {
-                    m_altTexts = new TextMeshProUGUI[m_altBGs.Length];
-                    for (int a = 0; a < m_altBGs.Length; a++)
-                    {
-                        m_altTexts[a] = m_altBGs[a].GetComponentInChildren<TextMeshProUGUI>();
-                        m_altBGs[a].gameObject.SetActive(false);
-                    }
-                }
-
-                m_textOut = m_textContainer.GetComponentInChildren<TextMeshProUGUI>();
-                m_textContainer.gameObject.SetActive(false);
-                
-                m_subscribed = true;
-                m_initialSubscribed = true;
-                m_textOut.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
-                m_camera = FindFirstObjectByType<CinemachineBrain>();
-                m_cameraGlobalDefaultBlendTime = m_camera.DefaultBlend.Time;
-            }
-            else if (!m_subscribed)
+            if (!m_subscribed && m_initialSubscribed)
             {
                 m_relay.d_onDialogueInitiation += InitiateDialogue;
                 m_relay.d_onDialogueUpdate += UpdateDialogue;
