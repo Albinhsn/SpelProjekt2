@@ -1076,6 +1076,10 @@ PrefabInstance:
       propertyPath: m_onInteraction.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 8172212905906292483, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
+      propertyPath: 'm_cameraOverrides.Array.data[1]'
+      value: 
+      objectReference: {fileID: 919256509}
     - target: {fileID: 8737636019276405933, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       propertyPath: m_Name
       value: ContainerPolisher
@@ -1156,7 +1160,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 210800645465315024, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 4396306381682660189, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 584254545096667585, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
       insertIndex: -1
       addedObject: {fileID: 919256508}
     m_AddedComponents: []
@@ -1188,6 +1192,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b309b15986d14776a712f32d288e1281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &397970063 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 584254545096667585, guid: a4bff9adcfa3b014a9c95305c71dbd93, type: 3}
+  m_PrefabInstance: {fileID: 397970059}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &567369613
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3257,12 +3266,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919256507}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.020854047, y: -0.8713539, z: -0.011728853, w: -0.49007124}
-  m_LocalPosition: {x: -0.92, y: 0.84, z: 1.55}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.023040248, y: -0.9627004, z: 0.0064501427, w: 0.2695097}
+  m_LocalPosition: {x: 2.4600222, y: 3.5492065, z: 1.4608153}
+  m_LocalScale: {x: 1.5873015, y: 1.5873015, z: 1.5873013}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 397970060}
+  m_Father: {fileID: 397970063}
   m_LocalEulerAnglesHint: {x: 0, y: -238.709, z: 2.742}
 --- !u!114 &919256509
 MonoBehaviour:
