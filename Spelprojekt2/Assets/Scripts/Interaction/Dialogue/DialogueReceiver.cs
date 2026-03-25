@@ -23,17 +23,16 @@ namespace Interaction.Dialogue
         [SerializeField] private float m_inputRepeatDelay = 0.1f;
         [SerializeField] private string m_speakerSoundEvent = "dsSpeakingSound";
         [SerializeField] private float m_fontSizeAt1080;
-        [SerializeField] private float m_textOutNoAltOffset = 200;
-        [SerializeField] private Image m_textContainer;
+        [SerializeField] private Image m_textContainerHigh;
+        [SerializeField] private Image m_textContainerLow;
         [SerializeField] private Image[] m_altBGs;
         
         
-        private TextMeshProUGUI m_textOut;
+        private TextMeshProUGUI m_textOutHigh;
+        private TextMeshProUGUI m_textOutLow;
         private TextMeshProUGUI[] m_altTexts;
         private int m_currentAltCount;
         private int m_selectedAlt = 0;
-
-        private float m_textOutDefaultPos;
         
         //Refs
         private CinemachineBrain m_camera;
@@ -87,13 +86,15 @@ namespace Interaction.Dialogue
                 }
             }
 
-            m_textOut = m_textContainer.GetComponentInChildren<TextMeshProUGUI>();
-            m_textContainer.gameObject.SetActive(false);
-            m_textOutDefaultPos = m_textContainer.rectTransform.anchoredPosition.y;
+            m_textOutHigh = m_textContainerHigh.GetComponentInChildren<TextMeshProUGUI>();
+            m_textOutLow = m_textContainerLow.GetComponentInChildren<TextMeshProUGUI>();
+            m_textContainerHigh.gameObject.SetActive(false);
+            m_textContainerLow.gameObject.SetActive(false);
             
             m_subscribed = true;
             m_initialSubscribed = true;
-            m_textOut.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
+            m_textOutHigh.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
+            m_textOutLow.fontSize = m_fontSizeAt1080 / 1080f * Screen.height;
             m_camera = FindFirstObjectByType<CinemachineBrain>();
             m_cameraGlobalDefaultBlendTime = m_camera.DefaultBlend.Time;
         }
@@ -119,9 +120,10 @@ namespace Interaction.Dialogue
                     if (m_activeText[m_activeCharIndex] == '<') m_activeCharIndex = m_activeText.IndexOf('>', m_activeCharIndex + 1);
                     
                     m_activeCharIndex++;
-                    m_textOut.text = m_prefix + m_activeText.Substring(0, m_activeCharIndex);
-                    if (m_activeCharIndex < m_activeText.Length) m_textOut.text += m_typingIndicator;
+                    m_textOutLow.text = m_prefix + m_activeText.Substring(0, m_activeCharIndex);
+                    if (m_activeCharIndex < m_activeText.Length) m_textOutLow.text += m_typingIndicator;
                     m_remainingTypeDelay = m_typeDelay;
+                    m_textOutHigh.text = m_textOutLow.text;
                     
                     AudioEventHub.I.PlayOneShot(m_speakerSoundEvent, Vector3.zero);
                 }
@@ -180,8 +182,10 @@ namespace Interaction.Dialogue
             UIManager.EnterState(UIState.Dialogue);
             Assert.IsTrue(m_activeStory is null);
             
-            m_textContainer.gameObject.SetActive(true);
-            SetFont(0, m_textOut);
+            m_textContainerLow.gameObject.SetActive(true);
+            m_textContainerHigh.gameObject.SetActive(false);
+            SetFont(0, m_textOutLow);
+            SetFont(0, m_textOutHigh);
             
             m_prefix = "";
             m_activeStory = packet.story;
@@ -192,7 +196,6 @@ namespace Interaction.Dialogue
 
             if(m_activeStory.globalTags is not null) ParseGlobalTags(m_activeStory.globalTags.ToArray());
             UpdateDialogue();
-            m_textContainer.rectTransform.anchoredPosition = new Vector2(m_textContainer.rectTransform.anchoredPosition.x, -m_textOutNoAltOffset);
         }
         private void UpdateDialogue()
         {
@@ -202,15 +205,19 @@ namespace Interaction.Dialogue
             if(m_activeStory.currentTags is not null) ParseTags(m_activeStory.currentTags.ToArray());
             
             
-            m_textOut.text = m_prefix;
+            m_textOutLow.text = m_prefix;
+            m_textOutHigh.text = m_prefix;
             m_activeCharIndex = 0;
             m_remainingTypeDelay = m_typeDelay;
             m_altsChecked = false;
             m_activeText = m_activeStory.currentText;
+            m_textContainerLow.gameObject.SetActive(true);
+            m_textContainerHigh.gameObject.SetActive(false);
         }
         private void EndDialogue()
         {
-            m_textContainer.gameObject.SetActive(false);
+            m_textContainerHigh.gameObject.SetActive(false);
+            m_textContainerLow.gameObject.SetActive(false);
             m_activeStory = null;
             m_prefix = "";
 
@@ -241,11 +248,13 @@ namespace Interaction.Dialogue
 
             if (m_currentAltCount == 0)
             {
-                m_textContainer.rectTransform.anchoredPosition = new Vector2(m_textContainer.rectTransform.anchoredPosition.x, -m_textOutNoAltOffset);
+                m_textContainerHigh.gameObject.SetActive(false);
+                m_textContainerLow.gameObject.SetActive(true);
                 return;
             }
             
-            m_textContainer.rectTransform.anchoredPosition = new Vector2(m_textContainer.rectTransform.anchoredPosition.x, m_textOutDefaultPos);
+            m_textContainerLow.gameObject.SetActive(false);
+            m_textContainerHigh.gameObject.SetActive(true);
             
             m_selectedAlt = 0;
             m_lastDiscreteInput = 0;
@@ -310,7 +319,8 @@ namespace Interaction.Dialogue
                 {
                     m_altBGs[a].gameObject.SetActive(false);
                 }
-                m_textContainer.rectTransform.anchoredPosition = new Vector2(m_textContainer.rectTransform.anchoredPosition.x, m_textOutDefaultPos);
+                m_textContainerLow.gameObject.SetActive(true);
+                m_textContainerHigh.gameObject.SetActive(false);
                 m_relay.Select(m_selectedAlt);
             }
         }
@@ -359,10 +369,12 @@ namespace Interaction.Dialogue
                     switch (tags[a].Substring(0, value_index))
                     {
                         case "font":
-                            SetFont(int.Parse(value), m_textOut);//Speaker font
+                            SetFont(int.Parse(value), m_textOutHigh);//Speaker font
+                            SetFont(int.Parse(value), m_textOutLow);
                             break;
                         case "color":
-                            m_textOut.color = m_colorSet.GetColor(value);//Color of speaker text
+                            m_textOutHigh.color = m_colorSet.GetColor(value);//Color of speaker text
+                            m_textOutLow.color = m_colorSet.GetColor(value);//Color of speaker text
                             use_default_color = false;
                             break;
                         case "speaker":
@@ -382,7 +394,8 @@ namespace Interaction.Dialogue
                 }
             }
 
-            if (use_default_color) m_textOut.color = m_colorSet.textDefaultColor;
+            if (use_default_color) m_textOutHigh.color = m_colorSet.textDefaultColor;
+            if (use_default_color) m_textOutLow.color = m_colorSet.textDefaultColor;
             if (use_default_transition_time) m_camera.DefaultBlend = new CinemachineBlendDefinition(m_camera.DefaultBlend.Style, m_cameraInteractionDefaultBlendTime);
         }
 
