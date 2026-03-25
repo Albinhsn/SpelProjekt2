@@ -299,28 +299,6 @@ public sealed class InputManager
     {
         operation.action.Enable();
 
-        InputBinding new_binding = InputBindingFromKeyAction(m_currentRebindKeyAction);
-        // HACK(ah): For some reason the display string is the correct newly remapped key
-        // but the path, and doing == doesn't always work xd
-        string new_str = new_binding.ToDisplayString();
-        bool new_is_ui = m_currentRebindKeyAction.ToString().Contains("UI");
-        for(int i = 0; i < (int)KeyAction.COUNT; i++) 
-        {
-            KeyAction action     = (KeyAction)i;
-            InputBinding binding = InputBindingFromKeyAction(action);
-            bool is_ui = action.ToString().Contains("UI");
-
-            bool is_same_key_map = new_is_ui == is_ui;
-            if(action != m_currentRebindKeyAction && is_same_key_map)
-            {
-                string str = binding.ToDisplayString();
-                if(str == new_str)
-                {
-                    Unbind(action);
-                }
-            }
-        }
-
         m_onRebindComplete?.Invoke(m_currentRebindKeyAction);
     }
 
