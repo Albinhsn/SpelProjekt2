@@ -193,7 +193,8 @@ public sealed class LevelManager
             var I = AudioSystem.I;
             if(I != null)
             {
-                I.SetSnapshot(Instance.m_duckSnapshot, false, 0);
+                string snapshot = string.IsNullOrEmpty(Instance.m_currentLevel.m_endSnapshot) ? Instance.m_duckSnapshot : Instance.m_currentLevel.m_endSnapshot;
+                I.SetSnapshot(snapshot, false, 0);
             }
         }
 
