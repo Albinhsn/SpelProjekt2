@@ -37,6 +37,7 @@ public sealed class LevelManager
     private PlayerTransformHandler m_playerTransformHandler;
     private PlayerCamera m_playerCamera;
 
+    private string m_activeSnapshot;
 
     private bool m_isTransitioning;
     private bool m_isGlitchingDone;
@@ -106,25 +107,19 @@ public sealed class LevelManager
             Instance.m_sceneLoader = new(Instance.m_currentLevel);
             Instance.m_sceneLoader.m_onAllScenesLoaded += SetScenesUnloadedBoolTrue;
             Instance.m_sceneLoader.UnloadAsync();        
+            Instance.m_activeSnapshot = string.IsNullOrEmpty(Instance.m_currentLevel.m_endSnapshot) ? Instance.m_duckSnapshot : Instance.m_currentLevel.m_endSnapshot;
             Debug.Log($"Unloaded scene {Instance.m_currentLevel.m_sceneName}");
-            var I = AudioSystem.I;
-            if(I != null)
-            {
-                string snapshot = string.IsNullOrEmpty(Instance.m_currentLevel.m_endSnapshot) ? Instance.m_duckSnapshot : Instance.m_currentLevel.m_endSnapshot;
-                I.SetSnapshot(snapshot, true, 0);
-            }
         }
         else
         {
             SetScenesUnloadedBoolTrue();
-            // Set duck snapshot
-            {
-                var I = AudioSystem.I;
-                if(I != null)
-                {
-                    I.SetSnapshot("MusicDuck", true, 0);
-                }
-            }
+            Instance.m_activeSnapshot = Instance.m_duckSnapshot;
+        }
+
+        var I = AudioSystem.I;
+        if(I != null)
+        {
+            I.SetSnapshot(Instance.m_activeSnapshot, true, 0);
         }
 
 
@@ -193,8 +188,7 @@ public sealed class LevelManager
             var I = AudioSystem.I;
             if(I != null)
             {
-                string snapshot = string.IsNullOrEmpty(Instance.m_currentLevel.m_endSnapshot) ? Instance.m_duckSnapshot : Instance.m_currentLevel.m_endSnapshot;
-                I.SetSnapshot(snapshot, false, 0);
+                I.SetSnapshot(Instance.m_activeSnapshot, false, 0);
             }
         }
 
