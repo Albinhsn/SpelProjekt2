@@ -69,14 +69,6 @@ public sealed class LevelManager
             return;
         }
 
-        // Set duck snapshot
-        {
-            var I = AudioSystem.I;
-            if(I != null)
-            {
-                I.SetSnapshot(Instance.m_duckSnapshot, true, 0);
-            }
-        }
 
         // ah: Apply end actions
         AudioSceneSettings audio = UnityEngine.Object.FindFirstObjectByType<AudioSceneSettings>();
@@ -115,10 +107,24 @@ public sealed class LevelManager
             Instance.m_sceneLoader.m_onAllScenesLoaded += SetScenesUnloadedBoolTrue;
             Instance.m_sceneLoader.UnloadAsync();        
             Debug.Log($"Unloaded scene {Instance.m_currentLevel.m_sceneName}");
+            var I = AudioSystem.I;
+            if(I != null)
+            {
+                string snapshot = string.IsNullOrEmpty(Instance.m_currentLevel.m_endSnapshot) ? Instance.m_duckSnapshot : Instance.m_currentLevel.m_endSnapshot;
+                I.SetSnapshot(snapshot, true, 0);
+            }
         }
         else
         {
             SetScenesUnloadedBoolTrue();
+            // Set duck snapshot
+            {
+                var I = AudioSystem.I;
+                if(I != null)
+                {
+                    I.SetSnapshot("MusicDuck", true, 0);
+                }
+            }
         }
 
 

@@ -7,6 +7,7 @@ public struct LevelData
     public string m_sceneName;
     public string m_scenePath;
     public SceneData m_scene;
+    public string m_endSnapshot;
 }
 
 [CreateAssetMenu(fileName = "LevelsData", menuName = "ScriptableObjects/LevelsData")]
