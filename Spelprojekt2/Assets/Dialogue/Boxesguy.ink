@@ -7,13 +7,12 @@ VAR talked = false
 {talked: ->stitch1 | ->stitch2}
 
 =stitch1
-Good that you're staying away from that box. #anim=isTalking:bool=true;
-#anim=isTalking:bool=false;
+Good that you're staying away from that box. #anim=isTalking:bool=false;
 ->DONE
 
 =stitch2
-~talked = true
-Hey, if you're thinking of moving that box; I wouldn't. # speaker=Unknown #camera=0 #anim=isTalking:bool=true;
+~talked = true 
+Hey, if you're thinking of moving that box; I wouldn't.  #speaker=Unknown  #camera=0  #anim=isTalking:bool=true;
 It's very close to that forcefield and if they collide that box is gonna disintegrate. 
 + [> <i>Acknowledge</i>]
     ...Okay? I take it I <i>don't</i> want the box to disintegrate. # speaker=Alea #anim=isTalking:bool=false;
@@ -29,8 +28,6 @@ It's very close to that forcefield and if they collide that box is gonna disinte
             +++[> <i>Inquire: Importance</i>]
                 Why are you telling me all this? # speaker=Alea #camera=0 #anim=isTalking:bool=false;
                     Well I'm sorry for trying to be helpful. # speaker=Boxesguy #anim=isTalking:bool=true;
-                    God outsiders are as bad as they say.
-
-#anim=isTalking:bool=false;
+                    God outsiders are as bad as they say. #anim=isTalking:bool=false;
 ->DONE      
 ->END

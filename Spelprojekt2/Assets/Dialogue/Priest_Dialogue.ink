@@ -86,7 +86,6 @@ Why? I don't understand... # speaker=Priest #anim=isTalking:bool=true;
         ++ [> <i>Further inquiring</i>] I was told you might be able to answer some questions. #speaker=Alea #anim=isTalking:bool=false;
             ->stitch2
         ++ [> <i>Withdraw from interaction</i>]
-        Goodbye. #speaker=Priest #anim=isTalking:bool=true;
-        #anim=isTalking:bool=false;
+        Goodbye. #speaker=Priest #anim=isTalking:bool=false;
         ->END
 ->END

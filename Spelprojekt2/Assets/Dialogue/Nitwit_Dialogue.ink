@@ -67,8 +67,7 @@ OH JEEZ! Uh... hello? #speaker=Unknown #camera=0 #anim=isTalking:bool=true;
             * [> <i>Proceed</i>]
             If you haven't picked up the thingy yet, you should. #speaker=Nit #camera=1 #anim=isTalking:bool=true;
             It's <i>pretty</i> important!
-            Bye for now!
-            #anim=isTalking:bool=false;
+            Bye for now! #anim=isTalking:bool=false;
                 -> DONE
                 =nit
                 ~NitInteract = false
@@ -87,8 +86,7 @@ OH JEEZ! Uh... hello? #speaker=Unknown #camera=0 #anim=isTalking:bool=true;
                     Maybe not the Priest though, he doesn't seem to keen on knowing me.
                 ->nit
                 ** [> <i>Proceed</i>]
-                    Cool! Nice talk. #speaker=Nit #anim=isTalking:bool=true;
-                    #anim=isTalking:bool=false;
+                    Cool! Nice talk. #speaker=Nit #anim=isTalking:bool=false;
                     ->choice
     -> DONE
 
