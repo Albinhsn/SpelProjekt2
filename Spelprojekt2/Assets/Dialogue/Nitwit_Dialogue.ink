@@ -1,5 +1,14 @@
 // Nitwit Dialogue
 
+/*
+
+Camera 0 = Default auto
+Camera 1 = Power up overlook + questions
+Camera 2 = Look up at building
+
+*/
+
+
 VAR FirstIneractionN = false
 VAR PickItUp = false
 VAR NitInteract = false
@@ -25,8 +34,7 @@ OH JEEZ! Uh... hello? #speaker=Unknown #camera=0 #anim=isTalking:bool=true;
             The Priest should know more, he's usually in his study. #speaker=Nit #camera=2 #anim=isTalking:bool=true;
             Also pick up that thing over there, I think you'd like it. #camera=1
             Well, good luck! I will just be standing here... #speaker=Nit #camera=0 #anim=isTalking:bool=true;
-            without anyone to talk to. Alone...
-            #anim=isTalking:bool=false;
+            without anyone to talk to. Alone... #anim=isTalking:bool=false;
             -> DONE
     -> DONE
 
