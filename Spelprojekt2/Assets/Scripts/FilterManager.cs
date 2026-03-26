@@ -29,6 +29,7 @@ public class FilterManager : MonoBehaviour
 
     private AudioCueSO m_filterOffCue;
     private AudioCueSO m_filterOnCue;
+    private AudioCueSO m_filterFailCue;
 
     public void Unlock()
     {
@@ -47,6 +48,7 @@ public class FilterManager : MonoBehaviour
         m_filterColorData    = Resources.Load("ScriptableObjects/FilterColorData") as FilterColorData;
         m_filterOnCue        = Resources.Load("Audio/AC_FilterOn") as AudioCueSO;
         m_filterOffCue       = Resources.Load("Audio/AC_FilterOff") as AudioCueSO;
+        m_filterFailCue       = Resources.Load("Audio/AC_FilterFail") as AudioCueSO;
         m_filterChanged = new();
 
         m_collidingWithCount = new int[(int)FilterKind.COUNT];
@@ -215,12 +217,16 @@ public class FilterManager : MonoBehaviour
 
     void Update()
     {
-        if(CanDeactivateCurrentFilter())
+        // ah: check if any filter was activated
+        for(int i = 0; i < (int)FilterKind.COUNT; i++)
         {
-            // ah: check if any filter was activated
-            for(int i = 0; i < (int)FilterKind.COUNT; i++)
+            if(InputManager.Filter((FilterKind)i))
             {
-                if(InputManager.Filter((FilterKind)i))
+                if(!CanDeactivateCurrentFilter())
+                {
+                    SfxDirector.PlayCue2(m_filterFailCue, this.transform.position);
+                }
+                else
                 {
                     ChangeFilter((FilterKind)i);
                 }
