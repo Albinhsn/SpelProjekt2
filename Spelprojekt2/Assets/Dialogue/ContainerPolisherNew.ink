@@ -28,7 +28,7 @@ It never ends. It never ends. It never ends. It never ends... #speaker=Unknown
                 +++ [> Express Confusion]
                     Why don't you just stop? # speaker=Alea
                     Oh... you're an outsider... I'm sorry, I'm not supposed to talk to you. Please leave. # speaker=Polisher
-                    <i>The woman starts banging her head angainst the container again</i> #anim=isIdle:bool=false # speaker=
+                    <i>The woman starts banging her head angainst the container again</i> #anim=isIdle:bool=false; # speaker=
                     ++++[> Insist]
                         Please, I want to help you. Why do you keep polishing the containers? # speaker=Alea
                             <i>The banging stops.</i> #anim=isIdle:bool=true; # speaker=
