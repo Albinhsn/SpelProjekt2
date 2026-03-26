@@ -22,7 +22,7 @@ VAR info = false
         ** [> <i>Initiate introduction</i>] I'm Alea. Someone told me to find you; # speaker=Alea #anim=isTalking:bool=false;
         they said you could help me find a way to the <color="purple">Bearing</color>. 
             ->sacred
-#anim=isTalking:bool=false;
+
 ->DONE
 
 = stitch2
@@ -72,8 +72,8 @@ VAR info = false
             If you wish to go to the <color="purple">Bearing</color> then <color="yellow">go to the roof</color>, 
             if you're lucky, and He wants to talk, then you will be able to move forward.
             Thank you. # speaker=Alea #anim=isTalking:bool=false;
-            Yeah, yeah, just go already. Oh and... <i>may he guide your path</i>, and all that. # speaker=Priest #anim=isTalking:bool=true;
-            + [> <i>Withdraw from interaction</i>] #anim=isTalking:bool=false;
+            Yeah, yeah, just go already. Oh and... <i>may he guide your path</i>, and all that. # speaker=Priest #anim=isTalking:bool=false;
+            + [> <i>Withdraw from interaction</i>] 
             ->DONE
             * [> <i>Further inquiring</i>]
             I was told you might be able to answer some questions. #speaker=Alea #anim=isTalking:bool=false;
