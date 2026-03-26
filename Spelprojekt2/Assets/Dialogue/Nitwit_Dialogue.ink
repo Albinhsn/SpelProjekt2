@@ -25,8 +25,7 @@ OH JEEZ! Uh... hello? #speaker=Unknown #camera=0 #anim=isTalking:bool=true;
             The Priest should know more, he's usually in his study. #speaker=Nit #camera=2 #anim=isTalking:bool=true;
             Also pick up that thing over there, I think you'd like it. #camera=1
             Well, good luck! I will just be standing here... #speaker=Nit #camera=0 #anim=isTalking:bool=true;
-            without anyone to talk to. Alone...
-            #anim=isTalking:bool=false;
+            without anyone to talk to. Alone... #anim=isTalking:bool=false;
             -> DONE
     -> DONE
 
@@ -59,8 +58,7 @@ OH JEEZ! Uh... hello? #speaker=Unknown #camera=0 #anim=isTalking:bool=true;
             * [> <i>Proceed</i>]
             If you haven't picked up the thingy yet, you should. #speaker=Nit #camera=1 #anim=isTalking:bool=true;
             It's <i>pretty</i> important!
-            Bye for now!
-            #anim=isTalking:bool=false;
+            Bye for now! #anim=isTalking:bool=false;
                 -> DONE
                 =nit
                 ~NitInteract = false
@@ -79,8 +77,7 @@ OH JEEZ! Uh... hello? #speaker=Unknown #camera=0 #anim=isTalking:bool=true;
                     Maybe not the Priest though, he doesn't seem to keen on knowing me.
                 ->nit
                 ** [> <i>Proceed</i>]
-                    Cool! Nice talk. #speaker=Nit #anim=isTalking:bool=true;
-                    #anim=isTalking:bool=false;
+                    Cool! Nice talk. #speaker=Nit #anim=isTalking:bool=false;
                     ->choice
     -> DONE
 
