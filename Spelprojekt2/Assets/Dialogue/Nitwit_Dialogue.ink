@@ -1,5 +1,14 @@
 // Nitwit Dialogue
 
+/*
+
+Camera 0 = Default auto
+Camera 1 = Power up overlook + questions
+Camera 2 = Look up at building
+
+*/
+
+
 VAR FirstIneractionN = false
 VAR PickItUp = false
 VAR NitInteract = false

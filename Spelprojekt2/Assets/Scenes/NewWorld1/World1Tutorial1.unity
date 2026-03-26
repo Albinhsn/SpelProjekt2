@@ -1888,7 +1888,7 @@ GameObject:
   - component: {fileID: 669611135}
   - component: {fileID: 669611136}
   m_Layer: 0
-  m_Name: DefaultCameraAuto
+  m_Name: DefaultCameraAuto0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10539,6 +10539,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 1.3631205e-15
       objectReference: {fileID: 0}
+    - target: {fileID: 1440513644264162290, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: m_Name
+      value: Camera2
+      objectReference: {fileID: 0}
     - target: {fileID: 1488653320125143975, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 10.364781
@@ -10815,10 +10819,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 8.216364e-16
       objectReference: {fileID: 0}
-    - target: {fileID: 5758640654968372889, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 19ffe528f8ca79040a0920dc4972a544, type: 2}
     - target: {fileID: 5779205823194181909, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -10919,6 +10919,22 @@ PrefabInstance:
       propertyPath: m_inkData
       value: 
       objectReference: {fileID: 4900000, guid: 8106ede6c86166645b9f9207398e7a84, type: 3}
+    - target: {fileID: 6951545452067181089, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: m_cameraOverrides.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6951545452067181089, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_cameraOverrides.Array.data[0]'
+      value: 
+      objectReference: {fileID: 669611136}
+    - target: {fileID: 6951545452067181089, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_cameraOverrides.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1890668008}
+    - target: {fileID: 6951545452067181089, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: 'm_cameraOverrides.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1890668005}
     - target: {fileID: 7013361032378293473, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -36.933315
@@ -11031,6 +11047,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 14efacc3f2e662743963fc73a6ee7220, type: 2}
+    - target: {fileID: 8158287449651384306, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
+      propertyPath: m_Name
+      value: DefaultCamera1
+      objectReference: {fileID: 0}
     - target: {fileID: 8197504989994443954, guid: 38daf59c085bf7b419f7de9d50953d4c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -4.293056
