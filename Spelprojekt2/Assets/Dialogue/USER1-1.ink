@@ -1,3 +1,9 @@
+VAR Interacted = false
+
+{Interacted: ->triggered | ->trigger}
+
+= trigger
+~Interacted = true
 Alea. #speaker=??? #camera=0 #transition=0
 * [> Inquire: Stranger]
     Is it you, USER? #speaker=Alea
@@ -8,3 +14,6 @@ Alea. #speaker=??? #camera=0 #transition=0
     What does that even mean? USER? #speaker=Alea
     <i>How am I meant to understand anything if you're so damn cryptic?</i> #camera=1 #transition=0
 -> END
+= triggered
+    Stop pushing me... # speaker=Button
+    -> END
