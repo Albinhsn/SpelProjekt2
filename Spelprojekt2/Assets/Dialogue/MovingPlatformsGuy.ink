@@ -15,8 +15,7 @@ Ey, you there lad or lassy. Can't tell. # speaker=Unknown #camera=0 #anim=isTalk
 I've been looking at those platforms ova' there # speaker=Disgruntled Citizen #camera=1 #transition=0
 and for the darndest long time I have not figured them out. 
 They keep going out of sync, if I had a way to maybe stop one or two I coulda scuttled on over.
-But no dice! Aye, I'm too old for this. # speaker=Old Disgruntled Citizen #camera=0 #transition=0
-#anim=isTalking:bool=false;
+But no dice! Aye, I'm too old for this. # speaker=Old Disgruntled Citizen #camera=0 #transition=0 #anim=isTalking:bool=false;
 -> DONE
 = think2
 ->questionM
@@ -41,6 +40,6 @@ Whatchu botherin’ an old localite for? # speaker=Old Disgruntled Citizen #came
         ***[> Adjusting Auditory Perception]
         ->questionM
 *[> Proceed]
-    Platforms, platforms and platforms... #speaker=Old Disgruntled Citizen #anim=isTalking:bool=true;
-    #anim=isTalking:bool=false;
+    Platforms, platforms and platforms... #speaker=Old Disgruntled Citizen #anim=isTalking:bool=false;
+   
 -> DONE
